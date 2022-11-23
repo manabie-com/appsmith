@@ -87,6 +87,10 @@ import static com.appsmith.server.constants.EnvVariables.APPSMITH_RECAPTCHA_SITE
 import static com.appsmith.server.constants.EnvVariables.APPSMITH_REPLY_TO;
 import static com.appsmith.server.constants.EnvVariables.APPSMITH_SIGNUP_ALLOWED_DOMAINS;
 import static com.appsmith.server.constants.EnvVariables.APPSMITH_SIGNUP_DISABLED;
+import static com.appsmith.server.constants.EnvVariables.MANABIE_MASTERMGMT_API_URL;
+import static com.appsmith.server.constants.EnvVariables.MANABIE_MASTERMGMT_API_AUTH_KEY;
+import static com.appsmith.server.constants.EnvVariables.MANABIE_MASTERMGMT_API_AUTH_VALUE;
+
 import static java.lang.Boolean.TRUE;
 
 @Slf4j
@@ -440,6 +444,17 @@ public class EnvManagerCEImpl implements EnvManagerCE {
 
                     if (changesCopy.containsKey(APPSMITH_DISABLE_TELEMETRY.name())) {
                         commonConfig.setTelemetryDisabled("true".equals(changesCopy.remove(APPSMITH_DISABLE_TELEMETRY.name())));
+                    }
+
+                    if (changesCopy.containsKey(MANABIE_MASTERMGMT_API_URL.name())) {
+                        commonConfig.setMastermgmtAPIUrl(changesCopy.remove(MANABIE_MASTERMGMT_API_URL.name()));
+                    }
+
+                    if (changesCopy.containsKey(MANABIE_MASTERMGMT_API_AUTH_KEY.name())) {
+                        commonConfig.setMastermgmtAPIUrl(changesCopy.remove(MANABIE_MASTERMGMT_API_AUTH_KEY.name()));
+                    }
+                    if (changesCopy.containsKey(MANABIE_MASTERMGMT_API_AUTH_VALUE.name())) {
+                        commonConfig.setMastermgmtAPIUrl(changesCopy.remove(MANABIE_MASTERMGMT_API_AUTH_VALUE.name()));
                     }
 
                     return dependentTasks.thenReturn(new EnvChangesResponseDTO(true));

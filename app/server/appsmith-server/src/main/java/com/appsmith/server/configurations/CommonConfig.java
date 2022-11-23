@@ -63,6 +63,15 @@ public class CommonConfig {
     @Value("${disable.telemetry:true}")
     private boolean isTelemetryDisabled;
 
+    @Value("${manabie.api.mastermgmt.url}")
+    private String mastermgmtAPIUrl;
+
+    @Value("${manabie.api.mastermgmt.auth_key}")
+    private String mastermgmtAPIAuthKey;
+
+    @Value("${manabie.api.mastermgmt.auth_value}")
+    private String mastermgmtAPIAuthValue;
+
     @Value("${appsmith.rts.url:http://localhost:8091}")
     private String rtsBaseDomain;
     private List<String> allowedDomains;

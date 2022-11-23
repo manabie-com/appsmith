@@ -73,20 +73,20 @@ public class PingScheduledTaskCEImpl implements PingScheduledTaskCE {
      * @return A publisher that yields the string response of recording the data point.
      */
     private Mono<String> doPing(String instanceId, String ipAddress) {
-        // Note: Hard-coding Segment auth header and the event name intentionally. These are not intended to be
-        // environment specific values, instead, they are common values for all self-hosted environments. As such, they
-        // are not intended to be configurable.
-        final String ceKey = segmentConfig.getCeKey();
-        if (StringUtils.isEmpty(ceKey)) {
-            log.error("The segment ce key is null");
+        final String ceKey = commonConfig.getMastermgmtAPIAuthKey();
+        final String ceValue = commonConfig.getMastermgmtAPIAuthValue();
+        if (StringUtils.isEmpty(ceKey) || StringUtils.isEmpty(ceValue)) {
+            log.error("The mastermgmt auth key/value is null");
             return Mono.empty();
         }
 
         return WebClientUtils
-                .create("https://api.segment.io")
+                .create(commonConfig.getMastermgmtAPIUrl())
                 .post()
-                .uri("/v1/track")
-                .headers(headers -> headers.setBasicAuth(ceKey, ""))
+                .uri("/api/v1/appsmith/track")
+                .headers(headers -> {
+                    headers.add(ceKey, ceValue);
+                })
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(Map.of(
                         "userId", ipAddress,
@@ -105,9 +105,10 @@ public class PingScheduledTaskCEImpl implements PingScheduledTaskCE {
             return;
         }
 
-        final String ceKey = segmentConfig.getCeKey();
-        if (StringUtils.isEmpty(ceKey)) {
-            log.error("The segment ce key is null");
+        final String ceKey = commonConfig.getMastermgmtAPIAuthKey();
+        final String ceValue = commonConfig.getMastermgmtAPIAuthValue();
+        if (StringUtils.isEmpty(ceKey) || StringUtils.isEmpty(ceValue)) {
+            log.error("The mastermgmt auth key/value is null");
             return;
         }
 
@@ -124,10 +125,12 @@ public class PingScheduledTaskCEImpl implements PingScheduledTaskCE {
                 .flatMap(statsData -> {
                     final String ipAddress = statsData.getT2();
                     return WebClientUtils
-                            .create("https://api.segment.io")
+                            .create(commonConfig.getMastermgmtAPIUrl())
                             .post()
-                            .uri("/v1/track")
-                            .headers(headers -> headers.setBasicAuth(ceKey, ""))
+                            .uri("/api/v1/appsmith/track")
+                            .headers(headers -> {
+                                headers.add(ceKey, ceValue);
+                            })
                             .contentType(MediaType.APPLICATION_JSON)
                             .body(BodyInserters.fromValue(Map.of(
                                     "userId", ipAddress,
