@@ -226,6 +226,9 @@ export const DropdownContainer = styled.div<{
       }};
     }
   }
+  & .bp3-control-group {
+    min-height: 40px;
+  }
 `;
 
 export const MenuItem = styled.div<{

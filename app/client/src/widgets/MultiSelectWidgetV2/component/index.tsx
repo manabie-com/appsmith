@@ -319,7 +319,7 @@ function MultiSelectComponent({
         <Select
           animation="slide-up"
           choiceTransitionName="rc-select-selection__choice-zoom"
-          className="rc-select"
+          className="rc-select rc-select-custom"
           // TODO: Make Autofocus a variable in the property pane
           // autoFocus
           defaultActiveFirstOption={false}

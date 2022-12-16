@@ -379,6 +379,7 @@ ${({ dropDownWidth, id }) => `
     .bp3-control.bp3-checkbox {
       margin-bottom: 0;
     }
+    display: none;
   }
 }
 `;
@@ -401,7 +402,9 @@ export const MultiSelectContainer = styled.div<{
       }};
     }
   }
-
+  .rc-select-custom{
+    min-height: 40px;
+  }
   .rc-select {
     display: inline-block;
     font-size: 12px;
