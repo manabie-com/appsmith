@@ -327,7 +327,7 @@ function JSDependencies() {
       isDefaultExpanded={isOpen}
       isSticky
       name="Libraries"
-      showAddButton={canCreateActions && featureFlags?.CUSTOM_JS_LIBRARY}
+      showAddButton={canCreateActions} // && featureFlags?.CUSTOM_JS_LIBRARY}
       step={0}
     >
       {dependencyList}
