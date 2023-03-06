@@ -32,6 +32,9 @@ public class FeatureFlagServiceCEImpl implements FeatureFlagServiceCE {
         if (featureEnum == null) {
             return false;
         }
+        if (featureEnum == FeatureFlagEnum.CUSTOM_JS_LIBRARY) {
+            return true;
+        }
         return check(featureEnum.toString(), user);
     }
 
