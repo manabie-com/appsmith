@@ -45,7 +45,7 @@ public class FeatureFlagServiceCEImpl implements FeatureFlagServiceCE {
     }
 
     private Boolean check(String featureName, User user) {
-        if (featureName.equals(FeatureFlagEnum.CUSTOM_JS_LIBRARY.name())) {
+        if (featureName.equals(FeatureFlagEnum.CUSTOM_JS_LIBRARY.toString())) {
             return true;
         }
         return ff4j.check(featureName, new FlippingExecutionContext(Map.of(FieldName.USER, user)));
