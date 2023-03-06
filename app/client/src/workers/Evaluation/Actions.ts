@@ -309,7 +309,6 @@ export const DATA_TREE_FUNCTIONS: Record<
 
 export const enhanceDataTreeWithFunctions = (
   dataTree: Readonly<DataTree>,
-  requestId = "",
   // Whether not to add functions like "run", "clear" to entity
   skipEntityFunctions = false,
   eventType?: EventType,
@@ -333,7 +332,6 @@ export const enhanceDataTreeWithFunctions = (
               pusher.bind(
                 {
                   TRIGGER_COLLECTOR: self.TRIGGER_COLLECTOR,
-                  REQUEST_ID: requestId,
                   EVENT_TYPE: eventType,
                 },
                 func,
@@ -348,7 +346,6 @@ export const enhanceDataTreeWithFunctions = (
         pusher.bind(
           {
             TRIGGER_COLLECTOR: self.TRIGGER_COLLECTOR,
-            REQUEST_ID: requestId,
           },
           funcOrFuncCreator,
         ),
@@ -376,7 +373,6 @@ export const enhanceDataTreeWithFunctions = (
 export const pusher = function(
   this: {
     TRIGGER_COLLECTOR: ActionDescription[];
-    REQUEST_ID: string;
     EVENT_TYPE?: EventType;
   },
   action: ActionDispatcherWithExecutionType,
@@ -392,6 +388,6 @@ export const pusher = function(
   if (executionType && executionType === ExecutionType.TRIGGER) {
     this.TRIGGER_COLLECTOR.push(actionPayload);
   } else {
-    return promisifyAction(this.REQUEST_ID, actionPayload, this.EVENT_TYPE);
+    return promisifyAction(actionPayload, this.EVENT_TYPE);
   }
 };

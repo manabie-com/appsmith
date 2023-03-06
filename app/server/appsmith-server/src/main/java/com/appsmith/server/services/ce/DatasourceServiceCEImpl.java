@@ -7,6 +7,7 @@ import com.appsmith.external.models.Datasource;
 import com.appsmith.external.models.DatasourceConfiguration;
 import com.appsmith.external.models.DatasourceTestResult;
 import com.appsmith.external.models.Endpoint;
+import com.appsmith.external.models.MustacheBindingToken;
 import com.appsmith.external.models.Policy;
 import com.appsmith.external.models.QDatasource;
 import com.appsmith.external.plugins.PluginExecutor;
@@ -145,7 +146,7 @@ public class DatasourceServiceCEImpl extends BaseService<DatasourceRepository, D
     private Mono<Datasource> generateAndSetDatasourcePolicies(Mono<User> userMono, Datasource datasource) {
         return userMono
                 .flatMap(user -> {
-                    Mono<Workspace> workspaceMono = workspaceService.findById(datasource.getWorkspaceId(), workspacePermission.getDatasourceEditPermission())
+                    Mono<Workspace> workspaceMono = workspaceService.findById(datasource.getWorkspaceId(), workspacePermission.getDatasourceCreatePermission())
                             .switchIfEmpty(Mono.error(new AppsmithException(AppsmithError.NO_RESOURCE_FOUND, FieldName.WORKSPACE, datasource.getWorkspaceId())));
 
                     return workspaceMono.map(workspace -> {
@@ -333,7 +334,8 @@ public class DatasourceServiceCEImpl extends BaseService<DatasourceRepository, D
                                 savedDatasource.setPluginName(unsavedDatasource.getPluginName());
                                 return savedDatasource;
                             });
-                });
+                })
+                .flatMap(repository::setUserPermissionsInObject);
     }
 
     /**
@@ -399,7 +401,7 @@ public class DatasourceServiceCEImpl extends BaseService<DatasourceRepository, D
     }
 
     @Override
-    public Set<String> extractKeysFromDatasource(Datasource datasource) {
+    public Set<MustacheBindingToken> extractKeysFromDatasource(Datasource datasource) {
         if (datasource == null || datasource.getDatasourceConfiguration() == null) {
             return new HashSet<>();
         }

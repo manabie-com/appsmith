@@ -64,7 +64,7 @@ type SelectProps = BaseCellComponentProps & {
   autoOpen: boolean;
   columnType: string;
   borderRadius: string;
-  options: DropdownOption[];
+  options?: DropdownOption[];
   onFilterChange: (
     text: string,
     rowIndex: number,
@@ -126,17 +126,17 @@ export const SelectCell = (props: SelectProps) => {
     fontStyle,
     hasUnsavedChanges,
     horizontalAlignment,
+    isCellDisabled,
     isCellEditable,
     isCellEditMode,
-    isCellDisabled,
     isCellVisible,
     isEditable,
     isFilterable = false,
     isHidden,
     isNewRow,
     onFilterChange,
-    onItemSelect,
     onFilterChangeActionString,
+    onItemSelect,
     onOptionSelectActionString,
     options = [],
     placeholderText,
@@ -190,7 +190,8 @@ export const SelectCell = (props: SelectProps) => {
 
   const onClick = useCallback((e) => e.stopPropagation(), []);
 
-  const selectedIndex = options
+  const selectedIndex = (Array.isArray(options) ? options : [])
+    .filter((d: DropdownOption) => d)
     .map((d: DropdownOption) => d.value)
     .indexOf(value);
 

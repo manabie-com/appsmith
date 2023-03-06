@@ -125,3 +125,6 @@ input:-webkit-autofill {
   background-color: white !important;
 }
 
+.bp3-overlay-zindex {
+  z-index: 20 !important;
+}

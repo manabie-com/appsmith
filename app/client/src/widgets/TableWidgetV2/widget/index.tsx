@@ -647,7 +647,7 @@ class TableWidgetV2 extends BaseWidget<TableProps, WidgetState> {
         this.props.filteredTableData,
       );
 
-      this.resetWidgetDefault();
+      this.props.updateWidgetMetaProperty("triggeredRowIndex", -1);
 
       const newColumnIds: string[] = getAllTableColumnKeys(
         this.props.tableData,
@@ -662,6 +662,8 @@ class TableWidgetV2 extends BaseWidget<TableProps, WidgetState> {
         if (newTableColumns) {
           this.updateColumnProperties(newTableColumns);
         }
+
+        this.props.updateWidgetMetaProperty("filters", defaultFilter);
       }
     }
 
@@ -762,24 +764,6 @@ class TableWidgetV2 extends BaseWidget<TableProps, WidgetState> {
         this.props.updateWidgetMetaProperty("selectedRowIndices", []);
       }
     }
-  };
-
-  /*
-   *  Function to reset filter and triggeredRowIndex when
-   *  component props change
-   */
-  resetWidgetDefault = () => {
-    const defaultFilter = [
-      {
-        column: "",
-        operator: OperatorTypes.OR,
-        value: "",
-        condition: "",
-      },
-    ];
-
-    this.props.updateWidgetMetaProperty("filters", defaultFilter);
-    this.props.updateWidgetMetaProperty("triggeredRowIndex", -1);
   };
 
   /*
@@ -1594,7 +1578,7 @@ class TableWidgetV2 extends BaseWidget<TableProps, WidgetState> {
             onFilterChangeActionString={column.onFilterUpdate}
             onItemSelect={this.onOptionSelect}
             onOptionSelectActionString={column.onOptionChange}
-            options={column.selectOptions}
+            options={cellProperties.selectOptions}
             placeholderText={cellProperties.placeholderText}
             resetFilterTextOnClose={cellProperties.resetFilterTextOnClose}
             rowIndex={rowIndex}

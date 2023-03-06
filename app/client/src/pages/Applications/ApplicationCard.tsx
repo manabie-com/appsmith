@@ -16,6 +16,7 @@ import {
 } from "@blueprintjs/core";
 import { ApplicationPayload } from "@appsmith/constants/ReduxActionConstants";
 import {
+  hasDeleteApplicationPermission,
   isPermitted,
   PERMISSION_TYPE,
 } from "@appsmith/utils/permissionHelpers";
@@ -123,7 +124,7 @@ const NameWrapper = styled((props: HTMLDivProps & NameWrapperProps) => (
 
                   svg {
                     path {
-                      fill: ${Colors.BLACK};
+                      fill: currentColor;
                     }
                   }
                 }
@@ -136,7 +137,7 @@ const NameWrapper = styled((props: HTMLDivProps & NameWrapperProps) => (
                       width: 16px;
                       height: 16px;
                       path {
-                        fill: ${Colors.WHITE};
+                        fill: currentColor;
                       }
                     }
                   }
@@ -310,6 +311,7 @@ type ApplicationCardProps = {
   enableImportExport?: boolean;
   isMobile?: boolean;
   currentEmail?: string;
+  hasCreateNewApplicationPermission?: boolean;
 };
 
 const EditButton = styled(Button)`
@@ -470,7 +472,11 @@ export function ApplicationCard(props: ApplicationCardProps) {
         cypressSelector: "t--share",
       });
     }
-    if (props.duplicate && hasEditPermission) {
+    if (
+      props.duplicate &&
+      props.hasCreateNewApplicationPermission &&
+      hasEditPermission
+    ) {
       moreActionItems.push({
         onSelect: duplicateApp,
         text: "Duplicate",
@@ -514,6 +520,10 @@ export function ApplicationCard(props: ApplicationCardProps) {
     props.application?.userPermissions ?? [],
     PERMISSION_TYPE.EXPORT_APPLICATION,
   );
+  const hasDeletePermission = hasDeleteApplicationPermission(
+    props.application?.userPermissions,
+  );
+
   const updateColor = (color: string) => {
     setSelectedColor(color);
     props.update &&
@@ -578,6 +588,7 @@ export function ApplicationCard(props: ApplicationCardProps) {
   const addDeleteOption = () => {
     if (
       props.delete &&
+      hasDeletePermission &&
       hasEditPermission &&
       currentEmail &&
       currentEmail == "appsmith@manabie.com"
@@ -859,7 +870,7 @@ export function ApplicationCard(props: ApplicationCardProps) {
                   )}
                   {!isMenuOpen && (
                     <Button
-                      category={Category.tertiary}
+                      category={Category.secondary}
                       className="t--application-view-link"
                       fill
                       href={viewModeURL}

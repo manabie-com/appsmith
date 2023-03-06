@@ -8,3 +8,9 @@ export enum InputTypes {
   COLOR = "COLOR",
   TEXTAREA = "TEXTAREA",
 }
+
+export enum NumberInputStepButtonPosition {
+  LEFT = "left",
+  RIGHT = "right",
+  NONE = "none",
+}
