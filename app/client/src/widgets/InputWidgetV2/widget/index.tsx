@@ -1,5 +1,5 @@
 import React from "react";
-import { WidgetState } from "widgets/BaseWidget";
+import { WidgetProps, WidgetState } from "widgets/BaseWidget";
 import { WidgetType } from "constants/WidgetConstants";
 import InputComponent, { InputComponentProps } from "../component";
 import { EventType } from "constants/AppsmithActionConstants/ActionConstants";
@@ -23,9 +23,14 @@ import { isNil, isNumber, merge, toString } from "lodash";
 import derivedProperties from "./parsedDerivedProperties";
 import { BaseInputWidgetProps } from "widgets/BaseInputWidget/widget";
 import { mergeWidgetConfig } from "utils/helpers";
-import { InputTypes } from "widgets/BaseInputWidget/constants";
+import {
+  InputTypes,
+  NumberInputStepButtonPosition,
+} from "widgets/BaseInputWidget/constants";
 import { getParsedText } from "./Utilities";
 import { Stylesheet } from "entities/AppTheming";
+import { checkInputTypeTextByProps } from "widgets/BaseInputWidget/utils";
+import { DynamicHeight } from "utils/WidgetFeatures";
 import { AppState } from "ce/reducers";
 import { connect } from "react-redux";
 import { LanguageEnums } from "entities/App";
@@ -36,9 +41,15 @@ export function defaultValueValidation(
   props: InputWidgetProps,
   _?: any,
 ): ValidationResponse {
-  const STRING_ERROR_MESSAGE = "This value must be string";
-  const NUMBER_ERROR_MESSAGE = "This value must be number";
-  const EMPTY_ERROR_MESSAGE = "";
+  const STRING_ERROR_MESSAGE = {
+    name: "TypeError",
+    message: "This value must be string",
+  };
+  const NUMBER_ERROR_MESSAGE = {
+    name: "TypeError",
+    message: "This value must be number",
+  };
+  const EMPTY_ERROR_MESSAGE = { name: "", message: "" };
   if (_.isObject(value)) {
     return {
       isValid: false,
@@ -86,6 +97,7 @@ export function defaultValueValidation(
         messages,
       };
     case "TEXT":
+    case "MULTI_LINE_TEXT":
     case "PASSWORD":
     case "EMAIL":
     case "COLOR":
@@ -124,25 +136,45 @@ export function minValueValidation(min: any, props: InputWidgetProps, _?: any) {
     return {
       isValid: true,
       parsed: undefined,
-      messages: [""],
+      messages: [
+        {
+          name: "",
+          message: "",
+        },
+      ],
     };
   } else if (!Number.isFinite(min)) {
     return {
       isValid: false,
       parsed: undefined,
-      messages: ["This value must be number"],
+      messages: [
+        {
+          name: "TypeError",
+          message: "This value must be number",
+        },
+      ],
     };
   } else if (max !== undefined && min >= max) {
     return {
       isValid: false,
       parsed: undefined,
-      messages: ["This value must be lesser than max value"],
+      messages: [
+        {
+          name: "RangeError",
+          message: "This value must be lesser than max value",
+        },
+      ],
     };
   } else {
     return {
       isValid: true,
       parsed: Number(min),
-      messages: [""],
+      messages: [
+        {
+          name: "",
+          message: "",
+        },
+      ],
     };
   }
 }
@@ -156,35 +188,75 @@ export function maxValueValidation(max: any, props: InputWidgetProps, _?: any) {
     return {
       isValid: true,
       parsed: undefined,
-      messages: [""],
+      messages: [
+        {
+          name: "",
+          message: "",
+        },
+      ],
     };
   } else if (!Number.isFinite(max)) {
     return {
       isValid: false,
       parsed: undefined,
-      messages: ["This value must be number"],
+      messages: [
+        {
+          name: "TypeError",
+          message: "This value must be number",
+        },
+      ],
     };
   } else if (min !== undefined && max <= min) {
     return {
       isValid: false,
       parsed: undefined,
-      messages: ["This value must be greater than min value"],
+      messages: [
+        {
+          name: "RangeError",
+          message: "This value must be greater than min value",
+        },
+      ],
     };
   } else {
     return {
       isValid: true,
       parsed: Number(max),
-      messages: [""],
+      messages: [
+        {
+          name: "",
+          message: "",
+        },
+      ],
     };
   }
 }
 
-interface InputProps extends InputWidgetProps {
-  lang?: LanguageEnums;
+function InputTypeUpdateHook(
+  props: WidgetProps,
+  propertyName: string,
+  propertyValue: unknown,
+) {
+  const updates = [
+    {
+      propertyPath: propertyName,
+      propertyValue: propertyValue,
+    },
+  ];
+
+  if (propertyValue === InputTypes.MULTI_LINE_TEXT) {
+    if (props.dynamicHeight === DynamicHeight.FIXED) {
+      updates.push({
+        propertyPath: "dynamicHeight",
+        propertyValue: DynamicHeight.AUTO_HEIGHT,
+      });
+    }
+  }
+
+  return updates;
 }
 
-class InputWidget extends BaseInputWidget<InputProps, WidgetState> {
-  static defaultProps: Partial<InputProps> | undefined;
+class InputWidget extends BaseInputWidget<InputWidgetProps, WidgetState> {
+  static defaultProps: Partial<InputWidgetProps> | undefined;
 
   static getPropertyPaneContentConfig() {
     return mergeWidgetConfig(
@@ -199,8 +271,12 @@ class InputWidget extends BaseInputWidget<InputProps, WidgetState> {
               controlType: "DROP_DOWN",
               options: [
                 {
-                  label: "Text",
+                  label: "Single-line text",
                   value: "TEXT",
+                },
+                {
+                  label: "Multi-line text",
+                  value: "MULTI_LINE_TEXT",
                 },
                 {
                   label: "Number",
@@ -218,13 +294,11 @@ class InputWidget extends BaseInputWidget<InputProps, WidgetState> {
                   label: "Color",
                   value: "COLOR",
                 },
-                {
-                  label: "Textarea",
-                  value: "TEXTAREA",
-                },
               ],
               isBindProperty: false,
               isTriggerProperty: false,
+              updateHook: InputTypeUpdateHook,
+              dependencies: ["dynamicHeight"],
             },
             {
               helpText:
@@ -280,10 +354,7 @@ class InputWidget extends BaseInputWidget<InputProps, WidgetState> {
                 params: { min: 1, natural: true, passThroughOnZero: false },
               },
               hidden: (props: InputWidgetProps) => {
-                return (
-                  props.inputType !== InputTypes.TEXT &&
-                  props.inputType !== InputTypes.TEXTAREA
-                );
+                return !checkInputTypeTextByProps(props);
               },
               dependencies: ["inputType"],
             },
@@ -362,6 +433,8 @@ class InputWidget extends BaseInputWidget<InputProps, WidgetState> {
                   allowedValues: ICON_NAMES,
                 },
               },
+              hidden: (props: InputWidgetProps) =>
+                props.inputType === InputTypes.MULTI_LINE_TEXT,
             },
             {
               propertyName: "iconAlign",
@@ -382,7 +455,9 @@ class InputWidget extends BaseInputWidget<InputProps, WidgetState> {
               isBindProperty: false,
               isTriggerProperty: false,
               validation: { type: ValidationTypes.TEXT },
-              hidden: (props: InputWidgetProps) => !props.iconName,
+              hidden: (props: InputWidgetProps) =>
+                props.inputType === InputTypes.MULTI_LINE_TEXT ||
+                !props.iconName,
               dependencies: ["iconName"],
             },
           ],
@@ -421,6 +496,24 @@ class InputWidget extends BaseInputWidget<InputProps, WidgetState> {
   }
 
   handleFocusChange = (focusState: boolean) => {
+    if (focusState) {
+      this.props.updateWidgetMetaProperty("isFocused", focusState, {
+        triggerPropertyName: "onFocus",
+        dynamicString: this.props.onFocus,
+        event: {
+          type: EventType.ON_FOCUS,
+        },
+      });
+    }
+    if (!focusState) {
+      this.props.updateWidgetMetaProperty("isFocused", focusState, {
+        triggerPropertyName: "onBlur",
+        dynamicString: this.props.onBlur,
+        event: {
+          type: EventType.ON_BLUR,
+        },
+      });
+    }
     super.handleFocusChange(focusState);
   };
 
@@ -518,11 +611,7 @@ class InputWidget extends BaseInputWidget<InputProps, WidgetState> {
       conditionalProps.minNum = this.props.minNum;
     }
 
-    if (
-      (this.props.inputType === InputTypes.TEXT ||
-        this.props.inputType === InputTypes.TEXTAREA) &&
-      this.props.maxChars
-    ) {
+    if (checkInputTypeTextByProps(this.props) && this.props.maxChars) {
       // pass maxChars only for Text type inputs, undefined for other types
       conditionalProps.maxChars = this.props.maxChars;
       if (
@@ -566,6 +655,16 @@ class InputWidget extends BaseInputWidget<InputProps, WidgetState> {
         );
       }
     }
+
+    if (
+      this.props.inputType === InputTypes.NUMBER &&
+      this.props.showStepArrows
+    ) {
+      conditionalProps.buttonPosition = NumberInputStepButtonPosition.RIGHT;
+    } else {
+      conditionalProps.buttonPosition = NumberInputStepButtonPosition.NONE;
+    }
+
     return (
       <InputComponent
         accentColor={this.props.accentColor}
@@ -590,24 +689,21 @@ class InputWidget extends BaseInputWidget<InputProps, WidgetState> {
         isInvalid={isInvalid}
         isLoading={this.props.isLoading}
         label={this.props.label}
-        translationJp={this.props.translationJp}
         labelAlignment={this.props.labelAlignment}
         labelPosition={this.props.labelPosition}
         labelStyle={this.props.labelStyle}
         labelTextColor={this.props.labelTextColor}
         labelTextSize={this.props.labelTextSize}
         labelWidth={this.getLabelWidth()}
-        multiline={this.props.inputType === InputTypes.TEXTAREA}
+        multiline={this.props.inputType === InputTypes.MULTI_LINE_TEXT}
         onFocusChange={this.handleFocusChange}
         onKeyDown={this.handleKeyDown}
         onValueChange={this.onValueChange}
         placeholder={this.props.placeholderText}
-        placeholderJp={this.props.placeholderJp}
         showError={!!this.props.isFocused}
         spellCheck={!!this.props.isSpellCheck}
         stepSize={1}
         tooltip={this.props.tooltip}
-        tooltipJp={this.props.tooltipJp}
         value={value}
         widgetId={this.props.widgetId}
         {...conditionalProps}
@@ -627,6 +723,7 @@ export interface InputWidgetProps extends BaseInputWidgetProps {
   maxNum?: number;
   minNum?: number;
   inputText: string;
+  lang?: LanguageEnums; // @Author: Bao Tran
 }
 
 const mapStateToProps = (state: AppState) => {

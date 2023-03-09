@@ -4,9 +4,10 @@ import {
   PropertyPaneSectionConfig,
 } from "constants/PropertyControlConstants";
 import { ValidationTypes } from "constants/WidgetValidation";
+import { memoize } from "lodash";
 import log from "loglevel";
 import { generateReactKey } from "./generators";
-import { WidgetType } from "./WidgetFactory";
+import WidgetFactory, { WidgetType } from "./WidgetFactory";
 import {
   PropertyPaneConfigTemplates,
   RegisteredWidgetFeatures,
@@ -17,6 +18,88 @@ import {
 export enum PropertyPaneConfigTypes {
   STYLE = "STYLE",
   CONTENT = "CONTENT",
+}
+
+export function addSearchConfigToPanelConfig(
+  config: readonly PropertyPaneConfig[],
+) {
+  return config.map((configItem) => {
+    if ((configItem as PropertyPaneSectionConfig).sectionName) {
+      const sectionConfig = {
+        ...configItem,
+      };
+      if (configItem.children) {
+        sectionConfig.children = addSearchConfigToPanelConfig(
+          configItem.children,
+        );
+      }
+      return sectionConfig;
+    } else if ((configItem as PropertyPaneControlConfig).controlType) {
+      const controlConfig = configItem as PropertyPaneControlConfig;
+      if (controlConfig.panelConfig) {
+        return {
+          ...controlConfig,
+          panelConfig: {
+            ...controlConfig.panelConfig,
+            searchConfig: generatePropertyPaneSearchConfig(
+              controlConfig.panelConfig?.contentChildren ?? [],
+              controlConfig.panelConfig?.styleChildren ?? [],
+            ),
+          },
+        };
+      }
+      return controlConfig;
+    }
+    return configItem;
+  });
+}
+
+function addSearchSpecificPropertiesToConfig(
+  config: readonly PropertyPaneConfig[],
+  tag: string,
+): PropertyPaneConfig[] {
+  return config.map((configItem) => {
+    if ((configItem as PropertyPaneSectionConfig).sectionName) {
+      const sectionConfig = {
+        ...configItem,
+        collapsible: false,
+        tag,
+      };
+      if (configItem.children) {
+        sectionConfig.children = addSearchSpecificPropertiesToConfig(
+          configItem.children,
+          tag,
+        );
+      }
+      return sectionConfig;
+    } else if ((configItem as PropertyPaneControlConfig).controlType) {
+      const controlConfig = configItem as PropertyPaneControlConfig;
+      if (controlConfig.panelConfig) {
+        return {
+          ...controlConfig,
+          panelConfig: {
+            ...controlConfig.panelConfig,
+            searchConfig: generatePropertyPaneSearchConfig(
+              controlConfig.panelConfig?.contentChildren ?? [],
+              controlConfig.panelConfig?.styleChildren ?? [],
+            ),
+          },
+        };
+      }
+      return controlConfig;
+    }
+    return configItem;
+  });
+}
+
+export function generatePropertyPaneSearchConfig(
+  contentConfig: readonly PropertyPaneConfig[],
+  styleConfig: readonly PropertyPaneConfig[],
+) {
+  return [
+    ...addSearchSpecificPropertiesToConfig(contentConfig, "CONTENT"),
+    ...addSearchSpecificPropertiesToConfig(styleConfig, "STYLE"),
+  ];
 }
 
 /* This function recursively parses the property pane configuration and
@@ -35,14 +118,15 @@ export const addPropertyConfigIds = (config: PropertyPaneConfig[]) => {
       );
     }
     const config = sectionOrControlConfig as PropertyPaneControlConfig;
-    if (
-      config.panelConfig &&
-      config.panelConfig.children &&
-      Array.isArray(config.panelConfig.children)
-    ) {
-      config.panelConfig.children = addPropertyConfigIds(
-        config.panelConfig.children,
-      );
+    if (config.panelConfig) {
+      if (
+        config.panelConfig.children &&
+        Array.isArray(config.panelConfig.children)
+      ) {
+        config.panelConfig.children = addPropertyConfigIds(
+          config.panelConfig.children,
+        );
+      }
 
       if (
         config.panelConfig.contentChildren &&
@@ -82,6 +166,7 @@ export function enhancePropertyPaneConfig(
   // Enhance property pane with widget features
   // TODO(abhinav): The following "configType" check should come
   // from the features themselves.
+
   if (
     features &&
     (configType === undefined || configType === PropertyPaneConfigTypes.CONTENT)
@@ -188,3 +273,9 @@ export function convertFunctionsToString(config: PropertyPaneConfig[]) {
     return sectionOrControlConfig;
   });
 }
+
+export const checkIsDropTarget = memoize(function isDropTarget(
+  type: WidgetType,
+) {
+  return !!WidgetFactory.widgetConfigMap.get(type)?.isCanvas;
+});

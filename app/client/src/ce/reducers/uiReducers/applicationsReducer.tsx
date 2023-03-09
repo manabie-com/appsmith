@@ -13,10 +13,15 @@ import {
   createMessage,
   ERROR_MESSAGE_CREATE_APPLICATION,
 } from "@appsmith/constants/messages";
-import { UpdateApplicationRequest } from "api/ApplicationApi";
+import {
+  AppEmbedSetting,
+  PageDefaultMeta,
+  UpdateApplicationRequest,
+} from "api/ApplicationApi";
 import { CreateApplicationFormValues } from "pages/Applications/helpers";
 import { AppLayoutConfig } from "reducers/entityReducers/pageListReducer";
 import { ConnectToGitResponse } from "actions/gitSyncActions";
+import { AppIconName } from "design-system-old";
 
 export const initialState: ApplicationsReduxState = {
   isFetchingApplications: false,
@@ -127,7 +132,9 @@ export const handlers = {
     action: ReduxAction<{ applicationList: ApplicationPayload[] }>,
   ) => ({
     ...state,
-    currentApplication: action.payload,
+    currentApplication: {
+      ...action.payload,
+    },
     isFetchingApplication: false,
   }),
   [ReduxActionTypes.CURRENT_APPLICATION_NAME_UPDATE]: (
@@ -139,6 +146,16 @@ export const handlers = {
       ...state.currentApplication,
       name: action.payload.name,
       slug: action.payload.slug,
+    },
+  }),
+  [ReduxActionTypes.CURRENT_APPLICATION_ICON_UPDATE]: (
+    state: ApplicationsReduxState,
+    action: ReduxAction<AppIconName>,
+  ) => ({
+    ...state,
+    currentApplication: {
+      ...state.currentApplication,
+      icon: action.payload,
     },
   }),
   [ReduxActionTypes.CURRENT_APPLICATION_LAYOUT_UPDATE]: (
@@ -494,6 +511,18 @@ export const handlers = {
       applicationList: [...state.applicationList, action.payload],
     };
   },
+  [ReduxActionTypes.CURRENT_APPLICATION_EMBED_SETTING_UPDATE]: (
+    state: ApplicationsReduxState,
+    action: ReduxAction<AppEmbedSetting>,
+  ) => {
+    return {
+      ...state,
+      currentApplication: {
+        ...state.currentApplication,
+        embedSetting: action.payload,
+      },
+    };
+  },
 };
 
 const applicationsReducer = createReducer(initialState, handlers);
@@ -533,7 +562,7 @@ export interface Application {
   appIsExample: boolean;
   new: boolean;
   defaultPageId: string;
-  pages: Array<{ id: string; isDefault: boolean; default: boolean }>;
+  pages: PageDefaultMeta[];
   userPermissions: string[];
 }
 

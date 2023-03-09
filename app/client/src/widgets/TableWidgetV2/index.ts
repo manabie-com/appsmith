@@ -1,11 +1,14 @@
 import { Colors } from "constants/Colors";
+import { FILL_WIDGET_MIN_WIDTH } from "constants/minWidthConstants";
 import { cloneDeep, set } from "lodash";
 import {
   combineDynamicBindings,
   getDynamicBindings,
 } from "utils/DynamicBindingUtils";
+import { getDefaultResponsiveBehavior } from "utils/layoutPropertiesUtils";
 import { WidgetProps } from "widgets/BaseWidget";
 import { BlueprintOperationTypes } from "widgets/constants";
+import { StickyType } from "./component/Constants";
 import { InlineEditingSaveOptions } from "./constants";
 import IconSVG from "./icon.svg";
 import Widget from "./widget";
@@ -16,8 +19,13 @@ export const CONFIG = {
   name: "Table",
   iconSVG: IconSVG,
   needsMeta: true,
+  needsHeightForContent: true,
   defaults: {
+    responsiveBehavior: getDefaultResponsiveBehavior(Widget.getWidgetType()),
+    minWidth: FILL_WIDGET_MIN_WIDTH,
     rows: 28,
+    canFreezeColumn: true,
+    columnUpdatedAt: Date.now(),
     columns: 34,
     animateLoading: true,
     defaultSelectedRowIndex: 0,
@@ -77,6 +85,7 @@ export const CONFIG = {
         computedValue: `{{Table1.processedTableData.map((currentRow, currentIndex) => ( currentRow["step"]))}}`,
         translationJp: "",
         validation: {},
+        sticky: StickyType.NONE,
       },
       task: {
         index: 1,
@@ -98,6 +107,7 @@ export const CONFIG = {
         computedValue: `{{Table1.processedTableData.map((currentRow, currentIndex) => ( currentRow["task"]))}}`,
         translationJp: "",
         validation: {},
+        sticky: StickyType.NONE,
       },
       status: {
         index: 2,
@@ -119,6 +129,7 @@ export const CONFIG = {
         computedValue: `{{Table1.processedTableData.map((currentRow, currentIndex) => ( currentRow["status"]))}}`,
         translationJp: "",
         validation: {},
+        sticky: StickyType.NONE,
       },
       action: {
         index: 3,
@@ -143,6 +154,7 @@ export const CONFIG = {
         computedValue: `{{Table1.processedTableData.map((currentRow, currentIndex) => ( currentRow["action"]))}}`,
         translationJp: "",
         validation: {},
+        sticky: StickyType.NONE,
       },
     },
     tableData: [
@@ -167,8 +179,8 @@ export const CONFIG = {
     ],
     columnWidthMap: {
       task: 245,
-      step: 62,
-      status: 75,
+      step: 70,
+      status: 85,
     },
     columnOrder: ["step", "task", "status", "action"],
     blueprint: {

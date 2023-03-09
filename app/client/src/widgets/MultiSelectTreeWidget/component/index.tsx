@@ -23,7 +23,7 @@ import styled from "styled-components";
 import { RenderMode, TextSize } from "constants/WidgetConstants";
 import { Alignment, Button, Classes, InputGroup } from "@blueprintjs/core";
 import { labelMargin, WidgetContainerDiff } from "widgets/WidgetUtils";
-import { Icon } from "design-system";
+import { Icon } from "design-system-old";
 import { Colors } from "constants/Colors";
 import { LabelPosition } from "components/constants";
 import useDropdown from "widgets/useDropdown";
@@ -38,6 +38,8 @@ export interface TreeSelectProps
   > {
   value?: DefaultValueType;
   onChange: (value?: DefaultValueType, labelList?: ReactNode[]) => void;
+  onDropdownOpen?: () => void;
+  onDropdownClose?: () => void;
   expandAll: boolean;
   mode: CheckedStrategy;
   labelText: string;
@@ -47,6 +49,7 @@ export interface TreeSelectProps
   labelTextColor?: string;
   labelTextSize?: TextSize;
   labelStyle?: string;
+  labelTooltip?: string;
   compactMode: boolean;
   dropDownWidth: number;
   width: number;
@@ -121,10 +124,13 @@ function MultiTreeSelectComponent({
   labelText,
   labelTextColor,
   labelTextSize,
+  labelTooltip,
   labelWidth,
   loading,
   mode,
   onChange,
+  onDropdownClose,
+  onDropdownOpen,
   options,
   placeholder,
   renderMode,
@@ -151,6 +157,8 @@ function MultiTreeSelectComponent({
   } = useDropdown({
     inputRef,
     renderMode,
+    onDropdownClose,
+    onDropdownOpen,
   });
 
   // treeDefaultExpandAll is uncontrolled after first render,
@@ -242,9 +250,11 @@ function MultiTreeSelectComponent({
           className={`multitree-select-label`}
           color={labelTextColor}
           compact={compactMode}
+          cyHelpTextClassName="multitree-select-tooltip"
           disabled={disabled}
           fontSize={labelTextSize}
           fontStyle={labelStyle}
+          helpText={labelTooltip}
           isDynamicHeightEnabled={isDynamicHeightEnabled}
           loading={loading}
           position={labelPosition}

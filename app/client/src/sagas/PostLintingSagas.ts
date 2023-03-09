@@ -1,7 +1,3 @@
-import {
-  createMessage,
-  JS_OBJECT_BODY_INVALID,
-} from "@appsmith/constants/messages";
 import { ENTITY_TYPE, Severity } from "entities/AppsmithConsole";
 import LOG_TYPE from "entities/AppsmithConsole/logtype";
 import { DataTree } from "entities/DataTree/dataTreeFactory";
@@ -11,7 +7,7 @@ import AppsmithConsole from "utils/AppsmithConsole";
 import {
   getEntityNameAndPropertyPath,
   isJSAction,
-} from "workers/Evaluation/evaluationUtils";
+} from "@appsmith/workers/Evaluation/evaluationUtils";
 
 // We currently only log lint errors in JSObjects
 export function* logLatestLintPropertyErrors({
@@ -21,6 +17,9 @@ export function* logLatestLintPropertyErrors({
   errors: LintErrors;
   dataTree: DataTree;
 }) {
+  const errorsToAdd = [];
+  const errorsToRemove = [];
+
   for (const path of Object.keys(errors)) {
     const { entityName, propertyPath } = getEntityNameAndPropertyPath(path);
     const entity = dataTree[entityName];
@@ -33,24 +32,31 @@ export function* logLatestLintPropertyErrors({
     const lintErrorMessagesInPath = lintErrorsInPath.map((error) => ({
       type: error.errorType,
       message: error.errorMessage,
+      lineNumber: error.line,
     }));
     const debuggerKey = entity.actionId + propertyPath + "-lint";
 
     if (isEmpty(lintErrorsInPath)) {
-      AppsmithConsole.deleteError(debuggerKey);
+      errorsToRemove.push({ id: debuggerKey });
       continue;
     }
-    AppsmithConsole.addError({
-      id: debuggerKey,
-      logType: LOG_TYPE.LINT_ERROR,
-      text: createMessage(JS_OBJECT_BODY_INVALID),
-      messages: lintErrorMessagesInPath,
-      source: {
-        id: path,
-        name: entityName,
-        type: ENTITY_TYPE.JSACTION,
-        propertyPath,
+
+    errorsToAdd.push({
+      payload: {
+        id: debuggerKey,
+        logType: LOG_TYPE.LINT_ERROR,
+        text: "LINT ERROR",
+        messages: lintErrorMessagesInPath,
+        source: {
+          id: entity.actionId,
+          name: entityName,
+          type: ENTITY_TYPE.JSACTION,
+          propertyPath,
+        },
       },
     });
   }
+
+  AppsmithConsole.addErrors(errorsToAdd);
+  AppsmithConsole.deleteErrors(errorsToRemove);
 }

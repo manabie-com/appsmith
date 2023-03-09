@@ -186,7 +186,8 @@ const StyledButton = styled.button<ThemeProp & ButtonStyleProps>`
   padding: 0px 10px;
 
   &:hover,
-  &:active {
+  &:active,
+  &:focus {
     ${buttonHoverActiveStyles}
   }
 
@@ -272,7 +273,7 @@ const BaseMenuItem = styled(MenuItem)<ThemeProp & BaseStyleProps>`
     backgroundColor
       ? `
       background-color: ${backgroundColor} !important;
-      &:hover {
+      &:hover, &:focus {
         background-color: ${darkenHover(backgroundColor)} !important;
       }
       &:active {
@@ -281,7 +282,7 @@ const BaseMenuItem = styled(MenuItem)<ThemeProp & BaseStyleProps>`
   `
       : `
     background: none !important
-      &:hover {
+      &:hover, &:focus {
         background-color: ${tinycolor(
           theme.colors.button.primary.primary.textColor,
         )
@@ -354,25 +355,21 @@ function PopoverContent(props: PopoverContentProps) {
       textColor,
       translationJp,
     } = menuItem;
-    if (iconAlign === Alignment.RIGHT) {
-      return (
-        <BaseMenuItem
-          backgroundColor={backgroundColor}
-          disabled={isDisabled}
-          key={id}
-          labelElement={<Icon color={iconColor} icon={iconName} />}
-          onClick={() => onItemClicked(onClick, buttonId)}
-          text={translate(lang, label, translationJp)}
-          textColor={textColor}
-        />
-      );
-    }
     return (
       <BaseMenuItem
         backgroundColor={backgroundColor}
         disabled={isDisabled}
-        icon={<Icon color={iconColor} icon={iconName} />}
+        icon={
+          iconAlign !== Alignment.RIGHT && iconName ? (
+            <Icon color={iconColor} icon={iconName} />
+          ) : null
+        }
         key={id}
+        labelElement={
+          iconAlign === Alignment.RIGHT && iconName ? (
+            <Icon color={iconColor} icon={iconName} />
+          ) : null
+        }
         onClick={() => onItemClicked(onClick, buttonId)}
         text={translate(lang, label, translationJp)}
         textColor={textColor}
@@ -406,6 +403,7 @@ class ButtonGroupComponent extends React.Component<
       };
     });
 
+    // @ts-expect-error: setTimeout return type mismatch
     this.timer = setTimeout(() => {
       this.setState(() => {
         return {

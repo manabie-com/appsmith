@@ -38,8 +38,11 @@ export function defaultValueValidation(
   props: PhoneInputWidgetProps,
   _?: any,
 ): ValidationResponse {
-  const STRING_ERROR_MESSAGE = "This value must be string";
-  const EMPTY_ERROR_MESSAGE = "";
+  const STRING_ERROR_MESSAGE = {
+    name: "TypeError",
+    message: "This value must be string",
+  };
+  const EMPTY_ERROR_MESSAGE = { name: "", message: "" };
   if (_.isObject(value)) {
     return {
       isValid: false,
@@ -298,6 +301,24 @@ class PhoneInputWidget extends BaseInputWidget<
   };
 
   handleFocusChange = (focusState: boolean) => {
+    if (focusState) {
+      this.props.updateWidgetMetaProperty("isFocused", focusState, {
+        triggerPropertyName: "onFocus",
+        dynamicString: this.props.onFocus,
+        event: {
+          type: EventType.ON_FOCUS,
+        },
+      });
+    }
+    if (!focusState) {
+      this.props.updateWidgetMetaProperty("isFocused", focusState, {
+        triggerPropertyName: "onBlur",
+        dynamicString: this.props.onBlur,
+        event: {
+          type: EventType.ON_BLUR,
+        },
+      });
+    }
     super.handleFocusChange(focusState);
   };
 

@@ -6,15 +6,17 @@ import * as Sentry from "@sentry/react";
 import _, { toString } from "lodash";
 import BaseControl, { ControlProps } from "./BaseControl";
 import { StyledPropertyPaneButton } from "./StyledControls";
-import styled from "constants/DefaultTheme";
+import styled from "styled-components";
 import { Indices } from "constants/Layers";
-import { DroppableComponent } from "./DraggableListComponent";
-import { Size, Category } from "design-system";
+import { Size, Category } from "design-system-old";
 import EmptyDataState from "components/utils/EmptyDataState";
 import EvaluatedValuePopup from "components/editorComponents/CodeEditor/EvaluatedValuePopup";
 import { EditorTheme } from "components/editorComponents/CodeEditor/EditorConfig";
 import { CodeEditorExpected } from "components/editorComponents/CodeEditor";
-import { ColumnProperties } from "widgets/TableWidgetV2/component/Constants";
+import {
+  ColumnProperties,
+  StickyType,
+} from "widgets/TableWidgetV2/component/Constants";
 import {
   createColumn,
   isColumnTypeEditable,
@@ -31,9 +33,10 @@ import {
   isDynamicValue,
 } from "utils/DynamicBindingUtils";
 import { DraggableListCard } from "components/propertyControls/DraggableListCard";
-import { Checkbox, CheckboxType } from "design-system";
+import { Checkbox, CheckboxType } from "design-system-old";
 import { ColumnTypes } from "widgets/TableWidgetV2/constants";
 import { Colors } from "constants/Colors";
+import { DraggableListControl } from "pages/Editor/PropertyPane/DraggableListControl";
 
 const TabsWrapper = styled.div`
   width: 100%;
@@ -124,18 +127,29 @@ class PrimaryColumnsControlV2 extends BaseControl<ControlProps, State> {
       hasScrollableList: false,
     };
   }
-
   componentDidMount() {
     this.checkAndUpdateIfEditableColumnPresent();
   }
 
   componentDidUpdate(prevProps: ControlProps): void {
-    //on adding a new column last column should get focused
+    /**
+     * On adding a new column the last column should get focused.
+     * If frozen columns are present then the focus should be on the newly added column
+     */
     if (
       Object.keys(prevProps.propertyValue).length + 1 ===
       Object.keys(this.props.propertyValue).length
     ) {
-      this.updateFocus(Object.keys(this.props.propertyValue).length - 1, true);
+      const columns = Object.keys(this.props.propertyValue);
+
+      const frozenColumnIndex = Object.keys(prevProps.propertyValue)
+        .map((column) => prevProps.propertyValue[column])
+        .filter((column) => column.sticky !== StickyType.RIGHT).length;
+
+      this.updateFocus(
+        frozenColumnIndex === 0 ? columns.length - 1 : frozenColumnIndex,
+        true,
+      );
       this.checkAndUpdateIfEditableColumnPresent();
     }
 
@@ -189,6 +203,9 @@ class PrimaryColumnsControlV2 extends BaseControl<ControlProps, State> {
             isColumnTypeEditable(column.columnType) && column.isEditable,
           isCheckboxDisabled:
             !isColumnTypeEditable(column.columnType) || column.isDerived,
+          isDragDisabled:
+            column.sticky === StickyType.LEFT ||
+            column.sticky === StickyType.RIGHT,
         };
       },
     );
@@ -224,15 +241,17 @@ class PrimaryColumnsControlV2 extends BaseControl<ControlProps, State> {
         </div>
         <TabsWrapper>
           <EvaluatedValuePopupWrapper {...this.props} isFocused={isFocused}>
-            <DroppableComponent
+            <DraggableListControl
               className={LIST_CLASSNAME}
               deleteOption={this.deleteOption}
               fixedHeight={370}
               focusedIndex={this.state.focusedIndex}
               itemHeight={45}
               items={draggableComponentColumns}
+              keyAccessor="id"
               onEdit={this.onEdit}
-              renderComponent={(props) =>
+              propertyPath={this.props.dataTreePath}
+              renderComponent={(props: any) =>
                 DraggableListCard({
                   ...props,
                   showCheckbox: true,
@@ -248,7 +267,7 @@ class PrimaryColumnsControlV2 extends BaseControl<ControlProps, State> {
           </EvaluatedValuePopupWrapper>
 
           <AddColumnButton
-            category={Category.tertiary}
+            category={Category.secondary}
             className="t--add-column-btn"
             icon="plus"
             onClick={this.addNewColumn}

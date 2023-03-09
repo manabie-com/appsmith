@@ -1,9 +1,20 @@
 import CodeMirror from "codemirror";
 import { isMacOrIOS } from "utils/helpers";
+import { EditorModes } from "../EditorConfig";
 
 export const getCodeCommentKeyMap = () => {
   return isMacOrIOS() ? "Cmd-/" : "Ctrl-/";
 };
+
+export function getLineCommentString(mode: EditorModes) {
+  switch (mode) {
+    case EditorModes.SQL:
+    case EditorModes.SQL_WITH_BINDING:
+      return "--";
+    default:
+      return "//";
+  }
+}
 
 // Most of the code below is copied from https://github.com/codemirror/codemirror5/blob/master/addon/comment/comment.js
 // with minor modifications to support commenting in JS fields with {{ }} syntax
@@ -34,6 +45,7 @@ function getEndLineForLineUncomment(
 }
 
 const JS_FIELD_BEGIN = "{{";
+const JS_FIELD_END = "}}";
 
 const nonWhitespace = /[^\s\u00a0]/;
 
@@ -42,8 +54,13 @@ const noOptions: CodeMirror.CommentOptions = {};
 /**
  * Gives index of the first non whitespace character in the line
  **/
-function firstNonWhitespace(str: string) {
-  const found = str.search(nonWhitespace);
+function firstNonWhitespace(str: string, mode: EditorModes) {
+  const found = str.search(
+    [EditorModes.JAVASCRIPT, EditorModes.TEXT_WITH_BINDING].includes(mode) &&
+      str.includes(JS_FIELD_BEGIN)
+      ? JS_FIELD_BEGIN
+      : nonWhitespace,
+  );
   return found === -1 ? 0 : found;
 }
 
@@ -59,13 +76,6 @@ function probablyInsideString(
   );
 }
 
-function getMode(cm: CodeMirror.Editor, pos: CodeMirror.Position) {
-  const mode = cm.getMode();
-  return mode.useInnerComments === false || !mode.innerMode
-    ? mode
-    : cm.getModeAt(pos);
-}
-
 function performLineCommenting(
   // this is a fake parameter to specify type for this
   // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-0.html#specifying-the-type-of-this-for-functions
@@ -76,11 +86,17 @@ function performLineCommenting(
 ) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const self: CodeMirror.Editor = this as any;
-  const mode = getMode(self, from);
+  const mode = self.getMode();
   const firstLine = self.getLine(from.line);
   if (firstLine === null || probablyInsideString(self, from, firstLine)) return;
 
-  const commentString = options.lineComment || mode.lineComment;
+  // When mode is TEXT, the name is null string, we skip commenting
+  const commentString =
+    mode.name === EditorModes.TEXT_WITH_BINDING &&
+    !(firstLine.includes(JS_FIELD_BEGIN) || firstLine.includes(JS_FIELD_END))
+      ? ""
+      : options.lineComment || mode.lineComment;
+
   if (!commentString) {
     if (options.blockCommentStart || mode.blockCommentStart) {
       options.fullLines = true;
@@ -101,7 +117,17 @@ function performLineCommenting(
         const baseString =
           line.search(nonWhitespace) === -1
             ? line
-            : line.slice(0, firstNonWhitespace(line));
+            : line.slice(
+                0,
+                firstNonWhitespace(
+                  line,
+                  // When there is JS bindings inside SQL, the mode is JAVASCRIPT instead of SQL
+                  // we need to explicitly check if the SQL comment string is passed, make the mode SQL
+                  commentString === getLineCommentString(EditorModes.SQL)
+                    ? EditorModes.SQL
+                    : (mode.name as EditorModes),
+                ),
+              );
 
         const offset = (baseString || "").length;
 
@@ -153,7 +179,7 @@ function performLineUncommenting(
 ) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const self = this;
-  const mode = getMode(self, from);
+  const mode = self.getMode();
   const end = getEndLineForLineUncomment(from, to, self);
   const start = Math.min(from.line, end);
 
@@ -172,7 +198,7 @@ function performLineUncommenting(
       if (
         found > -1 &&
         // Handle JS fields with {{}}
-        !line.trim().startsWith(JS_FIELD_BEGIN) &&
+        !line.trim().includes(JS_FIELD_BEGIN) &&
         nonWhitespace.test(line.slice(0, found))
       )
         break lineComment;
@@ -290,7 +316,9 @@ function performLineUncommenting(
 }
 
 /** This function handles commenting which includes functions copied from comment add on with modifications */
-export const handleCodeComment = (cm: CodeMirror.Editor) => {
+export const handleCodeComment = (lineCommentingString: string) => (
+  cm: CodeMirror.Editor,
+) => {
   cm.lineComment = performLineCommenting;
 
   cm.uncomment = performLineUncommenting;
@@ -300,7 +328,7 @@ export const handleCodeComment = (cm: CodeMirror.Editor) => {
     commentBlankLines: true,
     // Always provide the line comment, otherwise it'll not work for JS fields when
     // the mode is set to text/plain (when whole text wrapped in {{}} is selected)
-    lineComment: "//",
+    lineComment: lineCommentingString,
     indent: true,
   });
 };

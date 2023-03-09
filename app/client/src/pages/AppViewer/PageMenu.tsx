@@ -27,6 +27,9 @@ import {
   INVITE_USERS_MESSAGE,
   INVITE_USERS_PLACEHOLDER,
 } from "@appsmith/constants/messages";
+import { getAppsmithConfigs } from "@appsmith/configs";
+
+const { cloudHosting } = getAppsmithConfigs();
 
 type AppViewerHeaderProps = {
   isOpen?: boolean;
@@ -114,8 +117,11 @@ export function PageMenu(props: AppViewerHeaderProps) {
                 bgColor: "transparent",
               }}
               isOpen={showAppInviteUsersDialog}
-              message={createMessage(INVITE_USERS_MESSAGE)}
-              placeholder={createMessage(INVITE_USERS_PLACEHOLDER)}
+              message={createMessage(INVITE_USERS_MESSAGE, cloudHosting)}
+              placeholder={createMessage(
+                INVITE_USERS_PLACEHOLDER,
+                cloudHosting,
+              )}
               title={application.name}
               trigger={
                 <Button
@@ -132,7 +138,9 @@ export function PageMenu(props: AppViewerHeaderProps) {
               workspaceId={workspaceID}
             />
           )}
-          <PrimaryCTA className="t--back-to-editor--mobile" url={props.url} />
+          {isOpen && (
+            <PrimaryCTA className="t--back-to-editor--mobile" url={props.url} />
+          )}
         </div>
       </div>
     </>

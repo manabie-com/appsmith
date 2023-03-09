@@ -1,7 +1,7 @@
 package com.appsmith.server.services.ce;
 
 import com.appsmith.external.constants.AnalyticsEvents;
-import com.appsmith.external.converters.GsonISOStringToInstantConverter;
+import com.appsmith.external.converters.ISOStringToInstantConverter;
 import com.appsmith.server.configurations.CloudServicesConfig;
 import com.appsmith.server.constants.FieldName;
 import com.appsmith.server.domains.Application;
@@ -183,7 +183,7 @@ public class ApplicationTemplateServiceCEImpl implements ApplicationTemplateServ
                 .bodyToMono(String.class)
                 .map(jsonString -> {
                     Gson gson = new GsonBuilder()
-                            .registerTypeAdapter(Instant.class, new GsonISOStringToInstantConverter())
+                            .registerTypeAdapter(Instant.class, new ISOStringToInstantConverter())
                             .create();
                     Type fileType = new TypeToken<ApplicationJson>() {
                     }.getType();
@@ -284,9 +284,25 @@ public class ApplicationTemplateServiceCEImpl implements ApplicationTemplateServ
                 .flatMap(application -> importExportApplicationService.getApplicationImportDTO(
                         application.getId(), application.getWorkspaceId(), application)
                 )
-                .map(applicationImportDTO -> {
+                .flatMap(applicationImportDTO -> {
                     responseUtils.updateApplicationWithDefaultResources(applicationImportDTO.getApplication());
-                    return applicationImportDTO;
+                    Application application = applicationImportDTO.getApplication();
+                    ApplicationTemplate applicationTemplate = new ApplicationTemplate();
+                    applicationTemplate.setId(templateId);
+                    final Map<String, Object> eventData = Map.of(
+                            FieldName.APP_MODE, ApplicationMode.EDIT.toString(),
+                            FieldName.APPLICATION, application
+                    );
+
+                    final Map<String, Object> data = Map.of(
+                            FieldName.APPLICATION_ID, application.getId(),
+                            FieldName.WORKSPACE_ID, application.getWorkspaceId(),
+                            FieldName.TEMPLATE_APPLICATION_NAME, application.getName(),
+                            FieldName.EVENT_DATA, eventData
+                    );
+
+                    return analyticsService.sendObjectEvent(AnalyticsEvents.FORK, applicationTemplate, data)
+                            .thenReturn(applicationImportDTO);
                 });
 
         return Mono.create(sink -> importedApplicationMono

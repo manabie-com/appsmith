@@ -65,6 +65,8 @@ export interface TableWidgetProps
   enableClientSideSearch?: boolean;
   hiddenColumns?: string[];
   columnOrder?: string[];
+  frozenColumnIndices: Record<string, number>;
+  canFreezeColumn?: boolean;
   columnNameMap?: { [key: string]: string };
   columnTypeMap?: {
     [key: string]: { type: string; format: string; inputFormat?: string };
@@ -114,6 +116,8 @@ export const DEFAULT_COLUMN_WIDTH = 150;
 
 export const COLUMN_MIN_WIDTH = 60;
 
+export const TABLE_COLUMN_ORDER_KEY = "tableWidgetColumnOrder";
+
 export enum ColumnTypes {
   TEXT = "text",
   URL = "url",
@@ -147,6 +151,16 @@ export const ActionColumnTypes = [
   ColumnTypes.ICON_BUTTON,
   ColumnTypes.MENU_BUTTON,
   ColumnTypes.EDIT_ACTIONS,
+];
+
+export const FilterableColumnTypes = [
+  ColumnTypes.TEXT,
+  ColumnTypes.URL,
+  ColumnTypes.NUMBER,
+  ColumnTypes.DATE,
+  ColumnTypes.SELECT,
+  ColumnTypes.CHECKBOX,
+  ColumnTypes.SWITCH,
 ];
 
 export const DEFAULT_BUTTON_COLOR = "rgb(3, 179, 101)";
@@ -200,3 +214,5 @@ export const defaultEditableCell = {
   value: "",
   initialValue: "",
 };
+
+export const DEFAULT_COLUMN_NAME = "Table Column";

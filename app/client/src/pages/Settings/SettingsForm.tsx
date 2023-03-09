@@ -29,7 +29,7 @@ import {
   DISCONNECT_SERVICE_WARNING,
   MANDATORY_FIELDS_ERROR,
 } from "@appsmith/constants/messages";
-import { Toaster, Variant } from "design-system";
+import { Toaster, Variant } from "design-system-old";
 import {
   connectedMethods,
   saveAllowed,
@@ -133,7 +133,11 @@ export function SettingsForm(
     }
     _.forEach(props.settingsConfig, (value, settingName) => {
       const setting = AdminConfig.settingsMap[settingName];
-      if (setting && setting.controlType == SettingTypes.TOGGLE) {
+      if (
+        setting &&
+        (setting.controlType == SettingTypes.TOGGLE ||
+          setting.controlType == SettingTypes.CHECKBOX)
+      ) {
         const settingsStr = props.settingsConfig[settingName].toString();
         if (settingName.toLowerCase().includes("enable")) {
           props.settingsConfig[settingName] =

@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { fetchApplication } from "actions/applicationActions";
-import { setAppMode, updateAppPersistentStore } from "actions/pageActions";
+import { setAppMode, updateAppStore } from "actions/pageActions";
 import {
   ApplicationPayload,
   ReduxActionErrorTypes,
@@ -16,16 +17,13 @@ import history from "utils/history";
 import URLRedirect from "entities/URLRedirect/index";
 import URLGeneratorFactory from "entities/URLRedirect/factory";
 import { updateBranchLocally } from "actions/gitSyncActions";
+import { getCurrentGitBranch } from "selectors/gitSyncSelectors";
 import getQueryParamsObject from "utils/getQueryParamsObject";
 import { POST_MESSAGE_TYPE } from "@appsmith/constants/ApiConstants";
 import {
   executeActionTriggers,
   TriggerMeta,
-} from "sagas/ActionExecution/ActionExecutionSagas";
-import {
-  ActionDescription,
-  ActionTriggerType,
-} from "entities/DataTree/actionTriggers";
+} from "ce/sagas/ActionExecution/ActionExecutionSagas";
 import uniqueId from "lodash/uniqueId";
 import { EventType } from "constants/AppsmithActionConstants/ActionConstants";
 import { Channel, channel } from "redux-saga";
@@ -37,6 +35,8 @@ import {
   orgList,
   initNewConfigWithOrganization,
 } from "ce/variants/config";
+import { StoreValueActionDescription } from "@appsmith/entities/DataTree/actionTriggers";
+import { handleStoreOperations } from "sagas/ActionExecution/StoreActionSaga";
 
 export type AppEnginePayload = {
   applicationId?: string;
@@ -103,8 +103,13 @@ export default abstract class AppEngine {
     if (!apiCalls)
       throw new PageNotFoundError(`Cannot find page with id: ${pageId}`);
     const application: ApplicationPayload = yield select(getCurrentApplication);
+    const currentGitBranch: ReturnType<typeof getCurrentGitBranch> = yield select(
+      getCurrentGitBranch,
+    );
     yield put(
-      updateAppPersistentStore(getPersistentAppStore(application.id, branch)),
+      updateAppStore(
+        getPersistentAppStore(application.id, branch || currentGitBranch),
+      ),
     );
     const toLoadPageId: string = pageId || (yield select(getDefaultPageId));
     this._urlRedirect = URLGeneratorFactory.create(
@@ -188,24 +193,18 @@ function* storeConfig(channel: Channel<ConfigChannelPayload>) {
     while (true) {
       const payload: ConfigChannelPayload = yield take(channel);
       const { config, eventType, triggerMeta } = payload;
-      yield all(
-        Object.keys(config).map((x) =>
-          call(
-            executeActionTriggers,
-            {
-              type: ActionTriggerType.STORE_VALUE,
-              payload: {
-                key: x,
-                persist: true,
-                uniqueActionRequestId: uniqueId("store_value_id_"),
-                value: config[x as keyof EndpointGroups],
-              },
-            } as ActionDescription,
-            eventType,
-            triggerMeta,
-          ),
-        ),
-      );
+      const items = Object.keys(config).map((x) => {
+        return {
+          type: "STORE_VALUE",
+          payload: {
+            key: x,
+            persist: true,
+            uniqueActionRequestId: uniqueId("store_value_id_"),
+            value: config[x as keyof EndpointGroups],
+          },
+        } as StoreValueActionDescription;
+      });
+      yield call(handleStoreOperations, items);
     }
   } finally {
     channel.close();
@@ -228,20 +227,17 @@ function* messageChannelHandler(channel: Channel<MessageChannelPayload>) {
             "*",
           );
         } else {
-          yield call(
-            executeActionTriggers,
+          yield call(handleStoreOperations, [
             {
-              type: ActionTriggerType.STORE_VALUE,
+              type: "STORE_VALUE",
               payload: {
                 key: key,
                 persist: true,
                 uniqueActionRequestId: uniqueId("store_value_id_"),
                 value: data[key],
               },
-            } as ActionDescription,
-            eventType,
-            triggerMeta,
-          );
+            } as StoreValueActionDescription,
+          ]);
         }
       }
     }

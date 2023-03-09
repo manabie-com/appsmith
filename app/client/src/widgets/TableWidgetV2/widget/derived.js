@@ -178,7 +178,6 @@ export default {
   getOrderedTableColumns: (props, moment, _) => {
     let columns = [];
     let existingColumns = props.primaryColumns || {};
-
     /*
      * Assign index based on the columnOrder
      */

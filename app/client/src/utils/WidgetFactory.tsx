@@ -1,19 +1,21 @@
-import { WidgetBuilder, WidgetProps, WidgetState } from "widgets/BaseWidget";
-import React from "react";
 import { PropertyPaneConfig } from "constants/PropertyControlConstants";
+import React from "react";
+import { WidgetBuilder, WidgetProps, WidgetState } from "widgets/BaseWidget";
 
-import { WidgetConfigProps } from "reducers/entityReducers/widgetConfigReducer";
 import { RenderMode } from "constants/WidgetConstants";
+import { Stylesheet } from "entities/AppTheming";
 import * as log from "loglevel";
-import { WidgetFeatures } from "./WidgetFeatures";
+import { WidgetConfigProps } from "reducers/entityReducers/widgetConfigReducer";
+import { CanvasWidgetStructure } from "widgets/constants";
 import {
   addPropertyConfigIds,
+  addSearchConfigToPanelConfig,
   convertFunctionsToString,
   enhancePropertyPaneConfig,
+  generatePropertyPaneSearchConfig,
   PropertyPaneConfigTypes,
 } from "./WidgetFactoryHelpers";
-import { CanvasWidgetStructure } from "widgets/constants";
-import { Stylesheet } from "entities/AppTheming";
+import { WidgetFeatures } from "./WidgetFeatures";
 
 type WidgetDerivedPropertyType = any;
 export type DerivedPropertiesMap = Record<string, string>;
@@ -50,6 +52,11 @@ class WidgetFactory {
     readonly PropertyPaneConfig[]
   > = new Map();
   static propertyPaneStyleConfigsMap: Map<
+    WidgetType,
+    readonly PropertyPaneConfig[]
+  > = new Map();
+  // used to store the properties that appear in the search results
+  static propertyPaneSearchConfigsMap: Map<
     WidgetType,
     readonly PropertyPaneConfig[]
   > = new Map();
@@ -125,8 +132,12 @@ class WidgetFactory {
           enhancedPropertyPaneConfig,
         );
 
-        const finalPropertyPaneConfig = addPropertyConfigIds(
+        const propertyPaneConfigWithIds = addPropertyConfigIds(
           serializablePropertyPaneConfig,
+        );
+
+        const finalPropertyPaneConfig = addSearchConfigToPanelConfig(
+          propertyPaneConfigWithIds,
         );
 
         this.propertyPaneContentConfigsMap.set(
@@ -146,8 +157,12 @@ class WidgetFactory {
           enhancedPropertyPaneConfig,
         );
 
-        const finalPropertyPaneConfig = addPropertyConfigIds(
+        const propertyPaneConfigWithIds = addPropertyConfigIds(
           serializablePropertyPaneConfig,
+        );
+
+        const finalPropertyPaneConfig = addSearchConfigToPanelConfig(
+          propertyPaneConfigWithIds,
         );
 
         this.propertyPaneStyleConfigsMap.set(
@@ -155,6 +170,14 @@ class WidgetFactory {
           Object.freeze(finalPropertyPaneConfig),
         );
       }
+
+      this.propertyPaneSearchConfigsMap.set(
+        widgetType,
+        generatePropertyPaneSearchConfig(
+          WidgetFactory.getWidgetPropertyPaneContentConfig(widgetType),
+          WidgetFactory.getWidgetPropertyPaneStyleConfig(widgetType),
+        ),
+      );
     }
   }
 
@@ -269,6 +292,16 @@ class WidgetFactory {
     type: WidgetType,
   ): readonly PropertyPaneConfig[] {
     const map = this.propertyPaneStyleConfigsMap.get(type);
+    if (!map) {
+      return [];
+    }
+    return map;
+  }
+
+  static getWidgetPropertyPaneSearchConfig(
+    type: WidgetType,
+  ): readonly PropertyPaneConfig[] {
+    const map = this.propertyPaneSearchConfigsMap.get(type);
     if (!map) {
       return [];
     }

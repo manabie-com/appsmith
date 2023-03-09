@@ -31,7 +31,7 @@ import {
   Category,
   FormGroup as StyledFormGroup,
   Size,
-} from "design-system";
+} from "design-system-old";
 import { roleOptions, useCaseOptions } from "./constants";
 
 const DetailsFormWrapper = styled.div`
@@ -141,7 +141,7 @@ export default function DetailsForm(
         )}
         <ButtonWrapper>
           <Button
-            category={Category.tertiary}
+            category={Category.secondary}
             className="t--welcome-form-next-button"
             disabled={props.invalid}
             onClick={props.onNext}

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled, { ThemeProvider } from "styled-components";
 import { useDispatch } from "react-redux";
 import { withRouter, RouteComponentProps } from "react-router";
@@ -12,15 +12,8 @@ import {
   getIsInitialized,
   getAppViewHeaderHeight,
 } from "selectors/appViewSelectors";
-import { executeTrigger } from "actions/widgetActions";
-import { ExecuteTriggerPayload } from "constants/AppsmithActionConstants/ActionConstants";
-import { EditorContext } from "components/editorComponents/EditorContextProvider";
+import EditorContextProvider from "components/editorComponents/EditorContextProvider";
 import AppViewerPageContainer from "./AppViewerPageContainer";
-import {
-  resetChildrenMetaProperty,
-  syncUpdateWidgetMetaProperty,
-  triggerEvalOnMetaUpdate,
-} from "actions/metaActions";
 import { editorInitializer } from "utils/editor/EditorUtils";
 import * as Sentry from "@sentry/react";
 import { getViewModePageList } from "selectors/editorSelectors";
@@ -29,10 +22,6 @@ import webfontloader from "webfontloader";
 import { getSearchQuery } from "utils/helpers";
 import { getSelectedAppTheme } from "selectors/appThemingSelectors";
 import { useSelector } from "react-redux";
-import {
-  BatchPropertyUpdatePayload,
-  batchUpdateWidgetProperty,
-} from "actions/controlActions";
 import {
   setAppViewHeaderHeight,
   setLanguageAction,
@@ -45,11 +34,7 @@ import { getIsBranchUpdated } from "../utils";
 import { APP_MODE, LanguageEnums } from "entities/App";
 import { initAppViewer } from "actions/initActions";
 import { WidgetGlobaStyles } from "globalStyles/WidgetGlobalStyles";
-
-import {
-  checkContainersForAutoHeightAction,
-  updateWidgetAutoHeightAction,
-} from "actions/autoHeightActions";
+import useWidgetFocus from "utils/hooks/useWidgetFocus/useWidgetFocus";
 
 const AppViewerBody = styled.section<{
   hasPages: boolean;
@@ -108,6 +93,8 @@ function AppViewer(props: Props) {
   useEffect(() => {
     dispatch(setLanguageAction({ lang }));
   }, [lang]);
+
+  const focusRef = useWidgetFocus();
 
   /**
    * initializes the widgets factory and registers all widgets
@@ -200,76 +187,9 @@ function AppViewer(props: Props) {
     };
   }, [selectedTheme.properties.fontFamily.appFont]);
 
-  /**
-   * callback for executing an action
-   */
-  const executeActionCallback = useCallback(
-    (actionPayload: ExecuteTriggerPayload) =>
-      dispatch(executeTrigger(actionPayload)),
-    [executeTrigger, dispatch],
-  );
-
-  /**
-   * callback for initializing app
-   */
-  const resetChildrenMetaPropertyCallback = useCallback(
-    (widgetId: string) => dispatch(resetChildrenMetaProperty(widgetId)),
-    [resetChildrenMetaProperty, dispatch],
-  );
-
-  /**
-   * callback for updating widget meta property in batch
-   */
-  const batchUpdateWidgetPropertyCallback = useCallback(
-    (widgetId: string, updates: BatchPropertyUpdatePayload) =>
-      dispatch(batchUpdateWidgetProperty(widgetId, updates)),
-    [batchUpdateWidgetProperty, dispatch],
-  );
-
-  /**
-   * callback for updating widget meta property
-   */
-  const syncUpdateWidgetMetaPropertyCallback = useCallback(
-    (widgetId: string, propertyName: string, propertyValue: unknown) =>
-      dispatch(
-        syncUpdateWidgetMetaProperty(widgetId, propertyName, propertyValue),
-      ),
-    [syncUpdateWidgetMetaProperty, dispatch],
-  );
-
-  /**
-   * callback for triggering evaluation
-   */
-  const triggerEvalOnMetaUpdateCallback = useCallback(
-    () => dispatch(triggerEvalOnMetaUpdate()),
-    [triggerEvalOnMetaUpdate, dispatch],
-  );
-
-  const updateWidgetAutoHeightCallback = useCallback(
-    (widgetId: string, height: number) => {
-      dispatch(updateWidgetAutoHeightAction(widgetId, height));
-    },
-    [updateWidgetAutoHeightAction, dispatch],
-  );
-
-  const checkContainersForAutoHeightCallback = useCallback(
-    () => dispatch(checkContainersForAutoHeightAction()),
-    [checkContainersForAutoHeightAction],
-  );
-
   return (
     <ThemeProvider theme={lightTheme}>
-      <EditorContext.Provider
-        value={{
-          executeAction: executeActionCallback,
-          resetChildrenMetaProperty: resetChildrenMetaPropertyCallback,
-          batchUpdateWidgetProperty: batchUpdateWidgetPropertyCallback,
-          syncUpdateWidgetMetaProperty: syncUpdateWidgetMetaPropertyCallback,
-          triggerEvalOnMetaUpdate: triggerEvalOnMetaUpdateCallback,
-          updateWidgetAutoHeight: updateWidgetAutoHeightCallback,
-          checkContainersForAutoHeight: checkContainersForAutoHeightCallback,
-        }}
-      >
+      <EditorContextProvider renderMode="PAGE">
         <WidgetGlobaStyles
           fontFamily={selectedTheme.properties.fontFamily.appFont}
           primaryColor={selectedTheme.properties.colors.primaryColor}
@@ -279,12 +199,13 @@ function AppViewer(props: Props) {
             className={CANVAS_SELECTOR}
             hasPages={pages.length > 1}
             headerHeight={headerHeight}
+            ref={focusRef}
             showGuidedTourMessage={showGuidedTourMessage}
           >
             {isInitialized && registered && <AppViewerPageContainer />}
           </AppViewerBody>
         </AppViewerBodyContainer>
-      </EditorContext.Provider>
+      </EditorContextProvider>
     </ThemeProvider>
   );
 }

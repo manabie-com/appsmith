@@ -20,7 +20,7 @@ import {
   GOOGLE_RECAPTCHA_DOMAIN_ERROR,
   createMessage,
 } from "@appsmith/constants/messages";
-import { Toaster, Variant } from "design-system";
+import { Toaster, Variant } from "design-system-old";
 
 import ReCAPTCHA from "react-google-recaptcha";
 import { Colors } from "constants/Colors";
@@ -75,25 +75,6 @@ const TooltipStyles = createGlobalStyle`
   }
 `;
 
-/*
-  Don't use buttonHoverActiveStyles in a nested function it won't work -
-
-  const buttonHoverActiveStyles = css ``
-
-  const Button = styled.button`
-  // won't work
-    ${({ buttonColor, theme }) => {
-      &:hover, &:active {
-        ${buttonHoverActiveStyles}
-      }
-    }}
-
-  // will work
-  &:hover, &:active {
-    ${buttonHoverActiveStyles}
-  }`
-*/
-
 const buttonBaseStyle = css<ThemeProp & ButtonStyleProps>`
 height: 100%;
 background-image: none !important;
@@ -102,7 +83,7 @@ outline: none;
 padding: 0px 10px;
 gap: 8px;
 
-&:hover, &:active {
+&:hover, &:active, &:focus {
   ${buttonHoverActiveStyles}
  }
 
@@ -418,6 +399,10 @@ function RecaptchaV3Component(
   );
 }
 
+const Wrapper = styled.div`
+  height: 100%;
+`;
+
 function BtnWrapper(
   props: {
     children: any;
@@ -429,14 +414,14 @@ function BtnWrapper(
 ) {
   if (!props.googleRecaptchaKey) {
     return (
-      <div
+      <Wrapper
         className={props.className}
         onClick={(e: React.MouseEvent<HTMLElement>) =>
           props.onClick && !props.isLoading && props.onClick(e)
         }
       >
         {props.children}
-      </div>
+      </Wrapper>
     );
   } else {
     const handleError = (

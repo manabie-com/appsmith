@@ -7,7 +7,7 @@ import {
   PaginationItemWrapper,
   CommonFunctionsMenuWrapper,
 } from "../../TableStyledWrappers";
-import { SearchComponent } from "design-system";
+import { SearchComponent } from "design-system-old";
 import TableFilters from "./filter";
 import {
   ReactTableColumnProps,
@@ -155,7 +155,9 @@ function Actions(props: ActionsPropsType) {
           />
         </SearchComponentWrapper>
       )}
-      {(props.isVisibleFilters || props.isVisibleDownload) && (
+      {(props.isVisibleFilters ||
+        props.isVisibleDownload ||
+        props.allowAddNewRow) && (
         <CommonFunctionsMenuWrapper tableSizes={props.tableSizes}>
           {props.isVisibleFilters && (
             <TableFilters

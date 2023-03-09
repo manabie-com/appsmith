@@ -22,13 +22,20 @@ if [[ ${1-} =~ ^-*h(elp)?$ ]]; then
 
         If neither of the above ar set, then we check if mkcert is available, and use https if yes, or http otherwise.
 
+--https-port: Port to use for https. Default: 443.
+ --http-port: Port to use for http. Default: 80.
+
+        If neither of the above are set, then we use 443 for https, and 80 for http.
+
 --env-file: Specify an alternate env file. Defaults to '.env' at the root of the project.
+--use-k8s: Use appsmith.local-green.manabie.io as backend
 
 A single positional argument can be given to set the backend server proxy address. Example:
 
 '"$0"' https://localhost:8080
 '"$0"' https://host.docker.internal:8080
-'"$0"' https://release.app.appsmith.com:8080
+'"$0"' https://release.app.appsmith.com
+'"$0"' release  # This is identical to the one above
 ' >&2
     exit
 fi
@@ -51,9 +58,21 @@ while [[ $# -gt 0 ]]; do
             use_https=0
             shift
             ;;
+        --https-port)
+            https_listen_port=$2
+            shift 2
+            ;;
+        --http-port)
+            http_listen_port=$2
+            shift 2
+            ;;
         --env-file)
             env_file=$2
             shift
+            shift
+            ;;
+        --use-k8s)  # check if --use-k8s option is passed
+            use_k8s=1
             shift
             ;;
         -*|--*)
@@ -66,6 +85,11 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+if [[ ${backend-} == release ]]; then
+  # Special shortcut for release environment.
+  backend=https://release.app.appsmith.com
+fi
 
 if [[ -z ${run_as-} ]]; then
     if type nginx; then
@@ -130,6 +154,13 @@ rts_port=${rts_port-8091}
 backend="${backend-http://$backend_host:$backend_port}"
 frontend="http://$frontend_host:$frontend_port"
 rts="http://$rts_host:$rts_port"
+http_listen_port="${http_listen_port-80}"
+https_listen_port="${https_listen_port-443}"
+
+## Use manabie appsmith
+if [[ ${use_k8s-} == 1 ]]; then
+  backend=https://appsmith.local-green.manabie.io:31600
+fi
 
 
 if [[ -n ${env_file-} && ! -f $env_file ]]; then
@@ -171,6 +202,10 @@ rm -f "$nginx_access_log" "$nginx_error_log"
 
 nginx_dev_conf="$working_dir/nginx.dev.conf"
 
+# logging
+echo "Connecting to backend:" $backend
+
+
 # Rare case, if this file doesn't exist, and the `docker run` command
 # (from further below) the script runs, then it'll auto-create a _directory_
 # at this path, breaking this script after that.
@@ -190,6 +225,8 @@ events {
 }
 
 http {
+    error_log /var/log/nginx/error.log debug; # todo testing remove me not for production use
+    
     map \$http_x_forwarded_proto \$origin_scheme {
         default \$http_x_forwarded_proto;
         '' \$scheme;
@@ -210,24 +247,27 @@ http {
 
 $(if [[ $use_https == 1 ]]; then echo "
     server {
-        listen 80 default_server;
+        listen $http_listen_port default_server;
+        listen [::]:$http_listen_port default_server;
         server_name $domain;
-        return 301 https://\$host\$request_uri;
+        return 301 https://\$host$(if [[ $https_listen_port != 443 ]]; then echo ":$https_listen_port"; fi)\$request_uri;
     }
 "; fi)
 
     server {
 $(if [[ $use_https == 1 ]]; then echo "
-        listen 443 ssl http2 default_server;
+        listen $https_listen_port ssl http2 default_server;
+        listen [::]:$https_listen_port ssl http2 default_server;
         server_name $domain;
         ssl_certificate '$cert_file';
         ssl_certificate_key '$key_file';
 "; else echo "
-        listen 80 default_server;
+        listen $http_listen_port default_server;
+        listen [::]:$http_listen_port default_server;
         server_name _;
 "; fi)
 
-        client_max_body_size 100m;
+        client_max_body_size 150m;
         gzip on;
 
         proxy_ssl_server_name on;
@@ -236,6 +276,9 @@ $(if [[ $use_https == 1 ]]; then echo "
         proxy_set_header X-Forwarded-Proto \$origin_scheme;
         proxy_set_header X-Forwarded-Host \$host;
         proxy_set_header Accept-Encoding '';
+
+        # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors
+        add_header Content-Security-Policy \"frame-ancestors ${APPSMITH_ALLOWED_FRAME_ANCESTORS-'self' *}\";
 
         sub_filter_once off;
         location / {
@@ -250,7 +293,6 @@ $(if [[ $use_https == 1 ]]; then echo "
             sub_filter __APPSMITH_ALGOLIA_SEARCH_INDEX_NAME__ '${APPSMITH_ALGOLIA_SEARCH_INDEX_NAME-}';
             sub_filter __APPSMITH_ALGOLIA_API_KEY__ '${APPSMITH_ALGOLIA_API_KEY-}';
             sub_filter __APPSMITH_CLIENT_LOG_LEVEL__ '${APPSMITH_CLIENT_LOG_LEVEL-}';
-            sub_filter __APPSMITH_GOOGLE_MAPS_API_KEY__ '${APPSMITH_GOOGLE_MAPS_API_KEY-}';
             sub_filter __APPSMITH_TNC_PP__ '${APPSMITH_TNC_PP-}';
             sub_filter __APPSMITH_SENTRY_RELEASE__ '${APPSMITH_SENTRY_RELEASE-}';
             sub_filter __APPSMITH_SENTRY_ENVIRONMENT__ '${APPSMITH_SENTRY_ENVIRONMENT-}';
@@ -258,7 +300,6 @@ $(if [[ $use_https == 1 ]]; then echo "
             sub_filter __APPSMITH_VERSION_RELEASE_DATE__ '${APPSMITH_VERSION_RELEASE_DATE-}';
             sub_filter __APPSMITH_INTERCOM_APP_ID__ '${APPSMITH_INTERCOM_APP_ID-}';
             sub_filter __APPSMITH_MAIL_ENABLED__ '${APPSMITH_MAIL_ENABLED-}';
-            sub_filter __APPSMITH_DISABLE_TELEMETRY__ '${APPSMITH_DISABLE_TELEMETRY-}';
             sub_filter __APPSMITH_CLOUD_SERVICES_BASE_URL__ '${APPSMITH_CLOUD_SERVICES_BASE_URL-}';
             sub_filter __APPSMITH_RECAPTCHA_SITE_KEY__ '${APPSMITH_RECAPTCHA_SITE_KEY-}';
             sub_filter __APPSMITH_DISABLE_INTERCOM__ '${APPSMITH_DISABLE_INTERCOM-}';
@@ -333,6 +374,19 @@ else
 
 fi
 
+url_to_open=""
+if [[ $use_https == 1 ]]; then
+    url_to_open="https://$domain"
+    if [[ $https_listen_port != 443 ]]; then
+        url_to_open="$url_to_open:$https_listen_port"
+    fi
+else
+    url_to_open="http://localhost"
+    if [[ $http_listen_port != 80 ]]; then
+        url_to_open="$url_to_open:$http_listen_port"
+    fi
+fi
+
 echo '✅ Started NGINX'
 echo "ℹ️  Stop with: $stop_cmd"
-echo "🎉 $(if [[ $use_https == 1 ]]; then echo "https://$domain"; else echo "http://localhost"; fi)"
+echo "🎉 $url_to_open"

@@ -10,6 +10,7 @@ import com.appsmith.external.models.ActionDTO;
 import com.appsmith.external.models.Datasource;
 import com.appsmith.external.models.DefaultResources;
 import com.appsmith.external.models.PluginType;
+import com.appsmith.server.acl.AclPermission;
 import com.appsmith.server.constants.FieldName;
 import com.appsmith.server.domains.ActionDependencyEdge;
 import com.appsmith.server.domains.Layout;
@@ -22,6 +23,7 @@ import com.appsmith.server.dtos.DslActionDTO;
 import com.appsmith.server.dtos.LayoutActionUpdateDTO;
 import com.appsmith.server.dtos.LayoutDTO;
 import com.appsmith.server.dtos.PageDTO;
+import com.appsmith.server.dtos.ce.UpdateMultiplePageLayoutDTO;
 import com.appsmith.server.exceptions.AppsmithError;
 import com.appsmith.server.exceptions.AppsmithException;
 import com.appsmith.server.helpers.DefaultResourcesUtils;
@@ -62,10 +64,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-import static com.appsmith.server.acl.AclPermission.MANAGE_ACTIONS;
-import static com.appsmith.server.acl.AclPermission.MANAGE_PAGES;
-import static com.appsmith.server.acl.AclPermission.READ_PAGES;
 import static com.appsmith.server.services.ce.ApplicationPageServiceCEImpl.EVALUATION_VERSION;
 import static java.lang.Boolean.FALSE;
 import static java.util.stream.Collectors.toSet;
@@ -99,10 +99,10 @@ public class LayoutActionServiceCEImpl implements LayoutActionServiceCE {
     @Override
     public Mono<ActionDTO> createAction(ActionDTO action) {
         if (action.getCollectionId() == null) {
-            return this.createSingleAction(action);
+            return this.createSingleAction(action, Boolean.FALSE);
         }
 
-        return this.createSingleAction(action)
+        return this.createSingleAction(action, Boolean.FALSE)
                 .flatMap(savedAction -> collectionService.addSingleActionToCollection(action.getCollectionId(), savedAction));
     }
 
@@ -295,10 +295,12 @@ public class LayoutActionServiceCEImpl implements LayoutActionServiceCE {
                 Object parent = dsl;
                 Iterator<String> fieldsIterator = Arrays.stream(fields).filter(fieldToken -> !fieldToken.isBlank()).iterator();
                 boolean isLeafNode = false;
+                Object oldParent;
                 // This loop will end at either a leaf node, or the last identified JSON field (by throwing an exception)
                 // Valid forms of the fieldPath for this search could be:
                 // root.field.list[index].childField.anotherList.indexWithDotOperator.multidimensionalList[index1][index2]
                 while (fieldsIterator.hasNext()) {
+                    oldParent = parent;
                     String nextKey = fieldsIterator.next();
                     if (parent instanceof JSONObject) {
                         parent = ((JSONObject) parent).get(nextKey);
@@ -311,17 +313,17 @@ public class LayoutActionServiceCEImpl implements LayoutActionServiceCE {
                             } catch (IndexOutOfBoundsException e) {
                                 // The index being referred does not exist. Hence the path would not exist.
                                 throw new AppsmithException(AppsmithError.INVALID_DYNAMIC_BINDING_REFERENCE, widgetType,
-                                        widgetName, widgetId, fieldPath, pageId, layoutId, null);
+                                        widgetName, widgetId, fieldPath, pageId, layoutId, oldParent, nextKey, "Index out of bounds for list");
                             }
                         } else {
                             throw new AppsmithException(AppsmithError.INVALID_DYNAMIC_BINDING_REFERENCE, widgetType,
-                                    widgetName, widgetId, fieldPath, pageId, layoutId, null);
+                                    widgetName, widgetId, fieldPath, pageId, layoutId, oldParent, nextKey, "Child of list is not in an indexed path");
                         }
                     }
                     // After updating the parent, check for the types
                     if (parent == null) {
                         throw new AppsmithException(AppsmithError.INVALID_DYNAMIC_BINDING_REFERENCE, widgetType,
-                                widgetName, widgetId, fieldPath, pageId, layoutId, null);
+                                widgetName, widgetId, fieldPath, pageId, layoutId, oldParent, nextKey, "New element is null");
                     } else if (parent instanceof String) {
                         // If we get String value, then this is a leaf node
                         isLeafNode = true;
@@ -335,14 +337,14 @@ public class LayoutActionServiceCEImpl implements LayoutActionServiceCE {
                             try {
                                 String bindingAsString = objectMapper.writeValueAsString(parent);
                                 throw new AppsmithException(AppsmithError.INVALID_DYNAMIC_BINDING_REFERENCE, widgetType,
-                                        widgetName, widgetId, fieldPath, pageId, layoutId, bindingAsString);
+                                        widgetName, widgetId, fieldPath, pageId, layoutId, bindingAsString, nextKey, "Binding path has no mustache bindings");
                             } catch (JsonProcessingException e) {
                                 throw new AppsmithException(AppsmithError.JSON_PROCESSING_ERROR, parent);
                             }
                         }
 
                         // Stricter extraction of dynamic bindings
-                        Set<String> mustacheKeysFromFields = MustacheHelper.extractMustacheKeysFromFields(parent);
+                        Set<String> mustacheKeysFromFields = MustacheHelper.extractMustacheKeysFromFields(parent).stream().map(token -> token.getValue()).collect(Collectors.toSet());
 
                         String completePath = widgetName + "." + fieldPath;
                         if (widgetDynamicBindingsMap.containsKey(completePath)) {
@@ -614,8 +616,7 @@ public class LayoutActionServiceCEImpl implements LayoutActionServiceCE {
 
     }
 
-    @Override
-    public Mono<LayoutDTO> updateLayout(String pageId, String applicationId, String layoutId, Layout layout) {
+    private Mono<LayoutDTO> updateLayoutDsl(String pageId, String layoutId, Layout layout, Integer evaluatedVersion) {
         JSONObject dsl = layout.getDsl();
         if (dsl == null) {
             // There is no DSL here. No need to process anything. Return as is.
@@ -646,33 +647,23 @@ public class LayoutActionServiceCEImpl implements LayoutActionServiceCE {
         List<String> messages = new ArrayList<>();
 
         AtomicReference<Boolean> validOnPageLoadActions = new AtomicReference<>(Boolean.TRUE);
-        Mono<Integer> evaluatedVersionMono = applicationService
-                .findById(applicationId)
-                .switchIfEmpty(Mono.error(new AppsmithException(AppsmithError.ACL_NO_RESOURCE_FOUND,
-                        FieldName.APPLICATION_ID, applicationId)))
-                .map(application -> {
-                    Integer evaluationVersion = application.getEvaluationVersion();
-                    if (evaluationVersion == null) {
-                        evaluationVersion = EVALUATION_VERSION;
-                    }
-                    return evaluationVersion;
-                });
 
         // setting the layoutOnLoadActionActionErrors to empty to remove the existing errors before new DAG calculation.
         layout.setLayoutOnLoadActionErrors(new ArrayList<>());
 
-        Mono<List<Set<DslActionDTO>>> allOnLoadActionsMono = evaluatedVersionMono
-                .flatMap(evaluatedVersion -> pageLoadActionsUtil
+        Mono<List<Set<DslActionDTO>>> allOnLoadActionsMono = pageLoadActionsUtil
                         .findAllOnLoadActions(pageId, evaluatedVersion, widgetNames, edges, widgetDynamicBindingsMap, flatmapPageLoadActions, actionsUsedInDSL)
                         .onErrorResume(AppsmithException.class, error -> {
                             log.info(error.getMessage());
                             validOnPageLoadActions.set(FALSE);
                             layout.setLayoutOnLoadActionErrors(List.of(
                                     new ErrorDTO(error.getAppErrorCode(),
+                                            error.getErrorType(),
                                             layoutOnLoadActionErrorToastMessage,
-                                            error.getMessage())));
+                                            error.getMessage(),
+                                            error.getTitle())));
                             return Mono.just(new ArrayList<>());
-                        }));
+                        });
 
         // First update the actions and set execute on load to true
         JSONObject finalDsl = dsl;
@@ -704,7 +695,6 @@ public class LayoutActionServiceCEImpl implements LayoutActionServiceCE {
                             // in the layout for re-use to avoid computing DAG unnecessarily.
                             layout.setLayoutOnLoadActions(onLoadActions);
                             layout.setAllOnPageLoadActionNames(actionNames);
-                            layout.setAllOnPageLoadActionEdges(edges);
                             layout.setActionsUsedInDynamicBindings(actionsUsedInDSL);
                             // The below field is to ensure that we record if the page load actions computation was valid
                             // when last stored in the database.
@@ -744,13 +734,38 @@ public class LayoutActionServiceCEImpl implements LayoutActionServiceCE {
     }
 
     @Override
+    public Mono<LayoutDTO> updateLayout(String pageId, String applicationId, String layoutId, Layout layout) {
+        return applicationService
+                .findById(applicationId)
+                .switchIfEmpty(Mono.error(new AppsmithException(AppsmithError.ACL_NO_RESOURCE_FOUND,
+                        FieldName.APPLICATION_ID, applicationId)))
+                .flatMap(application -> {
+                    Integer evaluationVersion = application.getEvaluationVersion();
+                    if (evaluationVersion == null) {
+                        evaluationVersion = EVALUATION_VERSION;
+                    }
+                    return updateLayoutDsl(pageId, layoutId, layout, evaluationVersion);
+                });
+    }
+
+    @Override
     public Mono<LayoutDTO> updateLayout(String defaultPageId, String defaultApplicationId, String layoutId, Layout layout, String branchName) {
-        if (StringUtils.isEmpty(branchName)) {
+        if (!StringUtils.hasLength(branchName)) {
             return updateLayout(defaultPageId, defaultApplicationId, layoutId, layout);
         }
         return newPageService.findByBranchNameAndDefaultPageId(branchName, defaultPageId, pagePermission.getEditPermission())
                 .flatMap(branchedPage -> updateLayout(branchedPage.getId(), branchedPage.getApplicationId(), layoutId, layout))
                 .map(responseUtils::updateLayoutDTOWithDefaultResources);
+    }
+
+    @Override
+    public Mono<Integer> updateMultipleLayouts(String defaultApplicationId, String branchName, UpdateMultiplePageLayoutDTO updateMultiplePageLayoutDTO) {
+        List<Mono<LayoutDTO>> monoList = new ArrayList<>();
+        for (UpdateMultiplePageLayoutDTO.UpdatePageLayoutDTO pageLayout : updateMultiplePageLayoutDTO.getPageLayouts()) {
+            Mono<LayoutDTO> updatedLayoutMono = this.updateLayout(pageLayout.getPageId(), defaultApplicationId, pageLayout.getLayoutId(), pageLayout.getLayout(), branchName);
+            monoList.add(updatedLayoutMono);
+        }
+        return Flux.merge(monoList).then(Mono.just(monoList.size()));
     }
 
     private LayoutDTO generateResponseDTO(Layout layout) {
@@ -841,19 +856,19 @@ public class LayoutActionServiceCEImpl implements LayoutActionServiceCE {
                         defaultResources.setCollectionId(action.getCollectionId());
                     }
                     action.setDefaultResources(defaultResources);
-                    return createSingleAction(action);
+                    return createSingleAction(action, Boolean.FALSE);
                 })
                 .map(responseUtils::updateActionDTOWithDefaultResources);
     }
 
     @Override
-    public Mono<ActionDTO> createSingleAction(ActionDTO action) {
+    public Mono<ActionDTO> createSingleAction(ActionDTO action, Boolean isJsAction) {
         AppsmithEventContext eventContext = new AppsmithEventContext(AppsmithEventContextType.DEFAULT);
-        return createAction(action, eventContext);
+        return createAction(action, eventContext, isJsAction);
     }
 
     @Override
-    public Mono<ActionDTO> createAction(ActionDTO action, AppsmithEventContext eventContext) {
+    public Mono<ActionDTO> createAction(ActionDTO action, AppsmithEventContext eventContext, Boolean isJsAction) {
 
         if (action.getId() != null) {
             return Mono.error(new AppsmithException(AppsmithError.INVALID_PARAMETER, FieldName.ID));
@@ -875,8 +890,12 @@ public class LayoutActionServiceCEImpl implements LayoutActionServiceCE {
         newAction.setPublishedAction(new ActionDTO());
         newAction.getPublishedAction().setDatasource(new Datasource());
 
+        // If the action is a JS action, then we don't need to validate the page. Fetch the page with read.
+        // Else fetch the page with create action permission to ensure that the user has the right to create an action
+        AclPermission aclPermission = isJsAction ? pagePermission.getReadPermission() : pagePermission.getActionCreatePermission();
+
         Mono<NewPage> pageMono = newPageService
-                .findById(action.getPageId(), pagePermission.getActionCreatePermission())
+                .findById(action.getPageId(), aclPermission)
                 .switchIfEmpty(Mono.error(
                         new AppsmithException(AppsmithError.NO_RESOURCE_FOUND, FieldName.PAGE, action.getPageId())))
                 .cache();

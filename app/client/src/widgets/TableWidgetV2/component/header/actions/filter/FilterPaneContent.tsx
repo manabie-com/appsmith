@@ -7,6 +7,7 @@ import {
   ReactTableFilter,
   Operator,
   OperatorTypes,
+  DEFAULT_FILTER,
 } from "../../../Constants";
 import { DropdownOption } from ".";
 import CascadeFields from "./CascadeFields";
@@ -14,12 +15,17 @@ import {
   createMessage,
   TABLE_FILTER_COLUMN_TYPE_CALLOUT,
 } from "@appsmith/constants/messages";
-import { Icon, IconSize } from "design-system";
+import { Icon, IconSize } from "design-system-old";
 import Button from "pages/AppViewer/AppViewerButton";
 import { ButtonVariantTypes } from "components/constants";
 
 import AddIcon from "remixicon-react/AddLineIcon";
 import { cloneDeep } from "lodash";
+import {
+  ColumnTypes,
+  FilterableColumnTypes,
+} from "widgets/TableWidgetV2/constants";
+import { generateReactKey } from "utils/generators";
 
 const TableFilterOuterWrapper = styled.div<{
   borderRadius?: string;
@@ -108,13 +114,6 @@ interface TableFilterProps {
   borderRadius: string;
 }
 
-const DEFAULT_FILTER = {
-  column: "",
-  operator: OperatorTypes.OR,
-  value: "",
-  condition: "",
-};
-
 function TableFilterPaneContent(props: TableFilterProps) {
   const [filters, updateFilters] = React.useState(
     new Array<ReactTableFilter>(),
@@ -134,7 +133,12 @@ function TableFilterPaneContent(props: TableFilterProps) {
     if (updatedFilters.length >= 2) {
       operator = updatedFilters[1].operator;
     }
-    updatedFilters.push({ ...DEFAULT_FILTER, operator });
+    // New id is generated for new filter here
+    updatedFilters.push({
+      ...DEFAULT_FILTER,
+      id: generateReactKey(),
+      operator,
+    });
     updateFilters(updatedFilters);
   };
 
@@ -152,23 +156,24 @@ function TableFilterPaneContent(props: TableFilterProps) {
 
   const columns: DropdownOption[] = props.columns
     .map((column: ReactTableColumnProps) => {
-      const type = column.metaProperties?.type || "text";
+      const type = column.metaProperties?.type || ColumnTypes.TEXT;
+
       return {
         label: column.Header,
         value: column.alias,
         type: type,
       };
     })
-    .filter((column: { label: string; value: string; type: string }) => {
-      return !["video", "button", "image", "iconButton", "menuButton"].includes(
-        column.type as string,
-      );
+    .filter((column: { label: string; value: string; type: ColumnTypes }) => {
+      return FilterableColumnTypes.includes(column.type);
     });
+
   const hasAnyFilters = !!(
     filters.length >= 1 &&
     filters[0].column &&
     filters[0].condition
   );
+
   return (
     <TableFilterOuterWrapper
       borderRadius={props.borderRadius}
@@ -215,8 +220,9 @@ function TableFilterPaneContent(props: TableFilterProps) {
               columns={columns}
               condition={filter.condition}
               hasAnyFilters={hasAnyFilters}
+              id={filter.id}
               index={index}
-              key={index + JSON.stringify(filter)}
+              key={filter.id}
               operator={
                 filters.length >= 2 ? filters[1].operator : filter.operator
               }
