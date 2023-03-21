@@ -32,7 +32,6 @@ export type BodyContextType = {
   rows: ReactTableRowType<Record<string, unknown>>[];
   primaryColumnId?: string;
   isAddRowInProgress: boolean;
-  loadingTable?: boolean;
   getTableBodyProps?(
     propGetter?: TableBodyPropGetter<Record<string, unknown>> | undefined,
   ): TableBodyProps;
@@ -50,7 +49,6 @@ export const BodyContext = React.createContext<BodyContextType>({
   rows: [],
   primaryColumnId: "",
   isAddRowInProgress: false,
-  loadingTable: false,
   totalColumnsWidth: 0,
 });
 
@@ -159,7 +157,6 @@ export const TableBody = React.forwardRef(
       useVirtual,
       widgetId,
       width,
-      loadingTable,
       ...restOfProps
     } = props;
 
@@ -192,7 +189,6 @@ export const TableBody = React.forwardRef(
           columns,
           width,
           rows,
-          loadingTable,
           getTableBodyProps: props.getTableBodyProps,
           totalColumnsWidth: props.totalColumnsWidth,
         }}

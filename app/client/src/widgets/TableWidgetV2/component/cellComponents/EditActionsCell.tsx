@@ -8,7 +8,6 @@ import {
 import { Button } from "./Button";
 import { BaseCellComponentProps } from "../Constants";
 import { CellWrapper } from "../TableStyledWrappers";
-import { TableSizes } from "./../Constants";
 
 type RenderEditActionsProps = BaseCellComponentProps & {
   isSelected: boolean;
@@ -19,7 +18,6 @@ type RenderEditActionsProps = BaseCellComponentProps & {
     eventType: EventType,
   ) => void;
   onDiscard: () => void;
-  tableSizes: TableSizes;
 };
 
 export function EditActionCell(props: RenderEditActionsProps) {
@@ -39,7 +37,6 @@ export function EditActionCell(props: RenderEditActionsProps) {
     textColor,
     textSize,
     verticalAlignment,
-    tableSizes,
   } = props;
 
   if (!columnActions) {
@@ -56,7 +53,6 @@ export function EditActionCell(props: RenderEditActionsProps) {
         textColor={textColor}
         textSize={textSize}
         verticalAlignment={verticalAlignment}
-        tableSizes={tableSizes}
       />
     );
   }
@@ -72,7 +68,6 @@ export function EditActionCell(props: RenderEditActionsProps) {
       isCellVisible={isCellVisible}
       isHidden={isHidden}
       verticalAlignment={verticalAlignment}
-      tableSizes={tableSizes}
     >
       {columnActions.map((action: ButtonColumnActions) => {
         return (

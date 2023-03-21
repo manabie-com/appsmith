@@ -4,7 +4,6 @@ import {
   BaseCellComponentProps,
   CellAlignment,
   JUSTIFY_CONTENT,
-  TableSizes,
 } from "../Constants";
 import { CellWrapper, TooltipContentWrapper } from "../TableStyledWrappers";
 import { LabelPosition } from "components/constants";
@@ -62,7 +61,6 @@ type SwitchCellProps = BaseCellComponentProps & {
   isCellEditable: boolean;
   hasUnSavedChanges?: boolean;
   disabledSwitchMessage: string;
-  tableSizes: TableSizes;
 };
 
 export const SwitchCell = (props: SwitchCellProps) => {
@@ -81,7 +79,6 @@ export const SwitchCell = (props: SwitchCellProps) => {
     onChange,
     value,
     verticalAlignment,
-    tableSizes,
   } = props;
 
   const switchComponent = (
@@ -107,7 +104,6 @@ export const SwitchCell = (props: SwitchCellProps) => {
       isCellVisible={isCellVisible}
       isHidden={isHidden}
       verticalAlignment={verticalAlignment}
-      tableSizes={tableSizes}
     >
       {hasUnSavedChanges && <UnsavedChangesMarker accentColor={accentColor} />}
       {isCellEditable && !!disabledSwitch ? (

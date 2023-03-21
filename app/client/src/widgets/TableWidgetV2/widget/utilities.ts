@@ -217,7 +217,6 @@ export function getDefaultColumnProperties(
           id,
         )}"]))}}`,
     sticky: StickyType.NONE,
-    translationJp: "",
     validation: {},
   };
 

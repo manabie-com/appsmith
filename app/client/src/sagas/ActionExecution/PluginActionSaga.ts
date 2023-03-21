@@ -429,7 +429,7 @@ export default function* executePluginActionTriggerSaga(
     } else {
       throw new PluginTriggerFailureError(
         createMessage(ERROR_PLUGIN_ACTION_EXECUTE, action.name),
-        [],
+        [payload.body, params],
       );
     }
   } else {
@@ -1004,24 +1004,27 @@ function* executePluginActionSaga(
       // HACK: for hasura or grpc gateway query error by token invalid
       // Author: @Thanhloc
       if (payload.body) {
-        const data: any = payload.body;
-        for (const key in data) {
-          if (
-            (key == "message" && data[key] == "Unauthenticated") ||
-            (key == "errors" && data[key].length > 0)
-          ) {
-            hasError = true;
-            yield delay(1000);
+        let data: any = payload.body;
+        if (typeof data == "string") {
+          try {
+            data = JSON.parse(data);
+          } catch (e) {
+            console.log("Data is not a valid JSON object");
+          }
+        }
+        if (typeof data == "object") {
+          for (const key in data) {
+            if (
+              (key == "message" && data[key] == "Unauthenticated") ||
+              (key == "errors" && data[key].length > 0)
+            ) {
+              hasError = true;
+              yield delay(1000);
+            }
           }
         }
       }
       if (!hasError || i == 4) {
-        yield put(
-          executePluginActionSuccess({
-            id: actionId,
-            response: payload,
-          }),
-        );
         yield put(
           executePluginActionSuccess({
             id: actionId,

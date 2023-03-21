@@ -1,6 +1,6 @@
 import React from "react";
 
-import { BaseCellComponentProps, TableSizes } from "../Constants";
+import { BaseCellComponentProps } from "../Constants";
 import { CellWrapper } from "../TableStyledWrappers";
 import PopoverVideo from "widgets/VideoWidget/component/PopoverVideo";
 import { isString } from "lodash";
@@ -8,7 +8,6 @@ import { YOUTUBE_URL_REGEX } from "widgets/constants";
 
 type renderCellType = BaseCellComponentProps & {
   value: unknown;
-  tableSizes: TableSizes;
 };
 
 export const VideoCell = (props: renderCellType) => {
@@ -25,7 +24,6 @@ export const VideoCell = (props: renderCellType) => {
     textSize,
     value,
     verticalAlignment,
-    tableSizes,
   } = props;
 
   if (!value) {
@@ -42,7 +40,6 @@ export const VideoCell = (props: renderCellType) => {
         textColor={textColor}
         textSize={textSize}
         verticalAlignment={verticalAlignment}
-        tableSizes={tableSizes}
       />
     );
   } else if (isString(value) && YOUTUBE_URL_REGEX.test(value)) {
@@ -60,7 +57,6 @@ export const VideoCell = (props: renderCellType) => {
         textColor={textColor}
         textSize={textSize}
         verticalAlignment={verticalAlignment}
-        tableSizes={tableSizes}
       >
         <PopoverVideo url={value} />
       </CellWrapper>
@@ -75,7 +71,6 @@ export const VideoCell = (props: renderCellType) => {
         isCellVisible={isCellVisible}
         isHidden={isHidden}
         verticalAlignment={verticalAlignment}
-        tableSizes={tableSizes}
       >
         Invalid Video Link
       </CellWrapper>

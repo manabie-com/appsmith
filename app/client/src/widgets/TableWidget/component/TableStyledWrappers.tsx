@@ -2,7 +2,11 @@ import styled, { css } from "styled-components";
 import { TableSizes, CellLayoutProperties, CellAlignment } from "./Constants";
 import { Colors, Color } from "constants/Colors";
 import { hideScrollbar } from "constants/DefaultTheme";
-import { fontSizeUtility, darkenColor } from "widgets/WidgetUtils";
+import {
+  fontSizeUtility,
+  lightenColor,
+  darkenColor,
+} from "widgets/WidgetUtils";
 import { FontStyleTypes } from "constants/WidgetConstants";
 import { Classes } from "@blueprintjs/core";
 
@@ -68,6 +72,14 @@ export const TableWrapper = styled.div<{
       overflow: hidden;
       cursor: ${(props) => props.triggerRowSelection && "pointer"};
       background: ${Colors.WHITE};
+      &.selected-row {
+        background: ${({ accentColor }) =>
+          `${lightenColor(accentColor)}`} !important;
+      }
+      &:hover {
+        background: ${({ accentColor }) =>
+          `${lightenColor(accentColor)}`} !important;
+      }
     }
     .th,
     .td {

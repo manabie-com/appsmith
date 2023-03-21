@@ -21,7 +21,6 @@ const samplePrimaryColumns = {
     isDerived: false,
     label: "step",
     computedValue: ["#1", "#2", "#3"],
-    translationJp: "",
     labelColor: "#FFFFFF",
     cellBackground: "",
     textColor: "",
@@ -49,7 +48,6 @@ const samplePrimaryColumns = {
       "Create a query fetch_users with the Mock DB",
       "Bind the query using => fetch_users.data",
     ],
-    translationJp: "",
     labelColor: "#FFFFFF",
     cellBackground: "",
     textColor: "",
@@ -73,7 +71,6 @@ const samplePrimaryColumns = {
     isDerived: false,
     label: "status",
     computedValue: ["✅", "--", "--"],
-    translationJp: "",
     labelColor: "#FFFFFF",
     cellBackground: "",
     textColor: "",
@@ -100,7 +97,6 @@ const samplePrimaryColumns = {
     onClick:
       "{{currentRow.step === '#1' ? showAlert('Done', 'success') : currentRow.step === '#2' ? navigateTo('https://docs.appsmith.com/core-concepts/connecting-to-data-sources/querying-a-database',undefined,'NEW_WINDOW') : navigateTo('https://docs.appsmith.com/core-concepts/displaying-data-read/display-data-tables',undefined,'NEW_WINDOW')}}",
     computedValue: ["", "", ""],
-    translationJp: "",
     labelColor: "#FFFFFF",
     buttonColor: ["#553DE9", "#553DE9", "#553DE9"],
     borderRadius: ["0.375rem", "0.375rem", "0.375rem"],
@@ -131,7 +127,6 @@ const samplePrimaryColumns = {
     isSaveVisible: true,
     isDiscardVisible: true,
     computedValue: "",
-    translationJp: "",
     buttonStyle: "rgb(3, 179, 101)",
     labelColor: "#FFFFFF",
     menuColor: ["#553DE9", "#553DE9", "#553DE9"],
@@ -165,7 +160,6 @@ const samplePrimaryColumns = {
     isSaveVisible: true,
     isDiscardVisible: true,
     computedValue: "",
-    translationJp: "",
     buttonStyle: "rgb(3, 179, 101)",
     labelColor: "#FFFFFF",
     buttonColor: ["#553DE9", "#553DE9", "#553DE9"],
@@ -230,7 +224,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "id",
           isAscOrder: false,
           computedValue: [123, 234],
-          translationJp: "",
         },
         name: {
           index: 0,
@@ -251,7 +244,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "awesome",
           isAscOrder: undefined,
           computedValue: ["John Doe", "Jane Doe"],
-          translationJp: "",
         },
         extra: {
           index: 2,
@@ -271,7 +263,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "extra",
           isAscOrder: undefined,
           computedValue: ["Extra1", "Extra2"],
-          translationJp: "",
           isDerived: true,
         },
       },
@@ -293,7 +284,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "awesome",
           isAscOrder: undefined,
           computedValue: ["John Doe", "Jane Doe"],
-          translationJp: "",
         },
         {
           index: 1,
@@ -312,7 +302,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "id",
           isAscOrder: false,
           computedValue: [123, 234],
-          translationJp: "",
         },
         {
           index: 2,
@@ -330,7 +319,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "extra",
           isAscOrder: undefined,
           computedValue: ["Extra1", "Extra2"],
-          translationJp: "",
           isDerived: true,
         },
       ],
@@ -406,7 +394,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "id",
           isAscOrder: false,
           computedValue: [1234, 123, 234],
-          translationJp: "",
         },
         name: {
           index: 0,
@@ -427,7 +414,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "awesome",
           isAscOrder: undefined,
           computedValue: ["Jim Doe", "John Doe", "Jane Doe"],
-          translationJp: "",
         },
         extra: {
           index: 2,
@@ -447,7 +433,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "extra",
           isAscOrder: undefined,
           computedValue: ["", "Extra1", "Extra2"],
-          translationJp: "",
           isDerived: true,
         },
       },
@@ -469,7 +454,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "awesome",
           isAscOrder: undefined,
           computedValue: ["Jim Doe", "John Doe", "Jane Doe"],
-          translationJp: "",
         },
         {
           index: 1,
@@ -488,7 +472,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "id",
           isAscOrder: false,
           computedValue: [1234, 123, 234],
-          translationJp: "",
         },
         {
           index: 2,
@@ -506,7 +489,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "extra",
           isAscOrder: undefined,
           computedValue: ["", "Extra1", "Extra2"],
-          translationJp: "",
           isDerived: true,
         },
       ],
@@ -571,7 +553,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "id",
           isAscOrder: false,
           computedValue: [1234, 123, 234, 2345],
-          translationJp: "",
         },
         name: {
           index: 0,
@@ -592,7 +573,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "awesome",
           isAscOrder: undefined,
           computedValue: ["Jim Doe", "John Doe", "Jane Doe", "Jane Doeson"],
-          translationJp: "",
         },
         age: {
           index: 2,
@@ -612,7 +592,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "age",
           isAscOrder: undefined,
           computedValue: [28, null, 22, 30],
-          translationJp: "",
           isDerived: true,
         },
       },
@@ -634,7 +613,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "awesome",
           isAscOrder: undefined,
           computedValue: ["Jim Doe", "John Doe", "Jane Doe", "Jane Doeson"],
-          translationJp: "",
         },
         {
           index: 1,
@@ -653,7 +631,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "id",
           isAscOrder: false,
           computedValue: [1234, 123, 234],
-          translationJp: "",
         },
         {
           index: 2,
@@ -671,7 +648,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "age",
           isAscOrder: undefined,
           computedValue: [28, null, 22, 30],
-          translationJp: "",
           isDerived: true,
         },
       ],
@@ -741,7 +717,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "id",
           isAscOrder: false,
           computedValue: [1234, 123, 234, 2345],
-          translationJp: "",
         },
         name: {
           index: 0,
@@ -762,7 +737,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "awesome",
           isAscOrder: undefined,
           computedValue: ["Jim Doe", "", "Jane Doe", "Jane Doeson"],
-          translationJp: "",
         },
         age: {
           index: 2,
@@ -782,7 +756,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "age",
           isAscOrder: undefined,
           computedValue: [28, null, 22, 30],
-          translationJp: "",
           isDerived: true,
         },
       },
@@ -804,7 +777,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "awesome",
           isAscOrder: undefined,
           computedValue: ["Jim Doe", "", "Jane Doe", "Jane Doeson"],
-          translationJp: "",
         },
         {
           index: 1,
@@ -823,7 +795,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "id",
           isAscOrder: false,
           computedValue: [1234, 123, 234],
-          translationJp: "",
         },
         {
           index: 2,
@@ -841,7 +812,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "age",
           isAscOrder: undefined,
           computedValue: [28, null, 22, 30],
-          translationJp: "",
           isDerived: true,
         },
       ],
@@ -918,7 +888,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "id",
           isAscOrder: false,
           computedValue: [1234, 123, 234],
-          translationJp: "",
         },
         name: {
           index: 0,
@@ -939,7 +908,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "awesome",
           isAscOrder: undefined,
           computedValue: ["Jim Doe", "John Doe", "Jane Doe"],
-          translationJp: "",
         },
         extra: {
           index: 2,
@@ -959,7 +927,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "extra",
           isAscOrder: undefined,
           computedValue: ["", "Extra1", "Extra2"],
-          translationJp: "",
           isDerived: true,
         },
       },
@@ -981,7 +948,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "awesome",
           isAscOrder: undefined,
           computedValue: ["Jim Doe", "John Doe", "Jane Doe"],
-          translationJp: "",
         },
         {
           index: 1,
@@ -1000,7 +966,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "id",
           isAscOrder: false,
           computedValue: [1234, 123, 234],
-          translationJp: "",
         },
         {
           index: 2,
@@ -1018,7 +983,6 @@ describe("Validates getFilteredTableData Properties", () => {
           label: "extra",
           isAscOrder: undefined,
           computedValue: ["", "Extra1", "Extra2"],
-          translationJp: "",
           isDerived: true,
         },
       ],
@@ -2123,7 +2087,7 @@ describe("validate getUpdatedRow", () => {
         { id: 234, name: "Jane Doe", extra: "Extra2", __originalIndex__: 2 },
         { id: 123, name: "John Doe", extra: "Extra1", __originalIndex__: 1 },
       ],
-    };
+    }
     expect(getUpdatedRow(input1, moment, _)).toStrictEqual({
       id: 123,
       name: "John Doe1",
@@ -2196,7 +2160,7 @@ describe("validate getUpdatedRow", () => {
       status: "--",
     });
   });
-});
+})
 describe("getEditableCellValidity", () => {
   const { getEditableCellValidity } = derivedProperty;
 
