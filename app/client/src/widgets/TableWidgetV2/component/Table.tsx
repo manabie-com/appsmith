@@ -15,6 +15,7 @@ import {
   TableHeaderInnerWrapper,
 } from "./TableStyledWrappers";
 import TableHeader from "./header";
+import { Classes } from "@blueprintjs/core";
 import {
   ReactTableColumnProps,
   ReactTableFilter,
@@ -32,10 +33,6 @@ import SimpleBar from "simplebar-react";
 import "simplebar-react/dist/simplebar.min.css";
 import { createGlobalStyle } from "styled-components";
 import { Classes as PopOver2Classes } from "@blueprintjs/popover2";
-import { Classes } from "@blueprintjs/core";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import TableBodyHasNoData from "./TableBody/TableBodyHasNoData";
-import Scrollbars from "react-custom-scrollbars";
 import StaticTable from "./StaticTable";
 import VirtualTable from "./VirtualTable";
 import fastdom from "fastdom";
@@ -101,7 +98,6 @@ export interface TableProps {
   applyFilter: (filters: ReactTableFilter[]) => void;
   compactMode?: CompactMode;
   isVisibleDownload?: boolean;
-  loadingTable?: boolean;
   isVisibleFilters?: boolean;
   isVisiblePagination?: boolean;
   isVisibleSearch?: boolean;
@@ -189,15 +185,6 @@ export function Table(props: TableProps) {
       }),
     [columnString],
   );
-
-  function ScrollbarHorizontalThumb(props: any) {
-    return <div {...props} className="thumb-horizontal" />;
-  }
-
-  function ScrollbarHorizontalTrack(props: any) {
-    return <div {...props} className="track-horizontal" />;
-  }
-
   /*
     For serverSidePaginationEnabled we are taking props.data.length as the page size.
     As props.pageSize is being set by the visible number of rows in the table (without scrolling),
@@ -205,12 +192,12 @@ export function Table(props: TableProps) {
     is set higher/lower than the visible number of rows in the table
   */
   const pageCount =
-    (props.serverSidePaginationEnabled &&
-      props.totalRecordsCount &&
-      Math.ceil(props.totalRecordsCount / props.pageSize)) ||
-    0;
+    props.serverSidePaginationEnabled &&
+    props.totalRecordsCount &&
+    props.data.length
+      ? Math.ceil(props.totalRecordsCount / props.data.length)
+      : Math.ceil(props.data.length / props.pageSize);
   const currentPageIndex = props.pageNo < pageCount ? props.pageNo : 0;
-
   const {
     getTableBodyProps,
     getTableProps,
@@ -304,20 +291,11 @@ export function Table(props: TableProps) {
     };
   }, [isHeaderVisible, props.height, tableSizes.TABLE_HEADER_HEIGHT]);
 
-  // const shouldUseVirtual =
-  //   props.serverSidePaginationEnabled &&
-  //   !props.columns.some(
-  //     (column) => !!column.columnProperties.allowCellWrapping,
-  //   );
-  const shouldUseVirtual = false;
-
-  const style = useMemo(
-    () => ({
-      width: props.width,
-      height: 38,
-    }),
-    [props.width],
-  );
+  const shouldUseVirtual =
+    props.serverSidePaginationEnabled &&
+    !props.columns.some(
+      (column) => !!column.columnProperties.allowCellWrapping,
+    );
 
   useEffect(() => {
     if (props.isAddRowInProgress) {
@@ -329,7 +307,6 @@ export function Table(props: TableProps) {
     }
   }, [props.isAddRowInProgress]);
 
-  const hasNoData = !props.loadingTable && subPage.length === 0;
   return (
     <TableWrapper
       accentColor={props.accentColor}
@@ -353,6 +330,65 @@ export function Table(props: TableProps) {
         borderRadius={props.borderRadius}
         widgetId={props.widgetId}
       />
+      {isHeaderVisible && (
+        <SimpleBar
+          style={{
+            maxHeight: tableSizes.TABLE_HEADER_HEIGHT,
+          }}
+        >
+          <TableHeaderWrapper
+            backgroundColor={Colors.WHITE}
+            ref={tableHeaderWrapperRef}
+            serverSidePaginationEnabled={props.serverSidePaginationEnabled}
+            tableSizes={tableSizes}
+            width={props.width}
+          >
+            <TableHeaderInnerWrapper
+              backgroundColor={Colors.WHITE}
+              serverSidePaginationEnabled={props.serverSidePaginationEnabled}
+              tableSizes={tableSizes}
+              variant={props.variant}
+              width={props.width}
+            >
+              <TableHeader
+                accentColor={props.accentColor}
+                allowAddNewRow={props.allowAddNewRow}
+                applyFilter={props.applyFilter}
+                borderRadius={props.borderRadius}
+                boxShadow={props.boxShadow}
+                columns={tableHeadercolumns}
+                currentPageIndex={currentPageIndex}
+                delimiter={props.delimiter}
+                disableAddNewRow={!!props.editableCell.column}
+                disabledAddNewRowSave={props.disabledAddNewRowSave}
+                filters={props.filters}
+                isAddRowInProgress={props.isAddRowInProgress}
+                isVisibleDownload={props.isVisibleDownload}
+                isVisibleFilters={props.isVisibleFilters}
+                isVisiblePagination={props.isVisiblePagination}
+                isVisibleSearch={props.isVisibleSearch}
+                nextPageClick={props.nextPageClick}
+                onAddNewRow={props.onAddNewRow}
+                onAddNewRowAction={props.onAddNewRowAction}
+                pageCount={pageCount}
+                pageNo={props.pageNo}
+                pageOptions={pageOptions}
+                prevPageClick={props.prevPageClick}
+                searchKey={props.searchKey}
+                searchTableData={props.searchTableData}
+                serverSidePaginationEnabled={props.serverSidePaginationEnabled}
+                tableColumns={columns}
+                tableData={data}
+                tableSizes={tableSizes}
+                totalRecordsCount={props.totalRecordsCount}
+                updatePageNo={props.updatePageNo}
+                widgetId={props.widgetId}
+                widgetName={props.widgetName}
+              />
+            </TableHeaderInnerWrapper>
+          </TableHeaderWrapper>
+        </SimpleBar>
+      )}
       <div
         className={
           props.isLoading
@@ -402,12 +438,6 @@ export function Table(props: TableProps) {
             />
           )}
 
-          {shouldUseVirtual && hasNoData && (
-            <SimpleBar style={scrollContainerStyles}>
-              <TableBodyHasNoData />
-            </SimpleBar>
-          )}
-
           {shouldUseVirtual && (
             <VirtualTable
               accentColor={props.accentColor}
@@ -447,75 +477,6 @@ export function Table(props: TableProps) {
           )}
         </div>
       </div>
-      {isHeaderVisible && (
-        <SimpleBar
-          style={{
-            maxHeight: tableSizes.TABLE_HEADER_HEIGHT,
-          }}
-        >
-          <TableHeaderWrapper
-            backgroundColor={Colors.WHITE}
-            ref={tableHeaderWrapperRef}
-            serverSidePaginationEnabled={props.serverSidePaginationEnabled}
-            tableSizes={tableSizes}
-            width={props.width}
-          >
-            <Scrollbars
-              renderThumbHorizontal={ScrollbarHorizontalThumb}
-              // renderThumbVertical={ScrollbarVerticalThumb}
-              renderTrackHorizontal={ScrollbarHorizontalTrack}
-              style={style}
-            >
-              <TableHeaderInnerWrapper
-                backgroundColor={Colors.WHITE}
-                serverSidePaginationEnabled={props.serverSidePaginationEnabled}
-                tableSizes={tableSizes}
-                variant={props.variant}
-                width={props.width}
-              >
-                <TableHeader
-                  accentColor={props.accentColor}
-                  allowAddNewRow={props.allowAddNewRow}
-                  applyFilter={props.applyFilter}
-                  borderRadius={props.borderRadius}
-                  boxShadow={props.boxShadow}
-                  columns={tableHeadercolumns}
-                  currentPageIndex={currentPageIndex}
-                  delimiter={props.delimiter}
-                  disableAddNewRow={!!props.editableCell.column}
-                  disabledAddNewRowSave={props.disabledAddNewRowSave}
-                  filters={props.filters}
-                  isAddRowInProgress={props.isAddRowInProgress}
-                  isVisibleDownload={props.isVisibleDownload}
-                  isVisibleFilters={props.isVisibleFilters}
-                  isVisiblePagination={props.isVisiblePagination}
-                  isVisibleSearch={props.isVisibleSearch}
-                  nextPageClick={props.nextPageClick}
-                  onAddNewRow={props.onAddNewRow}
-                  onAddNewRowAction={props.onAddNewRowAction}
-                  pageCount={pageCount}
-                  pageNo={props.pageNo}
-                  pageOptions={pageOptions}
-                  prevPageClick={props.prevPageClick}
-                  searchKey={props.searchKey}
-                  searchTableData={props.searchTableData}
-                  serverSidePaginationEnabled={
-                    props.serverSidePaginationEnabled
-                  }
-                  tableColumns={columns}
-                  tableData={data}
-                  tableSizes={tableSizes}
-                  totalRecordsCount={props.totalRecordsCount}
-                  updatePageNo={props.updatePageNo}
-                  widgetId={props.widgetId}
-                  widgetName={props.widgetName}
-                  pageSize={props.pageSize}
-                />
-              </TableHeaderInnerWrapper>
-            </Scrollbars>
-          </TableHeaderWrapper>
-        </SimpleBar>
-      )}
     </TableWrapper>
   );
 }

@@ -187,7 +187,6 @@ export const DateCell = (props: DateComponentProps) => {
     value,
     verticalAlignment,
     widgetId,
-    tableSizes,
   } = props;
 
   const [hasFocus, setHasFocus] = useState(false);
@@ -351,7 +350,6 @@ export const DateCell = (props: DateComponentProps) => {
         textSize={textSize}
         value={value}
         verticalAlignment={verticalAlignment}
-        tableSizes={tableSizes}
       />
       {editor}
     </Container>

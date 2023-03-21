@@ -18,7 +18,7 @@ export interface EndpointGroups {
 
 export enum EnvKeys {
   UAT = "uat",
-  STAGING = "staging",
+  STAGING = "develop",
   PRODUCTION = "production",
 }
 
@@ -47,7 +47,7 @@ export const initNewConfigWithOrganization = async (
 
   return configs[env];
 };
-export const branchList: string[] = ["staging", "uat", "production"];
+export const branchList: string[] = ["develop", "uat", "production"];
 
 export const orgList: string[] = [
   "ga",

@@ -477,17 +477,6 @@ export default [
         validation: { type: ValidationTypes.BOOLEAN },
       },
       {
-        propertyName: "loadingTable",
-        helpText: "Toggle loading of table",
-        label: "Loading Table",
-        controlType: "SWITCH",
-        isJSConvertible: true,
-        isBindProperty: true,
-        isTriggerProperty: false,
-        defaultValue: false,
-        validation: { type: ValidationTypes.BOOLEAN },
-      },
-      {
         propertyName: "delimiter",
         label: "CSV Separator",
         controlType: "INPUT_TEXT",

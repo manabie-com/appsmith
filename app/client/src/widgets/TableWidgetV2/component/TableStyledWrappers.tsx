@@ -7,6 +7,7 @@ import {
   IMAGE_HORIZONTAL_ALIGN,
   IMAGE_VERTICAL_ALIGN,
   TEXT_ALIGN,
+  TABLE_SIZES,
   CellAlignment,
   VerticalAlignment,
   ImageSize,
@@ -16,7 +17,7 @@ import {
   TABLE_SCROLLBAR_WIDTH,
 } from "./Constants";
 import { Colors, Color } from "constants/Colors";
-import { hideScrollbar } from "constants/DefaultTheme";
+import { hideScrollbar, invisible } from "constants/DefaultTheme";
 import { lightenColor, darkenColor } from "widgets/WidgetUtils";
 import { FontStyleTypes } from "constants/WidgetConstants";
 import { Classes } from "@blueprintjs/core";
@@ -24,7 +25,7 @@ import { TableVariant, TableVariantTypes } from "../constants";
 import { Layers } from "constants/Layers";
 
 const BORDER_RADIUS = "border-radius: 4px;";
-const HEADER_CONTROL_FONT_SIZE = "0.75rem";
+const HEADER_CONTROL_FONT_SIZE = "12px";
 
 export const TableWrapper = styled.div<{
   width: number;
@@ -84,7 +85,6 @@ export const TableWrapper = styled.div<{
     }
   }
   .tableWrap {
-    cursor: default;
     height: 100%;
     display: block;
     position: relative;
@@ -92,20 +92,6 @@ export const TableWrapper = styled.div<{
     overflow: auto hidden;
     &.virtual {
       ${hideScrollbar};
-    }
-    .has-no-data {
-      display: inline-flex;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: #757575;
-      svg {
-        font-size: 1.5rem;
-        height: 24px;
-        margin-right: 5px;
-        color: #00000061;
-      }
     }
   }
   .table {
@@ -116,56 +102,29 @@ export const TableWrapper = styled.div<{
     width: 100%;
     ${hideScrollbar};
     .tbody {
-      overflow: hidden;
-    }
-    .tbody {
-      height: "fit-content";
-      width: 100%;
-      ${hideScrollbar};
-
-      .skeleton-cell {
-        display: flex !important;
-        .skeleton {
-          margin: auto;
-          opacity: 1;
-          animation: animation-overlay 1.5s ease-in-out 0.5s infinite;
-          width: calc(100% - 32px);
-          height: 20px;
-          border-radius: 4px/6.7px;
-          display: flex;
-          background-color: rgba(33, 33, 33, 0.11);
-          transform: scale(1, 0.6);
-          transform-origin: 0 55%;
-          -webkit-transform: scale(1, 0.6);
-          -moz-transform: scale(1, 0.6);
-          -ms-transform: scale(1, 0.6);
-          transform: scale(1, 0.6);
-          border-radius: 4px/6.7px;
-          &::before {
-            content: "\\00a0";
-          }
-        }
-      }
-    }
-    @keyframes animation-overlay {
-      0% {
-        opacity: 1;
-      }
-      50% {
-        opacity: 0.4;
-      }
-      100% {
-        opacity: 1;
-      }
-    }
-    .tbody.no-scroll {
-      overflow: hidden;
+      height: fit-content;
+      width: fit-content;
     }
     .tr {
-      overflow: hidden;
-      background: ${Colors.WHITE};
-      cursor: default;
       cursor: ${(props) => props.triggerRowSelection && "pointer"};
+      background: ${Colors.WHITE};
+      &.selected-row {
+        background: ${({ accentColor }) =>
+          `${lightenColor(accentColor)}`} !important;
+
+        &:hover {
+          background: ${({ accentColor }) =>
+            `${lightenColor(accentColor, "0.9")}`} !important;
+        }
+      }
+
+      ${(props) => {
+        if (!props.isAddRowInProgress) {
+          return `&:hover {
+            background: var(--wds-color-bg-hover) !important;
+          }`;
+        }
+      }}
       &.new-row {
         background: ${({ accentColor }) =>
           `${lightenColor(accentColor)}`} !important;
@@ -217,11 +176,13 @@ export const TableWrapper = styled.div<{
     }
 
     .th {
+      padding: 0 10px 0 0;
+      height: ${(props) =>
+        props.isHeaderVisible ? props.tableSizes.COLUMN_HEADER_HEIGHT : 40}px;
       line-height: ${(props) =>
         props.isHeaderVisible ? props.tableSizes.COLUMN_HEADER_HEIGHT : 40}px;
       background: var(--wds-color-bg);
-      font-weight: 500;
-      padding: ${(props) => props.tableSizes.CELL_PADDING}px;
+      font-weight: bold;
     }
     .td {
       min-height: ${(props) => props.tableSizes.ROW_HEIGHT}px;
@@ -319,7 +280,31 @@ export const TableWrapper = styled.div<{
       height: 100%;
     }
   }
+  .hidden-header {
+    opacity: 0.6;
 
+    ${invisible};
+  }
+  .header-menu {
+    cursor: pointer;
+    width: 24px;
+    display: flex;
+    align-items: center;
+    .bp3-popover2-target {
+      display: block;
+    }
+
+    &.hide {
+      &:hover {
+        .bp3-popover2-target {
+          display: block;
+        }
+      }
+      .bp3-popover2-target {
+        display: none;
+      }
+    }
+  }
   .column-menu {
     cursor: pointer;
     height: ${(props) => props.tableSizes.COLUMN_HEADER_HEIGHT}px;
@@ -404,14 +389,22 @@ export const PaginationWrapper = styled.div`
   justify-content: flex-end;
   align-items: center;
   padding: 8px;
+  color: var(--wds-color-text-light);
 `;
 
-export const PaginationItemWrapper = styled.button<{
+export const PaginationItemWrapper = styled.div<{
   disabled?: boolean;
   selected?: boolean;
   borderRadius: string;
   accentColor: string;
 }>`
+  background: ${(props) =>
+    props.disabled ? `var(--wds-color-bg-disabled)` : `var(--wds-color-bg)`};
+  border: 1px solid
+    ${(props) =>
+      props.disabled
+        ? `var(--wds-color-border-disabled)`
+        : `var(--wds-color-border)`};
   box-sizing: border-box;
   width: 24px;
   height: 24px;
@@ -419,6 +412,7 @@ export const PaginationItemWrapper = styled.button<{
   justify-content: center;
   align-items: center;
   margin: 0 4px;
+  cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
   border-radius: ${({ borderRadius }) => borderRadius};
 
   & > * {
@@ -490,7 +484,7 @@ export const TableStyles = css<{
   isTextType?: boolean;
 }>``;
 
-export const CELL_WRAPPER_LINE_HEIGHT = 1.43;
+export const CELL_WRAPPER_LINE_HEIGHT = 28;
 
 export const CellWrapper = styled.div<{
   isHidden?: boolean;
@@ -508,13 +502,13 @@ export const CellWrapper = styled.div<{
   disablePadding?: boolean;
   imageSize?: ImageSize;
   isCellDisabled?: boolean;
-  tableSizes?: TableSizes;
 }>`
   display: ${(props) => (props.isCellVisible !== false ? "flex" : "none")};
   align-items: center;
   justify-content: flex-start;
   width: 100%;
   height: 100%;
+  ${(props) => (props.isHidden ? invisible : "")};
   font-weight: ${(props) =>
     props.fontStyle?.includes(FontStyleTypes.BOLD) ? "bold" : "normal"};
   color: ${(props) => props.textColor};
@@ -551,8 +545,14 @@ export const CellWrapper = styled.div<{
   font-size: ${(props) => props.textSize};
 
   padding: ${(props) =>
-    props.tableSizes ? props.tableSizes.CELL_PADDING : 16}px;
-  line-height: ${CELL_WRAPPER_LINE_HEIGHT};
+    props.disablePadding
+      ? 0
+      : `${
+          props.compactMode
+            ? `${TABLE_SIZES[props.compactMode].VERTICAL_PADDING}px 10px`
+            : `${0}px 10px`
+        }`};
+  line-height: ${CELL_WRAPPER_LINE_HEIGHT}px;
   .${Classes.POPOVER_WRAPPER} {
     width: 100%;
     overflow: hidden;
@@ -665,6 +665,8 @@ export const CellCheckbox = styled.div`
   }
 `;
 
+const MIN_WIDTH_TO_SHOW_PAGE_ITEMS = 700;
+
 export const TableHeaderWrapper = styled.div<{
   serverSidePaginationEnabled: boolean;
   width: number;
@@ -673,7 +675,11 @@ export const TableHeaderWrapper = styled.div<{
 }>`
   position: relative;
   display: flex;
-  width: ${(props) => props.width}px;
+  width: 100%;
+  .show-page-items {
+    display: ${(props) =>
+      props.width < MIN_WIDTH_TO_SHOW_PAGE_ITEMS ? "none" : "flex"};
+  }
   height: ${(props) => props.tableSizes.TABLE_HEADER_HEIGHT}px;
   min-height: ${(props) => props.tableSizes.TABLE_HEADER_HEIGHT}px;
 `;
@@ -718,6 +724,7 @@ export const TableHeaderContentWrapper = styled.div`
   justify-content: center;
   font-size: ${HEADER_CONTROL_FONT_SIZE};
   line-height: 20px;
+  color: ${Colors.GRAY};
   margin: 0 4px;
   white-space: nowrap;
 `;
@@ -735,6 +742,7 @@ export const TableIconWrapper = styled.div<{
   display: flex;
   align-items: center;
   justify-content: center;
+  ${(props) => (props.disabled ? invisible : "")};
   cursor: ${(props) => !props.disabled && "pointer"};
   position: relative;
   &:hover {

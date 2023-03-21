@@ -20,7 +20,6 @@ import { generateReactKey } from "widgets/WidgetUtils";
 
 export type TableSizes = {
   COLUMN_HEADER_HEIGHT: number;
-  CELL_PADDING: number;
   TABLE_HEADER_HEIGHT: number;
   ROW_HEIGHT: number;
   ROW_FONT_SIZE: number;
@@ -56,10 +55,9 @@ export enum ImageSizes {
 
 export const TABLE_SIZES: { [key: string]: TableSizes } = {
   [CompactModeTypes.DEFAULT]: {
-    COLUMN_HEADER_HEIGHT: 22,
-    CELL_PADDING: 16,
-    TABLE_HEADER_HEIGHT: 38,
-    ROW_HEIGHT: 53,
+    COLUMN_HEADER_HEIGHT: 32,
+    TABLE_HEADER_HEIGHT: 40,
+    ROW_HEIGHT: 40,
     ROW_FONT_SIZE: 14,
     VERTICAL_PADDING: 6,
     VERTICAL_EDITOR_PADDING: 0,
@@ -67,9 +65,8 @@ export const TABLE_SIZES: { [key: string]: TableSizes } = {
     ROW_VIRTUAL_OFFSET: 3,
   },
   [CompactModeTypes.SHORT]: {
-    COLUMN_HEADER_HEIGHT: 22,
-    CELL_PADDING: 8,
-    TABLE_HEADER_HEIGHT: 38,
+    COLUMN_HEADER_HEIGHT: 32,
+    TABLE_HEADER_HEIGHT: 40,
     ROW_HEIGHT: 30,
     ROW_FONT_SIZE: 12,
     VERTICAL_PADDING: 0,
@@ -79,9 +76,8 @@ export const TABLE_SIZES: { [key: string]: TableSizes } = {
   },
   [CompactModeTypes.TALL]: {
     COLUMN_HEADER_HEIGHT: 32,
-    CELL_PADDING: 16,
-    TABLE_HEADER_HEIGHT: 48,
-    ROW_HEIGHT: 70,
+    TABLE_HEADER_HEIGHT: 40,
+    ROW_HEIGHT: 60,
     ROW_FONT_SIZE: 18,
     VERTICAL_PADDING: 16,
     VERTICAL_EDITOR_PADDING: 16,
@@ -266,7 +262,6 @@ export interface ColumnBaseProperties {
   enableSort?: boolean;
   isDerived: boolean;
   computedValue: string;
-  translationJp: string;
   isCellVisible?: boolean;
   isAscOrder?: boolean;
   alias: string;
