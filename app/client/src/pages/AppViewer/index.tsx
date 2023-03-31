@@ -170,7 +170,10 @@ function AppViewer(props: Props) {
    * loads font for canvas based on theme
    */
   useEffect(() => {
-    if (selectedTheme.properties.fontFamily.appFont !== DEFAULT_FONT_NAME) {
+    if (
+      selectedTheme.properties.fontFamily.appFont !== DEFAULT_FONT_NAME &&
+      selectedTheme.properties.fontFamily.appFont
+    ) {
       webfontloader.load({
         google: {
           families: [
