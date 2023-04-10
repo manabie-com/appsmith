@@ -1,14 +1,13 @@
 import { fork, put, select } from "redux-saga/effects";
-import { RouteChangeActionPayload } from "actions/focusHistoryActions";
+import type { RouteChangeActionPayload } from "actions/focusHistoryActions";
 import { FocusEntity, identifyEntityFromPath } from "navigation/FocusEntity";
 import log from "loglevel";
-import { Location } from "history";
-import { AppsmithLocationState } from "utils/history";
 import AnalyticsUtil from "utils/AnalyticsUtil";
 import { getRecentEntityIds } from "selectors/globalSearchSelectors";
-import { ReduxAction } from "ce/constants/ReduxActionConstants";
+import type { ReduxAction } from "ce/constants/ReduxActionConstants";
 import { getCurrentThemeDetails } from "selectors/themeSelectors";
-import { BackgroundTheme, changeAppBackground } from "sagas/ThemeSaga";
+import type { BackgroundTheme } from "sagas/ThemeSaga";
+import { changeAppBackground } from "sagas/ThemeSaga";
 import { updateRecentEntitySaga } from "sagas/GlobalSearchSagas";
 import { isEditorPath } from "@appsmith/pages/Editor/Explorer/helpers";
 import {
@@ -17,6 +16,8 @@ import {
 } from "actions/widgetSelectionActions";
 import { MAIN_CONTAINER_WIDGET_ID } from "constants/WidgetConstants";
 import { contextSwitchingSaga } from "ce/sagas/ContextSwitchingSaga";
+import { getSafeCrash } from "selectors/errorSelectors";
+import { flushErrors } from "actions/errorActions";
 
 let previousPath: string;
 
@@ -25,6 +26,7 @@ export function* handleRouteChange(
 ) {
   const { pathname, state } = action.payload.location;
   try {
+    yield fork(clearErrors);
     const isAnEditorPath = isEditorPath(pathname);
 
     // handled only on edit mode
@@ -48,9 +50,21 @@ function* appBackgroundHandler() {
   changeAppBackground(currentTheme);
 }
 
-function* logNavigationAnalytics(payload: {
-  location: Location<AppsmithLocationState>;
-}) {
+/**
+ * When an error occurs, we take over the whole router and keep it the error
+ * state till the errors are flushed. By default, we will flush out the
+ * error state when a CTA on the page is clicked but in case the
+ * user navigates via the browser buttons, this will ensure
+ * the errors are flushed
+ * */
+function* clearErrors() {
+  const isCrashed: boolean = yield select(getSafeCrash);
+  if (isCrashed) {
+    yield put(flushErrors());
+  }
+}
+
+function* logNavigationAnalytics(payload: RouteChangeActionPayload) {
   const {
     location: { pathname, state },
   } = payload;

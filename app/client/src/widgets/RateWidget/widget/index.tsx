@@ -1,15 +1,16 @@
-import { WidgetType } from "constants/WidgetConstants";
+import type { WidgetType } from "constants/WidgetConstants";
 import React from "react";
-import BaseWidget, { WidgetProps, WidgetState } from "widgets/BaseWidget";
+import type { WidgetProps, WidgetState } from "widgets/BaseWidget";
+import BaseWidget from "widgets/BaseWidget";
 import RateComponent from "../component";
-import { RateSize } from "../constants";
+import type { RateSize } from "../constants";
 
 import { EventType } from "constants/AppsmithActionConstants/ActionConstants";
 import { ValidationTypes } from "constants/WidgetValidation";
-import { Stylesheet } from "entities/AppTheming";
+import type { Stylesheet } from "entities/AppTheming";
 import { AutocompleteDataType } from "utils/autocomplete/CodemirrorTernService";
-import { getResponsiveLayoutConfig } from "utils/layoutPropertiesUtils";
-import { DerivedPropertiesMap } from "utils/WidgetFactory";
+import type { DerivedPropertiesMap } from "utils/WidgetFactory";
+import { isAutoLayout } from "utils/autoLayout/flexWidgetUtils";
 
 function validateDefaultRate(value: unknown, props: any, _: any) {
   try {
@@ -199,12 +200,11 @@ class RateWidget extends BaseWidget<RateWidgetProps, WidgetState> {
           },
         ],
       },
-      ...getResponsiveLayoutConfig(this.getWidgetType()),
       {
         sectionName: "Events",
         children: [
           {
-            helpText: "Triggers an action when the rate is changed",
+            helpText: "when the rate is changed",
             propertyName: "onRateChanged",
             label: "onChange",
             controlType: "ACTION_SELECTOR",
@@ -228,6 +228,7 @@ class RateWidget extends BaseWidget<RateWidgetProps, WidgetState> {
             helpText: "Controls the size of the stars in the widget",
             controlType: "ICON_TABS",
             fullWidth: true,
+            hidden: isAutoLayout,
             options: [
               {
                 label: "Small",

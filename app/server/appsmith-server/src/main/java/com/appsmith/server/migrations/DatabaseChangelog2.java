@@ -8,6 +8,7 @@ import com.appsmith.external.models.PluginType;
 import com.appsmith.external.models.Policy;
 import com.appsmith.external.models.Property;
 import com.appsmith.external.models.QBaseDomain;
+import com.appsmith.external.models.QBranchAwareDomain;
 import com.appsmith.external.models.QDatasource;
 import com.appsmith.server.acl.AclPermission;
 import com.appsmith.server.acl.AppsmithRole;
@@ -815,11 +816,11 @@ public class DatabaseChangelog2 {
         dropIndexIfExists(mongoTemplate, NewAction.class, "defaultApplicationId_gitSyncId_compound_index");
         dropIndexIfExists(mongoTemplate, ActionCollection.class, "defaultApplicationId_gitSyncId_compound_index");
 
-        String defaultResources = fieldName(QBaseDomain.baseDomain.defaultResources);
+        String defaultResources = fieldName(QBranchAwareDomain.branchAwareDomain.defaultResources);
         ensureIndexes(mongoTemplate, ActionCollection.class,
                 makeIndex(
                         defaultResources + "." + FieldName.APPLICATION_ID,
-                        fieldName(QBaseDomain.baseDomain.gitSyncId),
+                        fieldName(QBranchAwareDomain.branchAwareDomain.gitSyncId),
                         fieldName(QBaseDomain.baseDomain.deleted)
                 )
                         .named("defaultApplicationId_gitSyncId_deleted_compound_index")
@@ -828,7 +829,7 @@ public class DatabaseChangelog2 {
         ensureIndexes(mongoTemplate, NewAction.class,
                 makeIndex(
                         defaultResources + "." + FieldName.APPLICATION_ID,
-                        fieldName(QBaseDomain.baseDomain.gitSyncId),
+                        fieldName(QBranchAwareDomain.branchAwareDomain.gitSyncId),
                         fieldName(QBaseDomain.baseDomain.deleted)
                 )
                         .named("defaultApplicationId_gitSyncId_deleted_compound_index")
@@ -837,7 +838,7 @@ public class DatabaseChangelog2 {
         ensureIndexes(mongoTemplate, NewPage.class,
                 makeIndex(
                         defaultResources + "." + FieldName.APPLICATION_ID,
-                        fieldName(QBaseDomain.baseDomain.gitSyncId),
+                        fieldName(QBranchAwareDomain.branchAwareDomain.gitSyncId),
                         fieldName(QBaseDomain.baseDomain.deleted)
                 )
                         .named("defaultApplicationId_gitSyncId_deleted_compound_index")
@@ -2806,5 +2807,24 @@ public class DatabaseChangelog2 {
         Update update = new Update();
         update.set("datasourceConfiguration.connection.ssl.authType", "DISABLE");
         mongoTemplate.updateMulti(queryToGetDatasources, update, Datasource.class);
+    }
+
+    @ChangeSet(order = "042", id = "add-oracle-plugin", author = "")
+    public void addOraclePlugin(MongoTemplate mongoTemplate) {
+        Plugin plugin = new Plugin();
+        plugin.setName("Oracle Plugin");
+        plugin.setType(PluginType.DB);
+        plugin.setPackageName("oracle-plugin");
+        plugin.setUiComponent("DbEditorForm");
+        plugin.setResponseType(Plugin.ResponseType.TABLE);
+        plugin.setIconLocation("https://s3.us-east-2.amazonaws.com/assets.appsmith.com/oracle-db.jpg");
+        plugin.setDocumentationLink("https://docs.appsmith.com/datasource-reference/querying-oracle");
+        plugin.setDefaultInstall(true);
+        try {
+            mongoTemplate.insert(plugin);
+        } catch (DuplicateKeyException e) {
+            log.warn(plugin.getPackageName() + " already present in database.");
+        }
+        installPluginToAllWorkspaces(mongoTemplate, plugin.getId());
     }
 }

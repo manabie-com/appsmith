@@ -10,4 +10,4 @@ export const InputTypes: { [key: string]: string } = {
   COLOR: "COLOR",
 };
 
-export type InputType = typeof InputTypes[keyof typeof InputTypes];
+export type InputType = (typeof InputTypes)[keyof typeof InputTypes];

@@ -1,12 +1,11 @@
 import React from "react";
-import { WidgetProps, WidgetState } from "widgets/BaseWidget";
-import { WidgetType } from "constants/WidgetConstants";
-import InputComponent, { InputComponentProps } from "../component";
+import type { WidgetProps, WidgetState } from "widgets/BaseWidget";
+import type { WidgetType } from "constants/WidgetConstants";
+import type { InputComponentProps } from "../component";
+import InputComponent from "../component";
 import { EventType } from "constants/AppsmithActionConstants/ActionConstants";
-import {
-  ValidationTypes,
-  ValidationResponse,
-} from "constants/WidgetValidation";
+import type { ValidationResponse } from "constants/WidgetValidation";
+import { ValidationTypes } from "constants/WidgetValidation";
 import {
   createMessage,
   FIELD_REQUIRED_ERROR,
@@ -15,25 +14,25 @@ import {
   INPUT_DEFAULT_TEXT_MIN_NUM_ERROR,
   INPUT_TEXT_MAX_CHAR_ERROR,
 } from "@appsmith/constants/messages";
-import { DerivedPropertiesMap } from "utils/WidgetFactory";
+import type { DerivedPropertiesMap } from "utils/WidgetFactory";
 import { GRID_DENSITY_MIGRATION_V1, ICON_NAMES } from "widgets/constants";
 import { AutocompleteDataType } from "utils/autocomplete/CodemirrorTernService";
 import BaseInputWidget from "widgets/BaseInputWidget";
 import { isNil, isNumber, merge, toString } from "lodash";
 import derivedProperties from "./parsedDerivedProperties";
-import { BaseInputWidgetProps } from "widgets/BaseInputWidget/widget";
+import type { BaseInputWidgetProps } from "widgets/BaseInputWidget/widget";
 import { mergeWidgetConfig } from "utils/helpers";
 import {
   InputTypes,
   NumberInputStepButtonPosition,
 } from "widgets/BaseInputWidget/constants";
 import { getParsedText } from "./Utilities";
-import { Stylesheet } from "entities/AppTheming";
+import type { Stylesheet } from "entities/AppTheming";
 import { checkInputTypeTextByProps } from "widgets/BaseInputWidget/utils";
 import { DynamicHeight } from "utils/WidgetFeatures";
-import { AppState } from "ce/reducers";
+import type { AppState } from "ce/reducers";
 import { connect } from "react-redux";
-import { LanguageEnums } from "entities/App";
+import type { LanguageEnums } from "entities/App";
 import { translate } from "utils/translate";
 
 export function defaultValueValidation(

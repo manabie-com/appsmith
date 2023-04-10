@@ -1,6 +1,6 @@
 import React from "react";
-import { ReactNode } from "react";
-import { Dispatch } from "redux";
+import type { ReactNode } from "react";
+import type { Dispatch } from "redux";
 import TableData from "assets/gifs/table_data.gif";
 import DefaultText from "assets/gifs/default_text.gif";
 import {
@@ -9,7 +9,7 @@ import {
   forceShowContent,
   focusWidget,
 } from "actions/onboardingActions";
-import { IconName } from "design-system-old";
+import type { IconName } from "design-system-old";
 import { highlightSection, showIndicator } from "./utils";
 import { setExplorerPinnedAction } from "actions/explorerActions";
 import { forceOpenWidgetPanel } from "actions/widgetSidebarActions";
@@ -503,8 +503,9 @@ export const Steps: StepsType = {
         text: (
           <>
             Select the button widget to see the properties in the property pane.
-            From the onClick dropdown, select <b>Execute a query</b> {"&"} then
-            select <b>updateCustomerInfo</b> query
+            Click the <b>+</b> button beside the onClick property to add an
+            action, select <b>Execute a query</b> {"&"} then select{" "}
+            <b>updateCustomerInfo</b> query
           </>
         ),
       },
@@ -516,8 +517,8 @@ export const Steps: StepsType = {
       {
         text: (
           <>
-            Click the onSuccess dropdown, select <b>Execute a query</b> {"&"}{" "}
-            then choose <b>getCustomers</b> Query
+            Click the <b>+</b> button beside On success, select{" "}
+            <b>Execute a query</b> {"&"} then choose <b>getCustomers</b> Query
           </>
         ),
       },

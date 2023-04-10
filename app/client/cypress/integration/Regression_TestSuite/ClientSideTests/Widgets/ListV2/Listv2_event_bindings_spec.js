@@ -11,22 +11,15 @@ describe("Listv2 - Event bindings", () => {
     // Open the property pane of button in the inner list widget
     cy.openPropertyPane("buttonwidget");
 
-    // Enable JS mode for onClick
-    cy.get(toggleJSButton("onclick")).click({ force: true });
-
     cy.testJsontext(
       "onclick",
       "{{showAlert(`${currentView.Input1.text} _ ${currentItem.id} _ ${currentIndex}`)}}",
     );
     // Enter text in the parent list widget's text input
-    cy.get(widgetSelector("Input1"))
-      .find("input")
-      .type("Input");
+    cy.get(widgetSelector("Input1")).find("input").type("Input");
 
     // click the button on inner list 1st row.
-    cy.get(widgetSelector("Button1"))
-      .find("button")
-      .click({ force: true });
+    cy.get(widgetSelector("Button1")).find("button").click({ force: true });
 
     cy.get(commonlocators.toastmsg).contains("Input _ 000 _ 0");
   });
@@ -39,9 +32,7 @@ describe("Listv2 - Event bindings", () => {
       .type("Updated Input");
 
     // click the button on inner list 1st row.
-    cy.get(widgetSelector("Button1"))
-      .find("button")
-      .click({ force: true });
+    cy.get(widgetSelector("Button1")).find("button").click({ force: true });
 
     cy.wait(1000);
 

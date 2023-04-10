@@ -1,7 +1,9 @@
-import React, { ReactNode } from "react";
+import { GridDefaults } from "constants/WidgetConstants";
+import type { ReactNode } from "react";
+import React from "react";
 import styled from "styled-components";
 
-import { LayoutDirection } from "utils/autoLayout/constants";
+import type { LayoutDirection } from "utils/autoLayout/constants";
 
 /**
  * 1. Given a direction if should employ flex in perpendicular direction.
@@ -21,6 +23,9 @@ export interface AutoLayoutLayerProps {
   wrapCenter: boolean;
   wrapEnd: boolean;
   wrapLayer: boolean;
+  startColumns: number;
+  centerColumns: number;
+  endColumns: number;
 }
 
 const LayoutLayerContainer = styled.div<{
@@ -59,20 +64,43 @@ const CenterWrapper = styled(SubWrapper)`
 `;
 
 function AutoLayoutLayer(props: AutoLayoutLayerProps) {
+  const renderChildren = () => {
+    const {
+      center,
+      centerColumns,
+      end,
+      endColumns,
+      isMobile,
+      start,
+      startColumns,
+    } = props;
+    const arr: (JSX.Element | null)[] = [
+      <StartWrapper key={0} wrap={props.wrapStart && props.isMobile}>
+        {start}
+      </StartWrapper>,
+      <CenterWrapper key={1} wrap={props.wrapCenter && props.isMobile}>
+        {center}
+      </CenterWrapper>,
+      <EndWrapper key={2} wrap={props.wrapEnd && props.isMobile}>
+        {end}
+      </EndWrapper>,
+    ];
+    const isFull =
+      startColumns + centerColumns + endColumns ===
+        GridDefaults.DEFAULT_GRID_COLUMNS && !isMobile;
+    if (isFull) {
+      if (startColumns === 0) arr[0] = null;
+      if (centerColumns === 0) arr[1] = null;
+      if (endColumns === 0) arr[2] = null;
+    }
+    return arr.filter((item) => item !== null);
+  };
   return (
     <LayoutLayerContainer
       className={`auto-layout-layer-${props.widgetId}-${props.index}`}
       wrap={props.isMobile && props.wrapLayer}
     >
-      <StartWrapper wrap={props.wrapStart && props.isMobile}>
-        {props.start}
-      </StartWrapper>
-      <CenterWrapper wrap={props.wrapCenter && props.isMobile}>
-        {props.center}
-      </CenterWrapper>
-      <EndWrapper wrap={props.wrapEnd && props.isMobile}>
-        {props.end}
-      </EndWrapper>
+      {renderChildren()}
     </LayoutLayerContainer>
   );
 }

@@ -1,10 +1,10 @@
 import { createReducer } from "utils/ReducerUtils";
+import type { ReduxAction } from "@appsmith/constants/ReduxActionConstants";
 import {
-  ReduxAction,
   ReduxActionTypes,
   ReduxActionErrorTypes,
 } from "@appsmith/constants/ReduxActionConstants";
-import { ChangeLanguageAction } from "actions/appViewActions";
+import type { ChangeLanguageAction } from "actions/appViewActions";
 import { LanguageEnums } from "entities/App";
 
 const initialState: AppViewReduxState = {
