@@ -1,4 +1,5 @@
 import Uppy from "@uppy/core";
+import { LanguageEnums } from "entities/App";
 import Dashboard from "@uppy/dashboard";
 import GoogleDrive from "@uppy/google-drive";
 import OneDrive from "@uppy/onedrive";
@@ -575,7 +576,8 @@ class FilePickerWidget extends BaseWidget<
   /**
    * add all uppy events listeners needed
    */
-  initializeUppyEventListeners = () => {
+
+  initializeUppyEventListeners = (lang: LanguageEnums) => {
     this.state.uppy
       .use(Dashboard, {
         target: "body",
@@ -606,6 +608,43 @@ class FilePickerWidget extends BaseWidget<
         locale: {
           strings: {
             closeModal: "Close",
+            dropPasteFiles:
+              lang == LanguageEnums.JA
+                ? "ファイルをドラッグ＆ドロップ または %{browseFiles}"
+                : "Drag & drop your files or %{browseFiles}",
+            browseFiles:
+              lang == LanguageEnums.JA ? "ファイルを選択" : "browser",
+            xFilesSelected: {
+              "0":
+                lang == LanguageEnums.JA
+                  ? "%{smart_count} ファイルが選択されました"
+                  : "%{smart_count} file selected",
+              "1":
+                lang == LanguageEnums.JA
+                  ? "%{smart_count}  ファイルが選択されました"
+                  : "%{smart_count} files selected",
+            },
+            cancel: lang == LanguageEnums.JA ? "キャンセル" : "Cancel",
+            uploadXFiles: {
+              "0":
+                lang == LanguageEnums.JA
+                  ? "アップロード %{smart_count} ファイル"
+                  : "Upload %{smart_count} file",
+              "1":
+                lang == LanguageEnums.JA
+                  ? "アップロード %{smart_count} ファイル"
+                  : "Upload %{smart_count} files",
+            },
+            uploadXNewFiles: {
+              "0":
+                lang == LanguageEnums.JA
+                  ? "アップロード %{smart_count} ファイル"
+                  : "Upload +%{smart_count} file",
+              "1":
+                lang == LanguageEnums.JA
+                  ? "アップロード %{smart_count} ファイル"
+                  : "Upload +%{smart_count} files",
+            },
           },
         },
       })
@@ -811,7 +850,17 @@ class FilePickerWidget extends BaseWidget<
     super.componentDidMount();
 
     try {
-      this.initializeUppyEventListeners();
+      const DEFAULT_LANGUAGE = LanguageEnums.EN;
+
+      let lang: LanguageEnums =
+        (new URLSearchParams(window.location.search).get(
+          "lang",
+        ) as LanguageEnums) || DEFAULT_LANGUAGE;
+
+      if (!Object.values(LanguageEnums).includes(lang as LanguageEnums)) {
+        lang = DEFAULT_LANGUAGE;
+      }
+      this.initializeUppyEventListeners(lang);
       this.initializeSelectedFiles();
     } catch (e) {
       log.debug("Error in initializing uppy");
