@@ -1,30 +1,23 @@
 import { Alignment } from "@blueprintjs/core";
 import { LabelPosition } from "components/constants";
 import { EventType } from "constants/AppsmithActionConstants/ActionConstants";
-import { WidgetType } from "constants/WidgetConstants";
-import {
-  ValidationResponse,
-  ValidationTypes,
-} from "constants/WidgetValidation";
-import { Stylesheet } from "entities/AppTheming";
+import type { WidgetType } from "constants/WidgetConstants";
+import type { ValidationResponse } from "constants/WidgetValidation";
+import { ValidationTypes } from "constants/WidgetValidation";
+import type { Stylesheet } from "entities/AppTheming";
 import { EvaluationSubstitutionType } from "entities/DataTree/dataTreeFactory";
 import equal from "fast-deep-equal/es6";
-import {
-  findIndex,
-  isArray,
-  isNil,
-  isNumber,
-  isString,
-  LoDashStatic,
-} from "lodash";
+import type { LoDashStatic } from "lodash";
+import { findIndex, isArray, isNil, isNumber, isString } from "lodash";
 import React from "react";
 import { AutocompleteDataType } from "utils/autocomplete/CodemirrorTernService";
-import { getResponsiveLayoutConfig } from "utils/layoutPropertiesUtils";
+import { isAutoLayout } from "utils/autoLayout/flexWidgetUtils";
 import { GRID_DENSITY_MIGRATION_V1, MinimumPopupRows } from "widgets/constants";
 import { isAutoHeightEnabledForWidget } from "widgets/WidgetUtils";
-import BaseWidget, { WidgetProps, WidgetState } from "../../BaseWidget";
+import type { WidgetProps, WidgetState } from "../../BaseWidget";
+import BaseWidget from "../../BaseWidget";
 import SelectComponent from "../component";
-import { DropdownOption } from "../constants";
+import type { DropdownOption } from "../constants";
 import derivedProperties from "./parseDerivedProperties";
 
 export function defaultOptionValueValidation(
@@ -225,6 +218,7 @@ class SelectWidget extends BaseWidget<SelectWidgetProps, WidgetState> {
               { label: "Top", value: LabelPosition.Top },
               { label: "Auto", value: LabelPosition.Auto },
             ],
+            hidden: isAutoLayout,
             defaultValue: LabelPosition.Top,
             isBindProperty: false,
             isTriggerProperty: false,
@@ -381,12 +375,11 @@ class SelectWidget extends BaseWidget<SelectWidgetProps, WidgetState> {
           },
         ],
       },
-      ...getResponsiveLayoutConfig(this.getWidgetType()),
       {
         sectionName: "Events",
         children: [
           {
-            helpText: "Triggers an action when a user selects an option",
+            helpText: "when a user selects an option",
             propertyName: "onOptionChange",
             label: "onOptionChange",
             controlType: "ACTION_SELECTOR",
@@ -395,7 +388,7 @@ class SelectWidget extends BaseWidget<SelectWidgetProps, WidgetState> {
             isTriggerProperty: true,
           },
           {
-            helpText: "Triggers an action when the dropdown opens",
+            helpText: "when the dropdown opens",
             propertyName: "onDropdownOpen",
             label: "onDropdownOpen",
             controlType: "ACTION_SELECTOR",
@@ -404,7 +397,7 @@ class SelectWidget extends BaseWidget<SelectWidgetProps, WidgetState> {
             isTriggerProperty: true,
           },
           {
-            helpText: "Triggers an action when the dropdown closes",
+            helpText: "when the dropdown closes",
             propertyName: "onDropdownClose",
             label: "onDropdownClose",
             controlType: "ACTION_SELECTOR",
@@ -438,6 +431,7 @@ class SelectWidget extends BaseWidget<SelectWidgetProps, WidgetState> {
             helpText: "Control the font size of the label associated",
             controlType: "DROP_DOWN",
             defaultValue: "0.875rem",
+            hidden: isAutoLayout,
             options: [
               {
                 label: "S",
@@ -494,21 +488,6 @@ class SelectWidget extends BaseWidget<SelectWidgetProps, WidgetState> {
             isBindProperty: true,
             isTriggerProperty: false,
             validation: { type: ValidationTypes.TEXT },
-          },
-        ],
-      },
-      {
-        sectionName: "Colors",
-        children: [
-          {
-            propertyName: "accentColor",
-            label: "Accent Color",
-            controlType: "COLOR_PICKER",
-            isJSConvertible: true,
-            isBindProperty: true,
-            isTriggerProperty: false,
-            validation: { type: ValidationTypes.TEXT },
-            invisible: true,
           },
         ],
       },

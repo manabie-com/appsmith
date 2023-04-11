@@ -1,5 +1,5 @@
 import { ReduxActionTypes } from "@appsmith/constants/ReduxActionConstants";
-import { LanguageEnums } from "entities/App";
+import type { LanguageEnums } from "entities/App";
 
 export type ChangeLanguageAction = {
   lang: LanguageEnums;

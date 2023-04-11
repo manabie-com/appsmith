@@ -3,14 +3,11 @@ import styled from "styled-components";
 import { Colors } from "constants/Colors";
 import { useSelector } from "react-redux";
 import { getPluginImages } from "selectors/entitiesSelector";
-import {
-  Classes,
+import type {
   DropdownOption,
   RenderDropdownOptionType,
-  Text,
-  TextType,
-  TooltipComponent,
 } from "design-system-old";
+import { Classes, Text, TextType, TooltipComponent } from "design-system-old";
 import { FormIcons } from "icons/FormIcons";
 import _ from "lodash";
 
@@ -76,6 +73,7 @@ const OptionWrapper = styled.div<{
 const CreateIconWrapper = styled.div`
   margin: 0px 8px 0px 0px;
   cursor: pointer;
+  height: 20px;
 `;
 
 const ImageWrapper = styled.div`

@@ -1,25 +1,27 @@
-import React, { ReactNode } from "react";
+import type { ReactNode } from "react";
+import React from "react";
 
-import { TextSize } from "constants/WidgetConstants";
+import type { TextSize } from "constants/WidgetConstants";
 import { countOccurrences } from "workers/Evaluation/helpers";
 
 import { ValidationTypes } from "constants/WidgetValidation";
-import { DerivedPropertiesMap } from "utils/WidgetFactory";
+import type { DerivedPropertiesMap } from "utils/WidgetFactory";
 
 import WidgetStyleContainer from "components/designSystems/appsmith/WidgetStyleContainer";
-import { Color } from "constants/Colors";
-import { Stylesheet } from "entities/AppTheming";
+import type { Color } from "constants/Colors";
+import type { Stylesheet } from "entities/AppTheming";
 import styled from "styled-components";
-import { AppState } from "@appsmith/reducers";
+import type { AppState } from "@appsmith/reducers";
 import { connect } from "react-redux";
 import { LanguageEnums } from "entities/App";
 import { translate } from "utils/translate";
 import { pick } from "lodash";
 import { AutocompleteDataType } from "utils/autocomplete/CodemirrorTernService";
-import { getResponsiveLayoutConfig } from "utils/layoutPropertiesUtils";
-import BaseWidget, { WidgetProps, WidgetState } from "widgets/BaseWidget";
-import { ContainerStyle } from "widgets/ContainerWidget/component";
-import TextComponent, { TextAlign } from "../component";
+import type { WidgetProps, WidgetState } from "widgets/BaseWidget";
+import BaseWidget from "widgets/BaseWidget";
+import type { ContainerStyle } from "widgets/ContainerWidget/component";
+import type { TextAlign } from "../component";
+import TextComponent from "../component";
 import { OverflowTypes } from "../constants";
 
 const MAX_HTML_PARSING_LENGTH = 1000;
@@ -123,7 +125,6 @@ class TextWidget extends BaseWidget<TextProps, WidgetState> {
           },
         ],
       },
-      ...getResponsiveLayoutConfig(this.getWidgetType()),
     ];
   }
 

@@ -1,17 +1,18 @@
 import Uppy from "@uppy/core";
+import { LanguageEnums } from "entities/App";
 import Dashboard from "@uppy/dashboard";
 import GoogleDrive from "@uppy/google-drive";
 import OneDrive from "@uppy/onedrive";
 import Url from "@uppy/url";
-import { UppyFile } from "@uppy/utils";
+import type { UppyFile } from "@uppy/utils";
 import Webcam from "@uppy/webcam";
 import CloseIcon from "assets/icons/ads/cross.svg";
 import UpIcon from "assets/icons/ads/up-arrow.svg";
 import { EventType } from "constants/AppsmithActionConstants/ActionConstants";
 import { Colors } from "constants/Colors";
-import { WidgetType } from "constants/WidgetConstants";
+import type { WidgetType } from "constants/WidgetConstants";
 import { ValidationTypes } from "constants/WidgetValidation";
-import { Stylesheet } from "entities/AppTheming";
+import type { Stylesheet } from "entities/AppTheming";
 import { EvaluationSubstitutionType } from "entities/DataTree/dataTreeFactory";
 import { klona } from "klona";
 import _, { findIndex } from "lodash";
@@ -21,9 +22,9 @@ import React from "react";
 import shallowequal from "shallowequal";
 import { createGlobalStyle } from "styled-components";
 import { createBlobUrl, isBlobUrl } from "utils/AppsmithUtils";
-import { getResponsiveLayoutConfig } from "utils/layoutPropertiesUtils";
-import { DerivedPropertiesMap } from "utils/WidgetFactory";
-import BaseWidget, { WidgetProps, WidgetState } from "widgets/BaseWidget";
+import type { DerivedPropertiesMap } from "utils/WidgetFactory";
+import type { WidgetProps, WidgetState } from "widgets/BaseWidget";
+import BaseWidget from "widgets/BaseWidget";
 import FilePickerComponent from "../component";
 import FileDataTypes from "../constants";
 
@@ -425,14 +426,13 @@ class FilePickerWidget extends BaseWidget<
           },
         ],
       },
-      ...getResponsiveLayoutConfig(this.getWidgetType()),
 
       {
         sectionName: "Events",
         children: [
           {
             helpText:
-              "Triggers an action when the user selects a file. Upload files to a CDN and stores their URLs in filepicker.files",
+              "when the user selects a file. Upload files to a CDN and stores their URLs in filepicker.files",
             propertyName: "onFilesSelected",
             label: "onFilesSelected",
             controlType: "ACTION_SELECTOR",
@@ -576,7 +576,8 @@ class FilePickerWidget extends BaseWidget<
   /**
    * add all uppy events listeners needed
    */
-  initializeUppyEventListeners = () => {
+
+  initializeUppyEventListeners = (lang: LanguageEnums) => {
     this.state.uppy
       .use(Dashboard, {
         target: "body",
@@ -607,6 +608,43 @@ class FilePickerWidget extends BaseWidget<
         locale: {
           strings: {
             closeModal: "Close",
+            dropPasteFiles:
+              lang == LanguageEnums.JA
+                ? "ファイルをドラッグ＆ドロップ または %{browseFiles}"
+                : "Drag & drop your files or %{browseFiles}",
+            browseFiles:
+              lang == LanguageEnums.JA ? "ファイルを選択" : "browser",
+            xFilesSelected: {
+              "0":
+                lang == LanguageEnums.JA
+                  ? "%{smart_count} ファイルが選択されました"
+                  : "%{smart_count} file selected",
+              "1":
+                lang == LanguageEnums.JA
+                  ? "%{smart_count}  ファイルが選択されました"
+                  : "%{smart_count} files selected",
+            },
+            cancel: lang == LanguageEnums.JA ? "キャンセル" : "Cancel",
+            uploadXFiles: {
+              "0":
+                lang == LanguageEnums.JA
+                  ? "アップロード %{smart_count} ファイル"
+                  : "Upload %{smart_count} file",
+              "1":
+                lang == LanguageEnums.JA
+                  ? "アップロード %{smart_count} ファイル"
+                  : "Upload %{smart_count} files",
+            },
+            uploadXNewFiles: {
+              "0":
+                lang == LanguageEnums.JA
+                  ? "アップロード %{smart_count} ファイル"
+                  : "Upload +%{smart_count} file",
+              "1":
+                lang == LanguageEnums.JA
+                  ? "アップロード %{smart_count} ファイル"
+                  : "Upload +%{smart_count} files",
+            },
           },
         },
       })
@@ -812,7 +850,17 @@ class FilePickerWidget extends BaseWidget<
     super.componentDidMount();
 
     try {
-      this.initializeUppyEventListeners();
+      const DEFAULT_LANGUAGE = LanguageEnums.EN;
+
+      let lang: LanguageEnums =
+        (new URLSearchParams(window.location.search).get(
+          "lang",
+        ) as LanguageEnums) || DEFAULT_LANGUAGE;
+
+      if (!Object.values(LanguageEnums).includes(lang as LanguageEnums)) {
+        lang = DEFAULT_LANGUAGE;
+      }
+      this.initializeUppyEventListeners(lang);
       this.initializeSelectedFiles();
     } catch (e) {
       log.debug("Error in initializing uppy");

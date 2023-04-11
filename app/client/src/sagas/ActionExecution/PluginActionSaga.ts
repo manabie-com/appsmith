@@ -14,18 +14,21 @@ import {
   runAction,
   updateAction,
 } from "actions/pluginActionActions";
-import {
+import type {
   ApplicationPayload,
   ReduxAction,
+} from "@appsmith/constants/ReduxActionConstants";
+import {
   ReduxActionErrorTypes,
   ReduxActionTypes,
 } from "@appsmith/constants/ReduxActionConstants";
-import ActionAPI, {
+import type {
   ActionExecutionResponse,
   ActionResponse,
   ExecuteActionRequest,
   PaginationField,
 } from "api/ActionAPI";
+import ActionAPI from "api/ActionAPI";
 import {
   getAction,
   getCurrentPageNameByActionId,
@@ -38,13 +41,18 @@ import { getIsGitSyncModalOpen } from "selectors/gitSyncSelectors";
 import {
   getAppMode,
   getCurrentApplication,
-} from "selectors/applicationSelectors";
+} from "@appsmith/selectors/applicationSelectors";
 import { get, isArray, isString, set, find, isNil, flatten } from "lodash";
 import AppsmithConsole from "utils/AppsmithConsole";
 import { ENTITY_TYPE, PLATFORM_ERROR } from "entities/AppsmithConsole";
-import { validateResponse } from "sagas/ErrorSagas";
-import AnalyticsUtil, { EventName } from "utils/AnalyticsUtil";
-import { Action, PluginType } from "entities/Action";
+import {
+  extractClientDefinedErrorMetadata,
+  validateResponse,
+} from "sagas/ErrorSagas";
+import type { EventName } from "utils/AnalyticsUtil";
+import AnalyticsUtil from "utils/AnalyticsUtil";
+import type { Action } from "entities/Action";
+import { PluginType } from "entities/Action";
 import LOG_TYPE from "entities/AppsmithConsole/logtype";
 import { Toaster, Variant } from "design-system-old";
 import {
@@ -55,10 +63,12 @@ import {
   ACTION_EXECUTION_CANCELLED,
   ACTION_EXECUTION_FAILED,
 } from "@appsmith/constants/messages";
-import {
-  EventType,
+import type {
   LayoutOnLoadActionErrors,
   PageAction,
+} from "constants/AppsmithActionConstants/ActionConstants";
+import {
+  EventType,
   RESP_HEADER_DATATYPE,
 } from "constants/AppsmithActionConstants/ActionConstants";
 import {
@@ -72,7 +82,7 @@ import PerformanceTracker, {
 } from "utils/PerformanceTracker";
 import * as log from "loglevel";
 import { EMPTY_RESPONSE } from "components/editorComponents/ApiResponseView";
-import { AppState } from "@appsmith/reducers";
+import type { AppState } from "@appsmith/reducers";
 import { DEFAULT_EXECUTE_ACTION_TIMEOUT_MS } from "@appsmith/constants/ApiConstants";
 import { evaluateActionBindings } from "sagas/EvaluationsSaga";
 import { isBlobUrl, parseBlobUrl } from "utils/AppsmithUtils";
@@ -99,23 +109,23 @@ import {
   UserCancelledActionExecutionError,
 } from "sagas/ActionExecution/errorUtils";
 import { shouldBeDefined, trimQueryString } from "utils/helpers";
-import { JSCollection } from "entities/JSCollection";
+import type { JSCollection } from "entities/JSCollection";
 import { requestModalConfirmationSaga } from "sagas/UtilSagas";
 import { ModalType } from "reducers/uiReducers/modalActionReducer";
 import { getFormNames, getFormValues } from "redux-form";
 import { CURL_IMPORT_FORM } from "@appsmith/constants/forms";
 import { submitCurlImportForm } from "actions/importActions";
-import { curlImportFormValues } from "pages/Editor/APIEditor/helpers";
+import type { curlImportFormValues } from "pages/Editor/APIEditor/helpers";
 import { matchBasePath } from "@appsmith/pages/Editor/Explorer/helpers";
 import {
   isTrueObject,
   findDatatype,
 } from "@appsmith/workers/Evaluation/evaluationUtils";
 import { handleExecuteJSFunctionSaga } from "sagas/JSPaneSagas";
-import { Plugin } from "api/PluginApi";
+import type { Plugin } from "api/PluginApi";
 import { setDefaultActionDisplayFormat } from "./PluginActionSagaUtils";
 import { checkAndLogErrorsIfCyclicDependency } from "sagas/helper";
-import { TRunDescription } from "workers/Evaluation/fns/actionFns";
+import type { TRunDescription } from "workers/Evaluation/fns/actionFns";
 
 enum ActionResponseDataTypes {
   BINARY = "BINARY",
@@ -514,6 +524,12 @@ function* runActionShortcutSaga() {
   }
 }
 
+type RunActionError = {
+  name: string;
+  message: string;
+  clientDefinedError?: boolean;
+};
+
 function* runActionSaga(
   reduxAction: ReduxAction<{
     id: string;
@@ -559,7 +575,10 @@ function* runActionSaga(
 
   let payload = EMPTY_RESPONSE;
   let isError = true;
-  let error = { name: "", message: "" };
+  let error: RunActionError = {
+    name: "",
+    message: "",
+  };
   try {
     const executePluginActionResponse: ExecutePluginActionResponse = yield call(
       executePluginActionSaga,
@@ -589,6 +608,22 @@ function* runActionSaga(
     }
     log.error(e);
     error = { name: (e as Error).name, message: (e as Error).message };
+
+    const clientDefinedErrorMetadata = extractClientDefinedErrorMetadata(e);
+    if (clientDefinedErrorMetadata) {
+      set(
+        payload,
+        "statusCode",
+        `${clientDefinedErrorMetadata?.statusCode || ""}`,
+      );
+      set(payload, "request", {});
+      set(
+        payload,
+        "pluginErrorDetails",
+        clientDefinedErrorMetadata?.pluginErrorDetails,
+      );
+      set(error, "clientDefinedError", true);
+    }
   }
 
   // Error should be readable error if present.
@@ -609,13 +644,22 @@ function* runActionSaga(
       }
     : undefined;
 
+  const clientDefinedError = error.clientDefinedError
+    ? {
+        name: "PluginExecutionError",
+        message: error?.message,
+        clientDefinedError: true,
+      }
+    : undefined;
+
   const defaultError = {
     name: "PluginExecutionError",
     message: "An unexpected error occurred",
   };
 
   if (isError) {
-    error = readableError || payloadBodyError || defaultError;
+    error =
+      readableError || payloadBodyError || clientDefinedError || defaultError;
 
     // In case of debugger, both the current error message
     // and the readableError needs to be present,
@@ -654,8 +698,8 @@ function* runActionSaga(
             pluginType: actionObject.pluginType,
           },
           messages: appsmithConsoleErrorMessageList,
-          state: payload.request,
-          pluginErrorDetails: payload.pluginErrorDetails,
+          state: payload?.request,
+          pluginErrorDetails: payload?.pluginErrorDetails,
         },
       },
     ]);
@@ -794,10 +838,8 @@ function* executePageLoadAction(pageAction: PageAction) {
       message: createMessage(ACTION_EXECUTION_FAILED, pageAction.name),
     };
     try {
-      const executePluginActionResponse: ExecutePluginActionResponse = yield call(
-        executePluginActionSaga,
-        pageAction,
-      );
+      const executePluginActionResponse: ExecutePluginActionResponse =
+        yield call(executePluginActionSaga, pageAction);
       payload = executePluginActionResponse.payload;
       isError = executePluginActionResponse.isError;
     } catch (e) {
@@ -1009,7 +1051,7 @@ function* executePluginActionSaga(
           try {
             data = JSON.parse(data);
           } catch (e) {
-            console.log("Data is not a valid JSON object");
+            log.error("Data is not a valid JSON object");
           }
         }
         if (typeof data == "object") {

@@ -1,22 +1,24 @@
 import { EventType } from "constants/AppsmithActionConstants/ActionConstants";
-import { TextSize, WidgetType } from "constants/WidgetConstants";
+import type { TextSize, WidgetType } from "constants/WidgetConstants";
 import React from "react";
-import BaseWidget, { WidgetProps, WidgetState } from "widgets/BaseWidget";
+import type { WidgetProps, WidgetState } from "widgets/BaseWidget";
+import BaseWidget from "widgets/BaseWidget";
 import DatePickerComponent from "../component";
 
 import { ValidationTypes } from "constants/WidgetValidation";
 import { AutocompleteDataType } from "utils/autocomplete/CodemirrorTernService";
-import { DerivedPropertiesMap } from "utils/WidgetFactory";
+import type { DerivedPropertiesMap } from "utils/WidgetFactory";
 
 import { Alignment } from "@blueprintjs/core";
 import { LabelPosition } from "components/constants";
-import { Stylesheet } from "entities/AppTheming";
-import { getResponsiveLayoutConfig } from "utils/layoutPropertiesUtils";
+import type { Stylesheet } from "entities/AppTheming";
 import { GRID_DENSITY_MIGRATION_V1 } from "widgets/constants";
 import { isAutoHeightEnabledForWidget } from "widgets/WidgetUtils";
-import { DatePickerType, TimePrecision } from "../constants";
+import type { DatePickerType } from "../constants";
+import { TimePrecision } from "../constants";
 import { DateFormatOptions } from "./constants";
 import derivedProperties from "./parseDerivedProperties";
+import { isAutoLayout } from "utils/autoLayout/flexWidgetUtils";
 
 function allowedRange(value: any) {
   const allowedValues = [0, 1, 2, 3, 4, 5, 6];
@@ -85,8 +87,7 @@ class DatePickerWidget extends BaseWidget<DatePickerWidget2Props, WidgetState> {
               params: {
                 fn: allowedRange,
                 expected: {
-                  type:
-                    "0 : sunday\n1 : monday\n2 : tuesday\n3 : wednesday\n4 : thursday\n5 : friday\n6 : saturday",
+                  type: "0 : sunday\n1 : monday\n2 : tuesday\n3 : wednesday\n4 : thursday\n5 : friday\n6 : saturday",
                   example: "0",
                   autocompleteDataType: AutocompleteDataType.STRING,
                 },
@@ -149,6 +150,7 @@ class DatePickerWidget extends BaseWidget<DatePickerWidget2Props, WidgetState> {
             label: "Position",
             controlType: "ICON_TABS",
             fullWidth: true,
+            hidden: isAutoLayout,
             options: [
               { label: "Auto", value: LabelPosition.Auto },
               { label: "Left", value: LabelPosition.Left },
@@ -307,15 +309,13 @@ class DatePickerWidget extends BaseWidget<DatePickerWidget2Props, WidgetState> {
           },
         ],
       },
-      ...getResponsiveLayoutConfig(this.getWidgetType()),
       {
         sectionName: "Events",
         children: [
           {
             propertyName: "onDateSelected",
             label: "onDateSelected",
-            helpText:
-              "Triggers an action when a date is selected in the calendar",
+            helpText: "when a date is selected in the calendar",
             controlType: "ACTION_SELECTOR",
             isJSConvertible: true,
             isBindProperty: true,
@@ -324,7 +324,7 @@ class DatePickerWidget extends BaseWidget<DatePickerWidget2Props, WidgetState> {
           {
             propertyName: "onFocus",
             label: "onFocus",
-            helpText: "Triggers an action when the date picker receives focus",
+            helpText: "when the date picker receives focus",
             controlType: "ACTION_SELECTOR",
             isJSConvertible: true,
             isBindProperty: true,
@@ -333,7 +333,7 @@ class DatePickerWidget extends BaseWidget<DatePickerWidget2Props, WidgetState> {
           {
             propertyName: "onBlur",
             label: "onBlur",
-            helpText: "Triggers an action when the date picker loses focus",
+            helpText: "when the date picker loses focus",
             controlType: "ACTION_SELECTOR",
             isJSConvertible: true,
             isBindProperty: true,
@@ -365,6 +365,7 @@ class DatePickerWidget extends BaseWidget<DatePickerWidget2Props, WidgetState> {
             helpText: "Control the font size of the label associated",
             controlType: "DROP_DOWN",
             defaultValue: "0.875rem",
+            hidden: isAutoLayout,
             options: [
               {
                 label: "S",

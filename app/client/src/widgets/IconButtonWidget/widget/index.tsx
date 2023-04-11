@@ -1,19 +1,20 @@
-import { IconName } from "@blueprintjs/icons";
+import type { IconName } from "@blueprintjs/icons";
 import React from "react";
 
 import { EventType } from "constants/AppsmithActionConstants/ActionConstants";
-import { WidgetType } from "constants/WidgetConstants";
+import type { WidgetType } from "constants/WidgetConstants";
 import { ValidationTypes } from "constants/WidgetValidation";
-import BaseWidget, { WidgetProps, WidgetState } from "widgets/BaseWidget";
+import type { WidgetProps, WidgetState } from "widgets/BaseWidget";
+import BaseWidget from "widgets/BaseWidget";
 
 import { IconNames } from "@blueprintjs/icons";
-import { ButtonVariant, ButtonVariantTypes } from "components/constants";
-import { Stylesheet } from "entities/AppTheming";
-import { AppState } from "ce/reducers";
+import type { ButtonVariant } from "components/constants";
+import { ButtonVariantTypes } from "components/constants";
+import type { Stylesheet } from "entities/AppTheming";
+import type { AppState } from "ce/reducers";
 import { connect } from "react-redux";
-import { LanguageEnums } from "entities/App";
+import type { LanguageEnums } from "entities/App";
 import { translate } from "utils/translate";
-import { getResponsiveLayoutConfig } from "utils/layoutPropertiesUtils";
 import IconButtonComponent from "../component";
 
 const ICON_NAMES = Object.keys(IconNames).map(
@@ -59,7 +60,7 @@ class IconButtonWidget extends BaseWidget<IconButtonWidgetProps, WidgetState> {
             },
           },
           {
-            helpText: "Triggers an action when the button is clicked",
+            helpText: "when the button is clicked",
             propertyName: "onClick",
             label: "onClick",
             controlType: "ACTION_SELECTOR",
@@ -125,7 +126,6 @@ class IconButtonWidget extends BaseWidget<IconButtonWidgetProps, WidgetState> {
           },
         ],
       },
-      ...getResponsiveLayoutConfig(this.getWidgetType()),
     ];
   }
 
