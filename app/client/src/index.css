@@ -47,6 +47,16 @@ span.bp3-popover-target > * {
   min-width: 0;
 }
 
+.action-selector-popup span.bp3-popover-target > * {
+  max-width: 100%;
+}
+
+.action-selector-popup .bp3-button-text {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  min-width: 0;
+}
+
 div.bp3-popover-arrow {
   display: none;
 }
@@ -134,13 +144,4 @@ div.bp3-popover-arrow {
 
 .bp3-overlay-zindex {
   z-index: 20 !important;
-}
-input:autofill {
-  transition: background-color 600000s 0s, color 600000s 0s;
-  background-color: white !important;
-}
-
-input:-webkit-autofill {
-  transition: background-color 600000s 0s, color 600000s 0s;
-  background-color: white !important;
 }

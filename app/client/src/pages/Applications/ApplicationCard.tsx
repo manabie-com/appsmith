@@ -311,7 +311,6 @@ type ApplicationCardProps = {
   update?: (id: string, data: UpdateApplicationPayload) => void;
   enableImportExport?: boolean;
   isMobile?: boolean;
-  hasCreateNewApplicationPermission?: boolean;
   currentEmail?: string;
   permissions?: {
     hasCreateNewApplicationPermission?: boolean;
