@@ -78,66 +78,6 @@ const InputComponentWrapper = styled((props) => (
   isDynamicHeightEnabled?: boolean;
   isMultiline?: boolean;
 }>`
-  height: 40px;
-  position: relative;
-  .label {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 16px;
-    display: flex;
-    align-items: center;
-    z-index: 100;
-    pointer-events: none;
-    color: ${({ hasError }) =>
-      hasError ? "var(--wds-color-border-danger-focus)" : "rgb(117, 117, 117)"};
-  }
-  .label .text {
-    transition: all 0.1s ease-out;
-  }
-  .bp3-input{
-    height: 40px;
-  }
-  .bp3-input-group{
-    width: 100%;
-  }
-  .error-msg{
-    font-size: 0.75rem;
-    font-weight: 400;
-    letter-spacing: 0.4px;
-    text-transform: none;
-    font-family: Roboto, sans-serif;
-    text-align: left;
-    color: var(--wds-color-border-danger-focus);
-    position: absolute;
-    bottom: -20px;
-    left: 0;
-  }
-
-  :focus-within{
-    .label {
-      .text{
-        font-size: 1rem;
-        transform: translate(-15px,-19px) scale(0.75);
-        background-color: white;
-        padding-left: 4px;
-        padding-right: 4px;
-      }
-      color: ${({ hasError }) =>
-        hasError ? "var(--wds-color-border-danger-focus)" : "#1976d2"};
-    }
-  }
-  ${(props) =>
-    props.value
-      ? `
-      .label .text{
-        font-size: 1rem;
-        transform: translate(-15px,-19px) scale(0.75);
-        background-color: white;
-        padding-left: 4px;
-        padding-right: 4px;
-      }`
-      : ""};
   ${labelLayoutStyles}
   cursor: ${({ disabled }) => (disabled ? "not-allowed" : "auto")};
   .${Classes.INPUT_GROUP} {

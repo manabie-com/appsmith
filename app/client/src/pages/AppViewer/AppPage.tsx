@@ -31,8 +31,8 @@ export function AppPage(props: AppPageProps) {
   const isMobile = useIsMobileDevice();
   const appMode = useSelector(getAppMode);
   const isPublished = appMode === APP_MODE.PUBLISHED;
-
   useDynamicAppLayout();
+
   useEffect(() => {
     AnalyticsUtil.logEvent("PAGE_LOAD", {
       pageName: props.pageName,
