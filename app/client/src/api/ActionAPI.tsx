@@ -7,6 +7,11 @@ import axios from "axios";
 import type { Action, ActionViewMode } from "entities/Action";
 import type { APIRequest } from "constants/AppsmithActionConstants/ActionConstants";
 import type { WidgetType } from "constants/WidgetConstants";
+import { getCurrentApplicationId } from "selectors/editorSelectors";
+import store from "store";
+import { getAppStoreName } from "constants/AppConstants";
+import { getCurrentGitBranch } from "selectors/gitSyncSelectors";
+import getQueryParamsObject from "utils/getQueryParamsObject";
 
 export interface CreateActionRequest<T> extends APIRequest {
   datasourceId: string;
@@ -133,6 +138,16 @@ export interface UpdateActionNameRequest {
   newName: string;
   oldName: string;
 }
+
+function isValidJsonString(str: string) {
+  try {
+    JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+  return true;
+}
+
 class ActionAPI extends API {
   static url = "v1/actions";
   static apiUpdateCancelTokenSource: CancelTokenSource;
@@ -190,14 +205,27 @@ class ActionAPI extends API {
     executeAction: FormData,
     timeout?: number,
   ): AxiosPromise<ActionExecutionResponse> {
+    const branch =
+      getCurrentGitBranch(store.getState()) || getQueryParamsObject().branch;
+    const applicationId = getCurrentApplicationId(store.getState());
+
+    const appStoreName = getAppStoreName(applicationId, branch);
+    const existingStore = localStorage.getItem(appStoreName) || "{}";
+    const headers: any = {
+      accept: "application/json",
+      "Content-Type": "multipart/form-data",
+      Expect: "100-continue",
+    };
+    if (isValidJsonString(existingStore)) {
+      const parsedStore = JSON.parse(existingStore);
+      if (parsedStore.token) {
+        headers["Manabie-Token"] = parsedStore.token;
+      }
+    }
     ActionAPI.abortActionExecutionTokenSource = axios.CancelToken.source();
     return API.post(ActionAPI.url + "/execute", executeAction, undefined, {
       timeout: timeout || DEFAULT_EXECUTE_ACTION_TIMEOUT_MS,
-      headers: {
-        accept: "application/json",
-        "Content-Type": "multipart/form-data",
-        Expect: "100-continue",
-      },
+      headers: headers,
       cancelToken: ActionAPI.abortActionExecutionTokenSource.token,
     });
   }
