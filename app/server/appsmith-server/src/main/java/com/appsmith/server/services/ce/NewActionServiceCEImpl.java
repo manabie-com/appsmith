@@ -807,7 +807,6 @@ public class NewActionServiceCEImpl extends BaseService<NewActionRepository, New
                                         Datasource validatedDatasource = tuple2.getT1();
                                         DatasourceContext<?> resourceContext = tuple2.getT2();
                                         // Now that we have the context (connection details), execute the action.
-
                                         Instant requestedAt = Instant.now();
                                         return ((Mono<ActionExecutionResult>)
                                                 pluginExecutor.executeParameterizedWithMetrics(resourceContext.getConnection(),
@@ -1020,8 +1019,7 @@ public class NewActionServiceCEImpl extends BaseService<NewActionRepository, New
      * @param environmentName
      * @return actionExecutionResult if query succeeds, error messages otherwise
      */
-    public Mono<ActionExecutionResult> executeAction(ExecuteActionDTO executeActionDTO, String environmentName, String manabieToken) {
-        log.debug("MANABIE_TOKEN server/services/ce/NewActionServiceCEImpl.java executeAction {}", manabieToken);    
+    public Mono<ActionExecutionResult> executeAction(ExecuteActionDTO executeActionDTO, String environmentName) {
         // 1. Validate input parameters which are required for mustache replacements
         replaceNullWithQuotesForParamValues(executeActionDTO.getParams());
 
@@ -1217,9 +1215,10 @@ public class NewActionServiceCEImpl extends BaseService<NewActionRepository, New
                         actionPermission.getExecutePermission())
                         .map(branchedAction -> {
                             executeActionDTO.setActionId(branchedAction.getId());
+                            executeActionDTO.setManabieToken(manabieToken);
                             return executeActionDTO;
                         }))
-                .flatMap(executeActionDTO -> this.executeAction(executeActionDTO, environmentName, manabieToken))
+                .flatMap(executeActionDTO -> this.executeAction(executeActionDTO, environmentName))
                 .name(ACTION_EXECUTION_SERVER_EXECUTION)
                 .tap(Micrometer.observation(observationRegistry));
     }

@@ -18,6 +18,8 @@ public class ExecuteActionDTO {
 
     String actionId;
 
+    String manabieToken;
+
     List<Param> params;
 
     PaginationField paginationField;

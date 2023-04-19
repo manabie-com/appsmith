@@ -205,7 +205,7 @@ public class NewActionServiceCEImplTest {
 
     @Test
     public void testExecuteAction_withoutExecuteActionDTOPart_failsValidation() {
-        final Mono<ActionExecutionResult> actionExecutionResultMono = newActionService.executeAction(Flux.empty(), null, null);
+        final Mono<ActionExecutionResult> actionExecutionResultMono = newActionService.executeAction(Flux.empty(), null, null, null);
 
         StepVerifier
                 .create(actionExecutionResultMono)
@@ -226,7 +226,7 @@ public class NewActionServiceCEImplTest {
         final Flux<Part> partsFlux = BodyExtractors.toParts()
                 .extract(mock, this.context);
 
-        final Mono<ActionExecutionResult> actionExecutionResultMono = newActionService.executeAction(partsFlux, null, null);
+        final Mono<ActionExecutionResult> actionExecutionResultMono = newActionService.executeAction(partsFlux, null, null, null);
 
         StepVerifier
                 .create(actionExecutionResultMono)
@@ -247,7 +247,7 @@ public class NewActionServiceCEImplTest {
         final Flux<Part> partsFlux = BodyExtractors.toParts()
                 .extract(mock, this.context);
 
-        final Mono<ActionExecutionResult> actionExecutionResultMono = newActionService.executeAction(partsFlux, null, null);
+        final Mono<ActionExecutionResult> actionExecutionResultMono = newActionService.executeAction(partsFlux, null, null, null);
 
         StepVerifier
                 .create(actionExecutionResultMono)
@@ -337,7 +337,7 @@ public class NewActionServiceCEImplTest {
 
         NewActionServiceCE newActionServiceSpy = spy(newActionService);
 
-        Mono<ActionExecutionResult> actionExecutionResultMono = newActionServiceSpy.executeAction(partsFlux, null, null);
+        Mono<ActionExecutionResult> actionExecutionResultMono = newActionServiceSpy.executeAction(partsFlux, null, null, null);
 
         ActionExecutionResult mockResult = new ActionExecutionResult();
         mockResult.setIsExecutionSuccess(true);
@@ -387,7 +387,7 @@ public class NewActionServiceCEImplTest {
 
         NewActionServiceCE newActionServiceSpy = spy(newActionService);
 
-        Mono<ActionExecutionResult> actionExecutionResultMono = newActionServiceSpy.executeAction(partsFlux, null, null);
+        Mono<ActionExecutionResult> actionExecutionResultMono = newActionServiceSpy.executeAction(partsFlux, null, null, null);
 
         ActionExecutionResult mockResult = new ActionExecutionResult();
         mockResult.setIsExecutionSuccess(true);

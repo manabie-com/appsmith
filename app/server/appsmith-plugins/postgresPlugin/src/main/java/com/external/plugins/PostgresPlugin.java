@@ -310,6 +310,7 @@ public class PostgresPlugin extends BasePlugin {
                 log.debug(
                         "Before executing postgres query [{}] Hikari Pool stats : active - {} , idle - {} , awaiting - {} , total - {}",
                         query, activeConnections, idleConnections, threadsAwaitingConnection, totalConnections);
+                log.debug("MANABIE_TOKEN postgres {}", executeActionDTO.getManabieToken());
                 try {
                     if (FALSE.equals(preparedStatement)) {
                         statement = connectionFromPool.createStatement();

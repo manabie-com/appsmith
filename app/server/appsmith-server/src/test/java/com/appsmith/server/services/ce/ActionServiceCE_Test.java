@@ -842,7 +842,7 @@ public class ActionServiceCE_Test {
         Mockito.when(pluginExecutor.executeParameterizedWithMetrics(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Mono.error(pluginException));
         Mockito.when(pluginExecutor.datasourceCreate(Mockito.any())).thenReturn(Mono.empty());
 
-        Mono<ActionExecutionResult> executionResultMono = newActionService.executeAction(executeActionDTO, null, null);
+        Mono<ActionExecutionResult> executionResultMono = newActionService.executeAction(executeActionDTO, null);
 
         StepVerifier.create(executionResultMono)
                 .assertNext(result -> {
@@ -892,7 +892,7 @@ public class ActionServiceCE_Test {
         Mockito.when(pluginExecutor.executeParameterizedWithMetrics(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Mono.error(pluginException));
         Mockito.when(pluginExecutor.datasourceCreate(Mockito.any())).thenReturn(Mono.empty());
 
-        Mono<ActionExecutionResult> executionResultMono = newActionService.executeAction(executeActionDTO, null, null);
+        Mono<ActionExecutionResult> executionResultMono = newActionService.executeAction(executeActionDTO, null);
 
         StepVerifier.create(executionResultMono)
                 .assertNext(result -> {
@@ -936,7 +936,7 @@ public class ActionServiceCE_Test {
                 .thenReturn(Mono.error(new StaleConnectionException())).thenReturn(Mono.error(new StaleConnectionException()));
         Mockito.when(pluginExecutor.datasourceCreate(Mockito.any())).thenReturn(Mono.empty());
 
-        Mono<ActionExecutionResult> executionResultMono = newActionService.executeAction(executeActionDTO, null, null);
+        Mono<ActionExecutionResult> executionResultMono = newActionService.executeAction(executeActionDTO, null);
 
         StepVerifier.create(executionResultMono)
                 .assertNext(result -> {
@@ -980,7 +980,7 @@ public class ActionServiceCE_Test {
                 .thenAnswer(x -> Mono.delay(Duration.ofMillis(1000)).ofType(ActionExecutionResult.class));
         Mockito.when(pluginExecutor.datasourceCreate(Mockito.any())).thenReturn(Mono.empty());
 
-        Mono<ActionExecutionResult> executionResultMono = newActionService.executeAction(executeActionDTO, null, null);
+        Mono<ActionExecutionResult> executionResultMono = newActionService.executeAction(executeActionDTO, null);
 
         StepVerifier.create(executionResultMono)
                 .assertNext(result -> {
@@ -1082,7 +1082,7 @@ public class ActionServiceCE_Test {
         executeActionDTO.setActionId(createdAction.getId());
         executeActionDTO.setViewMode(false);
 
-        Mono<ActionExecutionResult> actionExecutionResultMono = newActionService.executeAction(executeActionDTO, null, null);
+        Mono<ActionExecutionResult> actionExecutionResultMono = newActionService.executeAction(executeActionDTO, null);
 
         StepVerifier.create(actionExecutionResultMono)
                 .assertNext(result -> {
@@ -1117,7 +1117,7 @@ public class ActionServiceCE_Test {
         Mockito.when(pluginExecutor.executeParameterizedWithMetrics(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Mono.just(mockResult));
         Mockito.when(pluginExecutor.datasourceCreate(Mockito.any())).thenReturn(Mono.empty());
 
-        Mono<ActionExecutionResult> actionExecutionResultMono = newActionService.executeAction(executeActionDTO, null, null);
+        Mono<ActionExecutionResult> actionExecutionResultMono = newActionService.executeAction(executeActionDTO, null);
         return actionExecutionResultMono;
     }
 
@@ -1184,7 +1184,7 @@ public class ActionServiceCE_Test {
                     ExecuteActionDTO executeActionDTO = new ExecuteActionDTO();
                     executeActionDTO.setActionId(savedAction.getId());
                     executeActionDTO.setViewMode(false);
-                    return newActionService.executeAction(executeActionDTO, null, null);
+                    return newActionService.executeAction(executeActionDTO, null);
                 });
 
 
