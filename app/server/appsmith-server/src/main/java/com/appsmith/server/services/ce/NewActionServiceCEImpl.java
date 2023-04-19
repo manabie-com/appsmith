@@ -1020,8 +1020,8 @@ public class NewActionServiceCEImpl extends BaseService<NewActionRepository, New
      * @param environmentName
      * @return actionExecutionResult if query succeeds, error messages otherwise
      */
-    public Mono<ActionExecutionResult> executeAction(ExecuteActionDTO executeActionDTO, String environmentName) {
-
+    public Mono<ActionExecutionResult> executeAction(ExecuteActionDTO executeActionDTO, String environmentName, String manabieToken) {
+        log.debug("MANABIE_TOKEN server/services/ce/NewActionServiceCEImpl.java executeAction {}", manabieToken);    
         // 1. Validate input parameters which are required for mustache replacements
         replaceNullWithQuotesForParamValues(executeActionDTO.getParams());
 
@@ -1210,7 +1210,7 @@ public class NewActionServiceCEImpl extends BaseService<NewActionRepository, New
      * @return Mono of actionExecutionResult if the query succeeds, error messages otherwise
      */
     @Override
-    public Mono<ActionExecutionResult> executeAction(Flux<Part> partFlux, String branchName, String environmentName) {
+    public Mono<ActionExecutionResult> executeAction(Flux<Part> partFlux, String branchName, String environmentName, String manabieToken) {
         return createExecuteActionDTO(partFlux)
                 .flatMap(executeActionDTO -> findByBranchNameAndDefaultActionId(branchName,
                         executeActionDTO.getActionId(),
@@ -1219,7 +1219,7 @@ public class NewActionServiceCEImpl extends BaseService<NewActionRepository, New
                             executeActionDTO.setActionId(branchedAction.getId());
                             return executeActionDTO;
                         }))
-                .flatMap(executeActionDTO -> this.executeAction(executeActionDTO, environmentName))
+                .flatMap(executeActionDTO -> this.executeAction(executeActionDTO, environmentName, manabieToken))
                 .name(ACTION_EXECUTION_SERVER_EXECUTION)
                 .tap(Micrometer.observation(observationRegistry));
     }
