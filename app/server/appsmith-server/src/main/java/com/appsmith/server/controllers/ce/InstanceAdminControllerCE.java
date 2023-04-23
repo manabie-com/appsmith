@@ -71,7 +71,6 @@ public class InstanceAdminControllerCE {
     @PostMapping("/restart")
     public Mono<ResponseDTO<Boolean>> restart() {
         log.debug("Received restart request");
-
         return envManager.restart()
                 .thenReturn(new ResponseDTO<>(HttpStatus.OK.value(), true, null));
     }
