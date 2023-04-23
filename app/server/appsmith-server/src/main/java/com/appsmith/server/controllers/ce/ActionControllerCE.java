@@ -44,7 +44,6 @@ import java.util.List;
 @Slf4j
 @RequestMapping(Url.ACTION_URL)
 public class ActionControllerCE {
-    private final EnvManager envManager;
 
     private final LayoutActionService layoutActionService;
     private final NewActionService newActionService;
@@ -53,12 +52,10 @@ public class ActionControllerCE {
     @Autowired
     public ActionControllerCE(LayoutActionService layoutActionService,
                               NewActionService newActionService,
-                              RefactoringSolution refactoringSolution,
-                              EnvManager envManager) {
+                              RefactoringSolution refactoringSolution) {
         this.layoutActionService = layoutActionService;
         this.newActionService = newActionService;
         this.refactoringSolution = refactoringSolution;
-        this.envManager = envManager;
     }
 
     @JsonView(Views.Public.class)

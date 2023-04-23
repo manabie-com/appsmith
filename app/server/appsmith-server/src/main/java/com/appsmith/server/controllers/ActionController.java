@@ -5,7 +5,6 @@ import com.appsmith.server.controllers.ce.ActionControllerCE;
 import com.appsmith.server.services.LayoutActionService;
 import com.appsmith.server.services.NewActionService;
 import com.appsmith.server.solutions.RefactoringSolution;
-import com.appsmith.server.solutions.EnvManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,10 +16,9 @@ public class ActionController extends ActionControllerCE {
 
     public ActionController(LayoutActionService layoutActionService,
                             NewActionService newActionService,
-                            RefactoringSolution refactoringSolution,
-                            EnvManager envManager) {
+                            RefactoringSolution refactoringSolution) {
 
-        super(layoutActionService, newActionService, refactoringSolution, envManager);
+        super(layoutActionService, newActionService, refactoringSolution);
 
     }
 
