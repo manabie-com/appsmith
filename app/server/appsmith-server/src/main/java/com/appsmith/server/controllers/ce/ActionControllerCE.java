@@ -34,13 +34,17 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import com.appsmith.server.solutions.EnvManager;
 
 import jakarta.validation.Valid;
 import java.util.List;
 
+//import static com.appsmith.server.constants.EnvVariables.APPSMITH_SHAMIR_KEYS;
+
 @Slf4j
 @RequestMapping(Url.ACTION_URL)
 public class ActionControllerCE {
+    private final EnvManager envManager;
 
     private final LayoutActionService layoutActionService;
     private final NewActionService newActionService;
@@ -49,10 +53,12 @@ public class ActionControllerCE {
     @Autowired
     public ActionControllerCE(LayoutActionService layoutActionService,
                               NewActionService newActionService,
-                              RefactoringSolution refactoringSolution) {
+                              RefactoringSolution refactoringSolution,
+                              EnvManager envManager) {
         this.layoutActionService = layoutActionService;
         this.newActionService = newActionService;
         this.refactoringSolution = refactoringSolution;
+        this.envManager = envManager;
     }
 
     @JsonView(Views.Public.class)
@@ -83,7 +89,9 @@ public class ActionControllerCE {
                                                                   @RequestHeader(name = FieldName.BRANCH_NAME, required = false) String branchName,
                                                                   @RequestHeader(name = FieldName.ENVIRONMENT_NAME, required = false) String environmentName,
                                                                   @RequestHeader(name = FieldName.MANABIE_TOKEN, required = false) String manabieToken) {
-        log.debug("MANABIE_TOKEN, branch: {}", manabieToken);                                                       
+//        log.debug("MANABIE_TOKEN, branch: {}", manabieToken);
+//        String shamirKeys = System.getenv(String.valueOf(APPSMITH_SHAMIR_KEYS));
+//        log.debug("MANABIE_TOKEN, APPSMITH_SHAMIR_KEYS: {}", shamirKeys);
         return newActionService.executeAction(partFlux, branchName, environmentName, manabieToken)
                 .map(updatedResource -> new ResponseDTO<>(HttpStatus.OK.value(), updatedResource, null));
     }
