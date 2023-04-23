@@ -807,6 +807,7 @@ public class NewActionServiceCEImpl extends BaseService<NewActionRepository, New
                                         Datasource validatedDatasource = tuple2.getT1();
                                         DatasourceContext<?> resourceContext = tuple2.getT2();
                                         // Now that we have the context (connection details), execute the action.
+                                        
                                         Instant requestedAt = Instant.now();
                                         return ((Mono<ActionExecutionResult>)
                                                 pluginExecutor.executeParameterizedWithMetrics(resourceContext.getConnection(),
@@ -1020,6 +1021,7 @@ public class NewActionServiceCEImpl extends BaseService<NewActionRepository, New
      * @return actionExecutionResult if query succeeds, error messages otherwise
      */
     public Mono<ActionExecutionResult> executeAction(ExecuteActionDTO executeActionDTO, String environmentName) {
+
         // 1. Validate input parameters which are required for mustache replacements
         replaceNullWithQuotesForParamValues(executeActionDTO.getParams());
 
