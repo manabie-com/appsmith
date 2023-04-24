@@ -807,7 +807,7 @@ public class NewActionServiceCEImpl extends BaseService<NewActionRepository, New
                                         Datasource validatedDatasource = tuple2.getT1();
                                         DatasourceContext<?> resourceContext = tuple2.getT2();
                                         // Now that we have the context (connection details), execute the action.
-
+                                        
                                         Instant requestedAt = Instant.now();
                                         return ((Mono<ActionExecutionResult>)
                                                 pluginExecutor.executeParameterizedWithMetrics(resourceContext.getConnection(),
@@ -1210,13 +1210,14 @@ public class NewActionServiceCEImpl extends BaseService<NewActionRepository, New
      * @return Mono of actionExecutionResult if the query succeeds, error messages otherwise
      */
     @Override
-    public Mono<ActionExecutionResult> executeAction(Flux<Part> partFlux, String branchName, String environmentName) {
+    public Mono<ActionExecutionResult> executeAction(Flux<Part> partFlux, String branchName, String environmentName, String manabieToken) {
         return createExecuteActionDTO(partFlux)
                 .flatMap(executeActionDTO -> findByBranchNameAndDefaultActionId(branchName,
                         executeActionDTO.getActionId(),
                         actionPermission.getExecutePermission())
                         .map(branchedAction -> {
                             executeActionDTO.setActionId(branchedAction.getId());
+                            executeActionDTO.setManabieToken(manabieToken);
                             return executeActionDTO;
                         }))
                 .flatMap(executeActionDTO -> this.executeAction(executeActionDTO, environmentName))

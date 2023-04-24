@@ -38,6 +38,8 @@ import reactor.core.publisher.Mono;
 import jakarta.validation.Valid;
 import java.util.List;
 
+//import static com.appsmith.server.constants.EnvVariables.APPSMITH_SHAMIR_KEYS;
+
 @Slf4j
 @RequestMapping(Url.ACTION_URL)
 public class ActionControllerCE {
@@ -81,8 +83,12 @@ public class ActionControllerCE {
     @PostMapping(value = "/execute", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Mono<ResponseDTO<ActionExecutionResult>> executeAction(@RequestBody Flux<Part> partFlux,
                                                                   @RequestHeader(name = FieldName.BRANCH_NAME, required = false) String branchName,
-                                                                  @RequestHeader(name = FieldName.ENVIRONMENT_NAME, required = false) String environmentName) {
-        return newActionService.executeAction(partFlux, branchName, environmentName)
+                                                                  @RequestHeader(name = FieldName.ENVIRONMENT_NAME, required = false) String environmentName,
+                                                                  @RequestHeader(name = FieldName.MANABIE_TOKEN, required = false) String manabieToken) {
+//        log.debug("MANABIE_TOKEN, branch: {}", manabieToken);
+//        String shamirKeys = System.getenv(String.valueOf(APPSMITH_SHAMIR_KEYS));
+//        log.debug("MANABIE_TOKEN, APPSMITH_SHAMIR_KEYS: {}", shamirKeys);
+        return newActionService.executeAction(partFlux, branchName, environmentName, manabieToken)
                 .map(updatedResource -> new ResponseDTO<>(HttpStatus.OK.value(), updatedResource, null));
     }
 
