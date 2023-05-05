@@ -889,15 +889,18 @@ function* executePageLoadAction(pageAction: PageAction) {
           },
         },
       ]);
-
-      yield put(
-        executePluginActionError({
-          actionId: pageAction.id,
-          isPageLoad: true,
-          error: { message: error.message },
-          data: payload,
-        }),
-      );
+      const queryParams = new URLSearchParams(window.location.search);
+      const embedQueryParam = queryParams.get("embed");
+      if (embedQueryParam != "true") {
+        yield put(
+          executePluginActionError({
+            actionId: pageAction.id,
+            isPageLoad: true,
+            error: { message: error.message },
+            data: payload,
+          }),
+        );
+      }
       PerformanceTracker.stopAsyncTracking(
         PerformanceTransactionName.EXECUTE_ACTION,
         {

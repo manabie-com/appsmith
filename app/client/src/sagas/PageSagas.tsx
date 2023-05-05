@@ -457,12 +457,16 @@ export function* fetchPublishedPageSaga(
 
 export function* fetchAllPublishedPagesSaga() {
   try {
-    const pageIds: string[] = yield select(getAllPageIds);
-    yield all(
-      pageIds.map((pageId: string) => {
-        return call(PageApi.fetchPublishedPage, { pageId, bustCache: true });
-      }),
-    );
+    const queryParams = new URLSearchParams(window.location.search);
+    const embedQueryParam = queryParams.get("embed");
+    if (embedQueryParam != "true") {
+      const pageIds: string[] = yield select(getAllPageIds);
+      yield all(
+        pageIds.map((pageId: string) => {
+          return call(PageApi.fetchPublishedPage, { pageId, bustCache: true });
+        }),
+      );
+    }
   } catch (error) {
     log.error({ error });
   }
