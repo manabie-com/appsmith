@@ -433,16 +433,20 @@ export default function* executePluginActionTriggerSaga(
         },
       },
     ]);
-    if (onError) {
-      throw new PluginTriggerFailureError(
-        createMessage(ERROR_ACTION_EXECUTE_FAIL, action.name),
-        [payload.body, params],
-      );
-    } else {
-      throw new PluginTriggerFailureError(
-        createMessage(ERROR_PLUGIN_ACTION_EXECUTE, action.name),
-        [payload.body, params],
-      );
+    const queryParams = new URLSearchParams(window.location.search);
+    const embedQueryParam = queryParams.get("embed");
+    if (embedQueryParam != "true") {
+      if (onError) {
+        throw new PluginTriggerFailureError(
+          createMessage(ERROR_ACTION_EXECUTE_FAIL, action.name),
+          [payload.body, params],
+        );
+      } else {
+        throw new PluginTriggerFailureError(
+          createMessage(ERROR_PLUGIN_ACTION_EXECUTE, action.name),
+          [payload.body, params],
+        );
+      }
     }
   } else {
     AppsmithConsole.info({
@@ -889,15 +893,18 @@ function* executePageLoadAction(pageAction: PageAction) {
           },
         },
       ]);
-
-      yield put(
-        executePluginActionError({
-          actionId: pageAction.id,
-          isPageLoad: true,
-          error: { message: error.message },
-          data: payload,
-        }),
-      );
+      const queryParams = new URLSearchParams(window.location.search);
+      const embedQueryParam = queryParams.get("embed");
+      if (embedQueryParam != "true") {
+        yield put(
+          executePluginActionError({
+            actionId: pageAction.id,
+            isPageLoad: true,
+            error: { message: error.message },
+            data: payload,
+          }),
+        );
+      }
       PerformanceTracker.stopAsyncTracking(
         PerformanceTransactionName.EXECUTE_ACTION,
         {
