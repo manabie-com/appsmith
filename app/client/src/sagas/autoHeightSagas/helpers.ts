@@ -1,4 +1,4 @@
-import type { AppState } from "@appsmith/reducers";
+// import type { AppState } from "@appsmith/reducers";
 import {
   GridDefaults,
   MAIN_CONTAINER_WIDGET_ID,
@@ -26,11 +26,13 @@ export function* shouldWidgetsCollapse() {
 }
 
 export function* shouldAllInvisibleWidgetsInAutoHeightContainersCollapse() {
-  const flag: boolean = yield select((state: AppState) => {
-    return !!state.ui.applications.currentApplication?.collapseInvisibleWidgets;
-  });
+  // const flag: boolean = yield select((state: AppState) => {
+  //   return !!state.ui.applications.currentApplication?.collapseInvisibleWidgets;
+  // });
 
-  return flag;
+  // return flag;
+  // https://github.com/appsmithorg/appsmith/issues/22411
+  return true;
 }
 
 export function* getChildOfContainerLikeWidget(
