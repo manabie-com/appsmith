@@ -31,6 +31,7 @@ export default async function (request: EvalWorkerASyncRequest) {
     unEvalUpdates,
   );
   const evalTree = dataTreeEvaluator.evalTree;
+
   return dataTreeEvaluator.evaluateTriggers(
     dynamicTrigger,
     evalTree,
