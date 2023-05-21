@@ -1293,7 +1293,6 @@ export default class DataTreeEvaluator {
     context?: EvaluateContext,
   ) {
     const { jsSnippets } = getDynamicBindings(userScript);
-
     return evaluateAsync(
       jsSnippets[0] || userScript,
       dataTree,
