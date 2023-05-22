@@ -316,20 +316,20 @@ export async function evaluateAsync(
     try {
       result = await indirectEval(script);
     } catch (e) {
-      const error = e as Error;
-      const errorMessage = error.name
-        ? { name: error.name, message: error.message }
-        : {
-            name: "UncaughtPromiseRejection",
-            message: `${error.message}`,
-          };
-      errors.push({
-        errorMessage: errorMessage,
-        severity: Severity.ERROR,
-        raw: script,
-        errorType: PropertyEvaluationErrorType.PARSE,
-        originalBinding: userScript,
-      });
+      // const error = e as Error;
+      // const errorMessage = error.name
+      //   ? { name: error.name, message: error.message }
+      //   : {
+      //       name: "UncaughtPromiseRejection",
+      //       message: `${error.message}`,
+      //     };
+      // errors.push({
+      //   errorMessage: errorMessage,
+      //   severity: Severity.ERROR,
+      //   raw: script,
+      //   errorType: PropertyEvaluationErrorType.PARSE,
+      //   originalBinding: userScript,
+      // });
     } finally {
       return {
         result,

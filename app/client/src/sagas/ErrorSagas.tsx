@@ -253,7 +253,11 @@ function logErrorSaga(action: ReduxAction<{ error: ErrorPayloadType }>) {
 }
 
 function showAlertAboutError(message: string) {
-  Toaster.show({ text: message, variant: Variant.danger });
+  const queryParams = new URLSearchParams(window.location.search);
+  const embedQueryParam = queryParams.get("embed");
+  if (embedQueryParam != "true") {
+    Toaster.show({ text: message, variant: Variant.danger });
+  }
 }
 
 /**
