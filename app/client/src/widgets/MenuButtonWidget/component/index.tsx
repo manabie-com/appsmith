@@ -241,7 +241,7 @@ const StyledMenu = styled(Menu)<{
 `;
 
 function PopoverContent(props: PopoverContentProps) {
-  const { backgroundColor, getVisibleItems, isCompact, onItemClicked, lang } =
+  const { backgroundColor, getVisibleItems, isCompact, lang, onItemClicked } =
     props;
 
   const visibleItems = getVisibleItems();
@@ -365,9 +365,9 @@ function MenuButtonComponent(props: MenuButtonComponentProps) {
     placement,
     renderMode,
     sourceData,
+    translationJp,
     widgetId,
     width,
-    translationJp,
   } = props;
   const lang = useSelector(getLang);
 

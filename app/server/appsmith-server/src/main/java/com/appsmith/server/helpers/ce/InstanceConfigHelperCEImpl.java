@@ -86,9 +86,7 @@ public class InstanceConfigHelperCEImpl implements InstanceConfigHelperCE {
                     return Mono.error(populateSchemaMismatchError((Integer) config.getConfig().get("value")));
                 })
                 .doOnError(errorSignal -> {
-                    log.error("""
-
-                                    ################################################
+                    log.error("""################################################
                                     Error while trying to start up Appsmith instance:\s
                                     {}
                                     ################################################

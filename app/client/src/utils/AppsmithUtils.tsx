@@ -237,10 +237,43 @@ export const convertToString = (value: any): string => {
   return value.toString();
 };
 
+export const getInitialsFromName = (fullName: string) => {
+  let inits = "";
+  // if name contains space. eg: "Full Name"
+  if (fullName && fullName.includes(" ")) {
+    const namesArr = fullName.split(" ");
+    let initials = namesArr
+      .map((name: string) => name.charAt(0))
+      .join("")
+      .toUpperCase();
+    initials = initials;
+    inits = initials.slice(0, 2);
+  } else {
+    // handle for camelCase
+    const str = fullName ? fullName.replace(/([a-z])([A-Z])/g, "$1 $2") : "";
+    const namesArr = str.split(" ");
+    const initials = namesArr
+      .map((name: string) => name.charAt(0))
+      .join("")
+      .toUpperCase();
+    inits = initials.slice(0, 2);
+  }
+
+  return inits;
+};
+
 export const getInitialsAndColorCode = (
-  fullName: any,
+  fullName = "",
   colorPalette: string[],
 ): string[] => {
+  const initials = getInitialsFromName(fullName);
+  const colorCode = getColorCode(initials, colorPalette);
+  return [initials, colorCode];
+};
+export const getInitials = (
+  fullName: any,
+  // colorPalette: string[],
+): string => {
   let inits = "";
   // if name contains space. eg: "Full Name"
   if (fullName && fullName.includes(" ")) {
@@ -256,10 +289,9 @@ export const getInitialsAndColorCode = (
     initials = initials.join("").toUpperCase();
     inits = initials.slice(0, 2);
   }
-  const colorCode = getColorCode(inits, colorPalette);
-  return [inits, colorCode];
+  // const colorCode = getColorCode(inits, colorPalette);
+  return inits;
 };
-
 export const getColorCode = (
   initials: string,
   colorPalette: string[],
@@ -339,10 +371,7 @@ export const isBlobUrl = (url: string) => {
  */
 export const createBlobUrl = (data: Blob | MediaSource, type: string) => {
   let url = URL.createObjectURL(data);
-  url = url.replace(
-    `${window.location.protocol}//${window.location.hostname}/`,
-    "",
-  );
+  url = url.replace(`${window.location.origin}/`, "");
 
   return `${url}?type=${type}`;
 };
@@ -353,9 +382,7 @@ export const createBlobUrl = (data: Blob | MediaSource, type: string) => {
  * @returns [string,string] [blobUrl, type]
  */
 export const parseBlobUrl = (blobId: string) => {
-  const url = `blob:${window.location.protocol}//${
-    window.location.hostname
-  }/${blobId.substring(5)}`;
+  const url = `blob:${window.location.origin}/${blobId.substring(5)}`;
   return url.split("?type=");
 };
 

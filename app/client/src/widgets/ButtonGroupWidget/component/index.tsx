@@ -345,7 +345,7 @@ interface PopoverContentProps {
 }
 
 function PopoverContent(props: PopoverContentProps) {
-  const { buttonId, menuItems, onItemClicked, lang } = props;
+  const { buttonId, lang, menuItems, onItemClicked } = props;
 
   let items = Object.keys(menuItems)
     .map((itemKey) => menuItems[itemKey])
@@ -540,10 +540,10 @@ class ButtonGroupComponent extends React.Component<
       buttonVariant,
       groupButtons,
       isDisabled,
+      lang,
       minPopoverWidth,
       orientation,
       widgetId,
-      lang,
     } = this.props;
     const { loadedBtnId } = this.state;
     const isHorizontal = orientation === "horizontal";
@@ -554,6 +554,14 @@ class ButtonGroupComponent extends React.Component<
     // sort btns by index
     items = sortBy(items, ["index"]);
     const popoverId = `button-group-${widgetId}`;
+
+    const getOnClick = (button: GroupButtonProps) => {
+      if (!button.onClick) return;
+
+      return () => {
+        this.onButtonClick(button.onClick, button.id);
+      };
+    };
 
     return (
       <ButtonGroupWrapper
@@ -648,9 +656,7 @@ class ButtonGroupComponent extends React.Component<
               disabled={isButtonDisabled}
               key={button.id}
               loading={!!loadedBtnId}
-              onClick={() => {
-                this.onButtonClick(button.onClick, button.id);
-              }}
+              onClick={getOnClick(button)}
               renderMode={this.props.renderMode}
               style={{ flex: "1 1 auto" }}
             >
@@ -662,7 +668,7 @@ class ButtonGroupComponent extends React.Component<
                 iconAlign={button.iconAlign}
                 isHorizontal={isHorizontal}
                 isLabel={!!button.label}
-                onClick={() => this.onButtonClick(button.onClick, button.id)}
+                onClick={getOnClick(button)}
               >
                 <StyledButtonContent
                   iconAlign={button.iconAlign || "left"}

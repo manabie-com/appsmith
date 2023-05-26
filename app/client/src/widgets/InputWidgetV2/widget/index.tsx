@@ -16,7 +16,7 @@ import {
 } from "@appsmith/constants/messages";
 import type { DerivedPropertiesMap } from "utils/WidgetFactory";
 import { GRID_DENSITY_MIGRATION_V1, ICON_NAMES } from "widgets/constants";
-import { AutocompleteDataType } from "utils/autocomplete/CodemirrorTernService";
+import { AutocompleteDataType } from "utils/autocomplete/AutocompleteDataType";
 import BaseInputWidget from "widgets/BaseInputWidget";
 import { isNil, isNumber, merge, toString } from "lodash";
 import derivedProperties from "./parsedDerivedProperties";
@@ -26,14 +26,15 @@ import {
   InputTypes,
   NumberInputStepButtonPosition,
 } from "widgets/BaseInputWidget/constants";
-import { getParsedText } from "./Utilities";
+import { getParsedText, isInputTypeEmailOrPassword } from "./Utilities";
 import type { Stylesheet } from "entities/AppTheming";
+import {
+  isAutoHeightEnabledForWidget,
+  DefaultAutocompleteDefinitions,
+} from "widgets/WidgetUtils";
 import { checkInputTypeTextByProps } from "widgets/BaseInputWidget/utils";
 import { DynamicHeight } from "utils/WidgetFeatures";
-import type { AppState } from "ce/reducers";
-import { connect } from "react-redux";
-import type { LanguageEnums } from "entities/App";
-import { translate } from "utils/translate";
+import type { AutocompletionDefinitions } from "widgets/constants";
 
 export function defaultValueValidation(
   value: any,
@@ -99,7 +100,6 @@ export function defaultValueValidation(
     case "MULTI_LINE_TEXT":
     case "PASSWORD":
     case "EMAIL":
-    case "COLOR":
       parsed = value;
       if (!_.isString(parsed)) {
         try {
@@ -233,7 +233,7 @@ export function maxValueValidation(max: any, props: InputWidgetProps, _?: any) {
 function InputTypeUpdateHook(
   props: WidgetProps,
   propertyName: string,
-  propertyValue: unknown,
+  propertyValue: any,
 ) {
   const updates = [
     {
@@ -250,13 +250,37 @@ function InputTypeUpdateHook(
       });
     }
   }
+  //if input type is email or password default the autofill state to be true
+  // the user needs to explicity set autofill to fault disable autofill
+  updates.push({
+    propertyPath: "shouldAllowAutofill",
+    propertyValue: isInputTypeEmailOrPassword(propertyValue),
+  });
 
   return updates;
 }
 
 class InputWidget extends BaseInputWidget<InputWidgetProps, WidgetState> {
-  static defaultProps: Partial<InputWidgetProps> | undefined;
-
+  static getAutocompleteDefinitions(): AutocompletionDefinitions {
+    return {
+      "!doc":
+        "An input text field is used to capture a users textual input such as their names, numbers, emails etc. Inputs are used in forms and can have custom validations.",
+      "!url": "https://docs.appsmith.com/widget-reference/input",
+      text: {
+        "!type": "string",
+        "!doc": "The text value of the input",
+        "!url": "https://docs.appsmith.com/widget-reference/input",
+      },
+      inputText: {
+        "!type": "string",
+        "!doc": "The unformatted text value of the input",
+        "!url": "https://docs.appsmith.com/widget-reference/input",
+      },
+      isValid: "bool",
+      isVisible: DefaultAutocompleteDefinitions.isVisible,
+      isDisabled: "bool",
+    };
+  }
   static getPropertyPaneContentConfig() {
     return mergeWidgetConfig(
       [
@@ -266,7 +290,7 @@ class InputWidget extends BaseInputWidget<InputWidgetProps, WidgetState> {
             {
               helpText: "Changes the type of data captured in the input",
               propertyName: "inputType",
-              label: "Data Type",
+              label: "Data type",
               controlType: "DROP_DOWN",
               options: [
                 {
@@ -289,10 +313,6 @@ class InputWidget extends BaseInputWidget<InputWidgetProps, WidgetState> {
                   label: "Email",
                   value: "EMAIL",
                 },
-                {
-                  label: "Color",
-                  value: "COLOR",
-                },
               ],
               isBindProperty: false,
               isTriggerProperty: false,
@@ -303,7 +323,7 @@ class InputWidget extends BaseInputWidget<InputWidgetProps, WidgetState> {
               helpText:
                 "Sets the default text of the widget. The text is updated if the default text changes",
               propertyName: "defaultText",
-              label: "Default Value",
+              label: "Default value",
               controlType: "INPUT_TEXT",
               placeholderText: "John Doe",
               isBindProperty: true,
@@ -343,7 +363,7 @@ class InputWidget extends BaseInputWidget<InputWidgetProps, WidgetState> {
             {
               helpText: "Sets maximum allowed text length",
               propertyName: "maxChars",
-              label: "Max Characters",
+              label: "Max characters",
               controlType: "INPUT_TEXT",
               placeholderText: "255",
               isBindProperty: true,
@@ -440,14 +460,14 @@ class InputWidget extends BaseInputWidget<InputWidgetProps, WidgetState> {
               label: "Position",
               helpText: "Sets the icon alignment of input field",
               controlType: "ICON_TABS",
-              fullWidth: true,
+              fullWidth: false,
               options: [
                 {
-                  icon: "VERTICAL_LEFT",
+                  startIcon: "skip-left-line",
                   value: "left",
                 },
                 {
-                  icon: "VERTICAL_RIGHT",
+                  startIcon: "skip-right-line",
                   value: "right",
                 },
               ],
@@ -592,12 +612,7 @@ class InputWidget extends BaseInputWidget<InputWidgetProps, WidgetState> {
     }
 
     const conditionalProps: Partial<InputComponentProps> = {};
-
-    conditionalProps.errorMessage = translate(
-      this.props.lang,
-      this.props.errorMessage,
-      this.props.errorMessageJp,
-    );
+    conditionalProps.errorMessage = this.props.errorMessage;
     if (this.props.isRequired && value.length === 0) {
       conditionalProps.errorMessage = createMessage(FIELD_REQUIRED_ERROR);
     }
@@ -663,10 +678,15 @@ class InputWidget extends BaseInputWidget<InputWidgetProps, WidgetState> {
     } else {
       conditionalProps.buttonPosition = NumberInputStepButtonPosition.NONE;
     }
-
+    const autoFillProps =
+      !this.props.shouldAllowAutofill &&
+      isInputTypeEmailOrPassword(this.props.inputType)
+        ? { autoComplete: "off" }
+        : {};
     return (
       <InputComponent
         accentColor={this.props.accentColor}
+        {...autoFillProps}
         // show label and Input side by side if true
         autoFocus={this.props.autoFocus}
         borderRadius={this.props.borderRadius}
@@ -684,7 +704,7 @@ class InputWidget extends BaseInputWidget<InputWidgetProps, WidgetState> {
         iconAlign={this.props.iconAlign}
         iconName={this.props.iconName}
         inputType={this.props.inputType}
-        isDynamicHeightEnabled
+        isDynamicHeightEnabled={isAutoHeightEnabledForWidget(this.props)}
         isInvalid={isInvalid}
         isLoading={this.props.isLoading}
         label={this.props.label}
@@ -722,13 +742,6 @@ export interface InputWidgetProps extends BaseInputWidgetProps {
   maxNum?: number;
   minNum?: number;
   inputText: string;
-  lang?: LanguageEnums; // @Author: Bao Tran
 }
 
-const mapStateToProps = (state: AppState) => {
-  return {
-    lang: state.ui.appView.lang,
-  };
-};
-
-export default connect(mapStateToProps, null)(InputWidget);
+export default InputWidget;

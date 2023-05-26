@@ -29,6 +29,7 @@ class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: any, errorInfo: any) {
+    console.log("LOCCCCCErrorBoundary", errorInfo);
     log.error({ error, errorInfo });
     Sentry.captureException(error);
   }

@@ -15,7 +15,7 @@ import { getCanvasClassName } from "utils/generators";
 import { forceOpenWidgetPanel } from "actions/widgetSidebarActions";
 import classNames from "classnames";
 import Centered from "components/designSystems/appsmith/CenteredWrapper";
-import { IconSize, Spinner } from "design-system-old";
+import { Spinner } from "design-system";
 import equal from "fast-deep-equal/es6";
 import { WidgetGlobaStyles } from "globalStyles/WidgetGlobalStyles";
 import { useDispatch } from "react-redux";
@@ -31,9 +31,9 @@ import {
   AUTOLAYOUT_RESIZER_WIDTH_BUFFER,
   useDynamicAppLayout,
 } from "utils/hooks/useDynamicAppLayout";
-import useGoogleFont from "utils/hooks/useGoogleFont";
 import Canvas from "../Canvas";
 import { CanvasResizer } from "widgets/CanvasResizer";
+import type { AppState } from "ce/reducers";
 
 type CanvasContainerProps = {
   isPreviewMode: boolean;
@@ -46,6 +46,7 @@ const Container = styled.section<{
   $isAutoLayout: boolean;
   background: string;
   isPreviewingNavigation?: boolean;
+  isAppSettingsPaneWithNavigationTabOpen?: boolean;
   navigationHeight?: number;
 }>`
   width: ${({ $isAutoLayout }) =>
@@ -57,12 +58,33 @@ const Container = styled.section<{
   overflow-y: auto;
   background: ${({ background }) => background};
 
-  ${({ isPreviewingNavigation, navigationHeight }) => {
+  ${({
+    isAppSettingsPaneWithNavigationTabOpen,
+    isPreviewingNavigation,
+    navigationHeight,
+  }) => {
+    let css = ``;
+
     if (isPreviewingNavigation) {
-      return `
+      css += `
         margin-top: ${navigationHeight}px !important;
       `;
     }
+
+    if (isAppSettingsPaneWithNavigationTabOpen) {
+      /**
+       * We need to remove the scrollbar width to avoid small white space on the
+       * right of the canvas since we disable all interactions, including scroll,
+       * while the app settings pane with navigation tab is open
+       */
+      css += `
+        ::-webkit-scrollbar {
+          width: 0px;
+        }
+      `;
+    }
+
+    return css;
   }}
 
   &:before {
@@ -105,12 +127,15 @@ function CanvasContainer(props: CanvasContainerProps) {
     };
   }, []);
 
-  const fontFamily = useGoogleFont(selectedTheme.properties.fontFamily.appFont);
+  const fontFamily = `${selectedTheme.properties.fontFamily.appFont}, sans-serif`;
+  const isAutoCanvasResizing = useSelector(
+    (state: AppState) => state.ui.widgetDragResize.isAutoCanvasResizing,
+  );
 
   let node: ReactNode;
   const pageLoading = (
     <Centered>
-      <Spinner />
+      <Spinner size="sm" />
     </Centered>
   );
 
@@ -151,7 +176,6 @@ function CanvasContainer(props: CanvasContainerProps) {
   // calculating exact height to not allow scroll at this component,
   // calculating total height minus margin on top, top bar and bottom bar and scrollbar height at the bottom
   const heightWithTopMargin = `calc(100vh - 2rem - ${topMargin} - ${smallHeaderHeight} - ${bottomBarHeight} - ${scrollBarHeight} - ${navigationHeight}px)`;
-  const resizerTop = `calc(2rem + ${topMargin} + ${smallHeaderHeight})`;
   return (
     <>
       <Container
@@ -173,12 +197,16 @@ function CanvasContainer(props: CanvasContainerProps) {
           "mt-24": shouldShowSnapShotBanner,
         })}
         id={"canvas-viewport"}
+        isAppSettingsPaneWithNavigationTabOpen={
+          isAppSettingsPaneWithNavigationTabOpen
+        }
         isPreviewingNavigation={isPreviewingNavigation}
         key={currentPageId}
         navigationHeight={navigationHeight}
         style={{
           height: shouldHaveTopMargin ? heightWithTopMargin : "100vh",
           fontFamily: fontFamily,
+          pointerEvents: isAutoCanvasResizing ? "none" : "auto",
         }}
       >
         <WidgetGlobaStyles
@@ -187,7 +215,7 @@ function CanvasContainer(props: CanvasContainerProps) {
         />
         {isAppThemeChanging && (
           <div className="fixed top-0 bottom-0 left-0 right-0 flex items-center justify-center bg-white/70 z-[2]">
-            <Spinner size={IconSize.XXL} />
+            <Spinner size="md" />
           </div>
         )}
         {node}
@@ -195,7 +223,6 @@ function CanvasContainer(props: CanvasContainerProps) {
       <CanvasResizer
         heightWithTopMargin={heightWithTopMargin}
         isPageInitiated={!isPageInitializing && !!widgetsStructure}
-        resizerTop={resizerTop}
         shouldHaveTopMargin={shouldHaveTopMargin}
       />
     </>

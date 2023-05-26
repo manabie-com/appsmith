@@ -7,7 +7,6 @@ import {
 import log from "loglevel";
 import history from "utils/history";
 import type { ApiResponse } from "api/ApiResponses";
-import { Toaster, Variant } from "design-system-old";
 import { flushErrors, safeCrashApp } from "actions/errorActions";
 import { AUTH_LOGIN_URL } from "constants/routes";
 import type { User } from "constants/userConstants";
@@ -33,6 +32,7 @@ import * as Sentry from "@sentry/react";
 import { axiosConnectionAbortedCode } from "api/ApiUtils";
 import { getLoginUrl } from "@appsmith/utils/adminSettingsHelpers";
 import type { PluginErrorDetails } from "api/ActionAPI";
+import { toast } from "design-system";
 
 /**
  * making with error message with action name
@@ -256,7 +256,7 @@ function showAlertAboutError(message: string) {
   const queryParams = new URLSearchParams(window.location.search);
   const embedQueryParam = queryParams.get("embed");
   if (embedQueryParam != "true") {
-    Toaster.show({ text: message, variant: Variant.danger });
+    toast.show(message, { kind: "error" });
   }
 }
 
@@ -274,12 +274,10 @@ function* safeCrashSagaRequest(action: ReduxAction<{ code?: ERROR_CODES }>) {
     code === ERROR_CODES.PAGE_NOT_FOUND
   ) {
     const queryParams = new URLSearchParams(window.location.search);
-    const embedQueryParam = queryParams.get("embed");
     const ssoTriggerQueryParam = queryParams.get("ssoTrigger");
-    const ssoLoginUrl =
-      embedQueryParam === "true" && ssoTriggerQueryParam
-        ? getLoginUrl(ssoTriggerQueryParam || "")
-        : null;
+    const ssoLoginUrl = ssoTriggerQueryParam
+      ? getLoginUrl(ssoTriggerQueryParam || "")
+      : null;
     if (ssoLoginUrl) {
       window.location.href = `${ssoLoginUrl}?redirectUrl=${encodeURIComponent(
         window.location.href,

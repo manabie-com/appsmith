@@ -72,7 +72,7 @@ import {
   takeLeading,
 } from "redux-saga/effects";
 import history from "utils/history";
-import { captureInvalidDynamicBindingPath, isNameValid } from "utils/helpers";
+import { isNameValid } from "utils/helpers";
 import { extractCurrentDSL } from "utils/WidgetPropsUtils";
 import { checkIfMigrationIsNeeded } from "utils/DSLMigrations";
 import {
@@ -109,7 +109,6 @@ import PerformanceTracker, {
   PerformanceTransactionName,
 } from "utils/PerformanceTracker";
 import log from "loglevel";
-import { Toaster, Variant } from "design-system-old";
 import { migrateIncorrectDynamicBindingPathLists } from "utils/migrations/IncorrectDynamicBindingPathLists";
 import * as Sentry from "@sentry/react";
 import { ERROR_CODES } from "@appsmith/constants/ApiConstants";
@@ -139,8 +138,10 @@ import { getUsedActionNames } from "selectors/actionSelectors";
 import { getPageList } from "selectors/entitiesSelector";
 import { setPreviewModeAction } from "actions/editorActions";
 import { SelectionRequestType } from "sagas/WidgetSelectUtils";
+import { toast } from "design-system";
 import { getCurrentGitBranch } from "selectors/gitSyncSelectors";
 import type { MainCanvasReduxState } from "reducers/uiReducers/mainCanvasReducer";
+import { UserCancelledActionExecutionError } from "./ActionExecution/errorUtils";
 
 const WidgetTypes = WidgetFactory.widgetTypes;
 
@@ -511,11 +512,17 @@ function* savePageSaga(action: ReduxAction<{ isRetry?: boolean }>) {
       payload: savePageRequest.dsl,
     });
 
-    captureInvalidDynamicBindingPath(
-      CanvasWidgetsNormalizer.denormalize("0", {
-        canvasWidgets: widgets,
-      }),
-    );
+    /**
+     * TODO: Reactivate the capturing or remove this block
+     * once the below issue has been fixed. Commenting to avoid
+     * Sentry quota to fill up
+     * https://github.com/appsmithorg/appsmith/issues/20744
+     */
+    // captureInvalidDynamicBindingPath(
+    //   CanvasWidgetsNormalizer.denormalize("0", {
+    //     canvasWidgets: widgets,
+    //   }),
+    // );
 
     const savePageResponse: SavePageResponse = yield call(
       PageApi.savePage,
@@ -528,9 +535,8 @@ function* savePageSaga(action: ReduxAction<{ isRetry?: boolean }>) {
       // Show toast messages from the server
       if (messages && messages.length && !guidedTourEnabled) {
         savePageResponse.data.messages.forEach((message) => {
-          Toaster.show({
-            text: message,
-            type: Variant.info,
+          toast.show(message, {
+            kind: "info",
           });
         });
       }
@@ -566,6 +572,10 @@ function* savePageSaga(action: ReduxAction<{ isRetry?: boolean }>) {
         failed: true,
       },
     );
+
+    if (error instanceof UserCancelledActionExecutionError) {
+      return;
+    }
 
     yield put({
       type: ReduxActionErrorTypes.SAVE_PAGE_ERROR,
@@ -625,6 +635,8 @@ export function* saveAllPagesSaga(pageLayouts: PageLayoutsRequest[]) {
 
     if (isValidResponse) {
       return true;
+    } else {
+      throw new Error(`Error while Saving all pages, ${response?.data}`);
     }
   } catch (error) {
     throw error;
@@ -1256,9 +1268,8 @@ export function* generateTemplatePageSaga(
         }),
       );
       // TODO : Add it to onSuccessCallback
-      Toaster.show({
-        text: "Successfully generated a page",
-        variant: Variant.success,
+      toast.show("Successfully generated a page", {
+        kind: "success",
       });
 
       yield put(

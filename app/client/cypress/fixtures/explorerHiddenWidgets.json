@@ -25,11 +25,7 @@
         "isCanvas": true,
         "displayName": "Modal",
         "iconSVG": "/static/media/icon.4975978e9a961fb0bfb4e38de7ecc7c5.svg",
-        "searchTags": [
-          "dialog",
-          "popup",
-          "notification"
-        ],
+        "searchTags": ["dialog", "popup", "notification"],
         "topRow": 22,
         "bottomRow": 24,
         "parentRowSpace": 10,
@@ -693,11 +689,7 @@
         "isCanvas": true,
         "displayName": "Modal",
         "iconSVG": "/static/media/icon.4975978e9a961fb0bfb4e38de7ecc7c5.svg",
-        "searchTags": [
-          "dialog",
-          "popup",
-          "notification"
-        ],
+        "searchTags": ["dialog", "popup", "notification"],
         "topRow": 27,
         "bottomRow": 267,
         "parentRowSpace": 10,
@@ -734,12 +726,9 @@
                 "onClick": "{{closeModal('Modal2')}}",
                 "onClick": "{{closeModal('SimpleModal')}}",
                 "buttonColor": "{{appsmith.theme.colors.primaryColor}}",
-                "displayName": "Icon Button",
+                "displayName": "Icon button",
                 "iconSVG": "/static/media/icon.1a0c634ac75f9fa6b6ae7a8df882a3ba.svg",
-                "searchTags": [
-                  "click",
-                  "submit"
-                ],
+                "searchTags": ["click", "submit"],
                 "topRow": 0,
                 "bottomRow": 4,
                 "type": "ICON_BUTTON_WIDGET",
@@ -774,11 +763,7 @@
                 "widgetName": "Simple_Modal_Text",
                 "displayName": "Text",
                 "iconSVG": "/static/media/icon.97c59b523e6f70ba6f40a10fc2c7c5b5.svg",
-                "searchTags": [
-                  "typography",
-                  "paragraph",
-                  "label"
-                ],
+                "searchTags": ["typography", "paragraph", "label"],
                 "topRow": 1,
                 "bottomRow": 5,
                 "type": "TEXT_WIDGET",
@@ -830,10 +815,7 @@
                 "buttonColor": "{{appsmith.theme.colors.primaryColor}}",
                 "displayName": "Button",
                 "iconSVG": "/static/media/icon.cca026338f1c8eb6df8ba03d084c2fca.svg",
-                "searchTags": [
-                  "click",
-                  "submit"
-                ],
+                "searchTags": ["click", "submit"],
                 "topRow": 18,
                 "bottomRow": 22,
                 "type": "BUTTON_WIDGET",
@@ -876,10 +858,7 @@
                 "buttonColor": "{{appsmith.theme.colors.primaryColor}}",
                 "displayName": "Button",
                 "iconSVG": "/static/media/icon.cca026338f1c8eb6df8ba03d084c2fca.svg",
-                "searchTags": [
-                  "click",
-                  "submit"
-                ],
+                "searchTags": ["click", "submit"],
                 "topRow": 18,
                 "bottomRow": 22,
                 "type": "BUTTON_WIDGET",
@@ -1038,10 +1017,7 @@
                 "buttonColor": "{{appsmith.theme.colors.primaryColor}}",
                 "displayName": "Button",
                 "iconSVG": "/static/media/icon.cca026338f1c8eb6df8ba03d084c2fca.svg",
-                "searchTags": [
-                  "click",
-                  "submit"
-                ],
+                "searchTags": ["click", "submit"],
                 "topRow": 3,
                 "bottomRow": 7,
                 "parentRowSpace": 10,
@@ -1122,10 +1098,7 @@
                 "buttonColor": "{{appsmith.theme.colors.primaryColor}}",
                 "displayName": "Button",
                 "iconSVG": "/static/media/icon.cca026338f1c8eb6df8ba03d084c2fca.svg",
-                "searchTags": [
-                  "click",
-                  "submit"
-                ],
+                "searchTags": ["click", "submit"],
                 "topRow": 2,
                 "bottomRow": 6,
                 "parentRowSpace": 10,
@@ -1203,10 +1176,7 @@
                 "buttonColor": "{{appsmith.theme.colors.primaryColor}}",
                 "displayName": "Button",
                 "iconSVG": "/static/media/icon.cca026338f1c8eb6df8ba03d084c2fca.svg",
-                "searchTags": [
-                  "click",
-                  "submit"
-                ],
+                "searchTags": ["click", "submit"],
                 "topRow": 2,
                 "bottomRow": 6,
                 "parentRowSpace": 10,

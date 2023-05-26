@@ -21,7 +21,7 @@ import type { NumberInputStepButtonPosition } from "../constants";
 import { InputTypes } from "../constants";
 
 // TODO(abhinav): All of the following imports should not be in widgets.
-import { Icon } from "design-system-old";
+import { Icon } from "@design-system/widgets-old";
 import type { InputType } from "widgets/InputWidget/constants";
 import { getBaseWidgetClassName } from "constants/componentClassNameConstants";
 import { LabelPosition } from "components/constants";
@@ -372,10 +372,6 @@ const TextInputWrapper = styled.div<{
   box-shadow: ${({ boxShadow }) => `${boxShadow}`} !important;
   min-height: 32px;
 
-  .auto-layout & {
-    min-height: 36px;
-  }
-
   &:hover {
     border-color: ${({ disabled, hasError }) => {
       if (disabled) {
@@ -598,6 +594,11 @@ class BaseInputComponent extends React.Component<
       this.textAreaInputComponent()
     ) : (
       <InputGroup
+        autoComplete={
+          this.props.inputType === "PASSWORD"
+            ? "new-password"
+            : this.props.autoComplete
+        }
         autoFocus={this.props.autoFocus}
         className={this.props.isLoading ? "bp3-skeleton" : ""}
         disabled={this.props.disabled}
@@ -614,9 +615,6 @@ class BaseInputComponent extends React.Component<
         onFocus={() => this.setFocusState(true)}
         onKeyDown={this.onKeyDown}
         onKeyUp={this.onKeyUp}
-        autoComplete={
-          this.props.inputType === "PASSWORD" ? "new-password" : "off"
-        }
         rightElement={
           this.props.inputType === "PASSWORD" ? (
             <Icon
@@ -776,6 +774,7 @@ export interface BaseInputComponentProps extends ComponentProps {
   compactMode: boolean;
   isInvalid: boolean;
   autoFocus?: boolean;
+  autoComplete?: string;
   iconName?: IconName;
   iconAlign?: Omit<Alignment, "center">;
   showError: boolean;

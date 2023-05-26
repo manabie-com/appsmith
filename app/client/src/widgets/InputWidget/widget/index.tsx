@@ -22,7 +22,7 @@ import { InputTypes } from "../constants";
 import { GRID_DENSITY_MIGRATION_V1 } from "widgets/constants";
 import { ISDCodeDropdownOptions } from "../component/ISDCodeDropdown";
 import { CurrencyDropdownOptions } from "../component/CurrencyCodeDropdown";
-import { AutocompleteDataType } from "utils/autocomplete/CodemirrorTernService";
+import { AutocompleteDataType } from "utils/autocomplete/AutocompleteDataType";
 import {
   formatCurrencyNumber,
   getDecimalSeparator,
@@ -31,6 +31,8 @@ import {
 import { LabelPosition } from "components/constants";
 import type { Stylesheet } from "entities/AppTheming";
 import { checkInputTypeTextByProps } from "widgets/BaseInputWidget/utils";
+import { DefaultAutocompleteDefinitions } from "widgets/WidgetUtils";
+import type { AutocompletionDefinitions } from "widgets/constants";
 
 export function defaultValueValidation(
   value: any,
@@ -123,6 +125,31 @@ class InputWidget extends BaseWidget<InputWidgetProps, WidgetState> {
       text: props.text,
     };
   }
+
+  static getAutocompleteDefinitions(): AutocompletionDefinitions {
+    return {
+      "!doc":
+        "An input text field is used to capture a users textual input such as their names, numbers, emails etc. Inputs are used in forms and can have custom validations.",
+      "!url": "https://docs.appsmith.com/widget-reference/input",
+      text: {
+        "!type": "string",
+        "!doc": "The text value of the input",
+        "!url": "https://docs.appsmith.com/widget-reference/input",
+      },
+      isValid: "bool",
+      isVisible: DefaultAutocompleteDefinitions.isVisible,
+      isDisabled: "bool",
+      countryCode: {
+        "!type": "string",
+        "!doc": "Selected country code for Phone Number type input",
+      },
+      currencyCountryCode: {
+        "!type": "string",
+        "!doc": "Selected country code for Currency type input",
+      },
+    };
+  }
+
   static getPropertyPaneConfig() {
     return [
       {
@@ -131,7 +158,7 @@ class InputWidget extends BaseWidget<InputWidgetProps, WidgetState> {
           {
             helpText: "Changes the type of data captured in the input",
             propertyName: "inputType",
-            label: "Data Type",
+            label: "Data type",
             controlType: "DROP_DOWN",
             options: [
               {
@@ -183,7 +210,7 @@ class InputWidget extends BaseWidget<InputWidgetProps, WidgetState> {
           {
             helpText: "Changes the country code",
             propertyName: "phoneNumberCountryCode",
-            label: "Default Country Code",
+            label: "Default country code",
             enableSearch: true,
             dropdownHeight: "195px",
             controlType: "DROP_DOWN",
@@ -297,7 +324,7 @@ class InputWidget extends BaseWidget<InputWidgetProps, WidgetState> {
             helpText:
               "The error message to display if the regex or valid property check fails",
             propertyName: "errorMessage",
-            label: "Error Message",
+            label: "Error message",
             controlType: "INPUT_TEXT",
             placeholderText: "Not a valid email!",
             inputType: "TEXT",
@@ -357,7 +384,7 @@ class InputWidget extends BaseWidget<InputWidgetProps, WidgetState> {
           },
           {
             propertyName: "animateLoading",
-            label: "Animate Loading",
+            label: "Animate loading",
             controlType: "SWITCH",
             helpText: "Controls the loading of the widget",
             defaultValue: true,
@@ -379,7 +406,7 @@ class InputWidget extends BaseWidget<InputWidgetProps, WidgetState> {
           {
             helpText: "Focus input automatically on load",
             propertyName: "autoFocus",
-            label: "Auto Focus",
+            label: "Auto focus",
             controlType: "SWITCH",
             isJSConvertible: true,
             isBindProperty: true,
@@ -436,13 +463,14 @@ class InputWidget extends BaseWidget<InputWidgetProps, WidgetState> {
             propertyName: "labelAlignment",
             label: "Alignment",
             controlType: "LABEL_ALIGNMENT_OPTIONS",
+            fullWidth: false,
             options: [
               {
-                icon: "LEFT_ALIGN",
+                startIcon: "align-left",
                 value: Alignment.LEFT,
               },
               {
-                icon: "RIGHT_ALIGN",
+                startIcon: "align-right",
                 value: Alignment.RIGHT,
               },
             ],
@@ -499,11 +527,11 @@ class InputWidget extends BaseWidget<InputWidgetProps, WidgetState> {
         ],
       },
       {
-        sectionName: "Label Styles",
+        sectionName: "Label styles",
         children: [
           {
             propertyName: "labelTextColor",
-            label: "Text Color",
+            label: "Text color",
             controlType: "COLOR_PICKER",
             isJSConvertible: true,
             isBindProperty: true,
@@ -517,7 +545,7 @@ class InputWidget extends BaseWidget<InputWidgetProps, WidgetState> {
           },
           {
             propertyName: "labelTextSize",
-            label: "Text Size",
+            label: "Text size",
             controlType: "DROP_DOWN",
             defaultValue: "0.875rem",
             options: [
@@ -563,11 +591,11 @@ class InputWidget extends BaseWidget<InputWidgetProps, WidgetState> {
             controlType: "BUTTON_GROUP",
             options: [
               {
-                icon: "BOLD_FONT",
+                startIcon: "text-bold",
                 value: "BOLD",
               },
               {
-                icon: "ITALICS_FONT",
+                startIcon: "text-italic",
                 value: "ITALIC",
               },
             ],
@@ -602,11 +630,11 @@ class InputWidget extends BaseWidget<InputWidgetProps, WidgetState> {
             controlType: "ICON_TABS",
             options: [
               {
-                icon: "VERTICAL_LEFT",
+                startIcon: "align-left",
                 value: "left",
               },
               {
-                icon: "VERTICAL_RIGHT",
+                startIcon: "align-right",
                 value: "right",
               },
             ],
