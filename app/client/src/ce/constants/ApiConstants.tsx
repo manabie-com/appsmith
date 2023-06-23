@@ -47,6 +47,7 @@ export const getSnapShotAPIRoute = (applicationId: string) =>
 
 export enum POST_MESSAGE_TYPE {
   TOKEN = "TOKEN",
+  LOADED = "LOADED",
   SNACKBAR = "SNACKBAR",
 }
 

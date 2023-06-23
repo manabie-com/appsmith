@@ -214,7 +214,7 @@ class ActionAPI extends API {
     const headers: any = {
       accept: "application/json",
       "Content-Type": "multipart/form-data",
-      Expect: "100-continue",
+      // Expect: "100-continue",
     };
     if (isValidJsonString(existingStore)) {
       const parsedStore = JSON.parse(existingStore);
