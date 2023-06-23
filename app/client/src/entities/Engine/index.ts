@@ -123,6 +123,12 @@ export default abstract class AppEngine {
     };
 
     window.addEventListener("message", messageHandler);
+    window.parent.postMessage(
+      JSON.stringify({
+        type: POST_MESSAGE_TYPE.LOADED,
+      }),
+      "*",
+    );
     return { toLoadPageId, applicationId: application.id };
   }
 
