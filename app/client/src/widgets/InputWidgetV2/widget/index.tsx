@@ -28,12 +28,9 @@ import {
 } from "widgets/BaseInputWidget/constants";
 import { getParsedText } from "./Utilities";
 import type { Stylesheet } from "entities/AppTheming";
+import { isAutoHeightEnabledForWidget } from "widgets/WidgetUtils";
 import { checkInputTypeTextByProps } from "widgets/BaseInputWidget/utils";
 import { DynamicHeight } from "utils/WidgetFeatures";
-import type { AppState } from "ce/reducers";
-import { connect } from "react-redux";
-import type { LanguageEnums } from "entities/App";
-import { translate } from "utils/translate";
 
 export function defaultValueValidation(
   value: any,
@@ -255,8 +252,6 @@ function InputTypeUpdateHook(
 }
 
 class InputWidget extends BaseInputWidget<InputWidgetProps, WidgetState> {
-  static defaultProps: Partial<InputWidgetProps> | undefined;
-
   static getPropertyPaneContentConfig() {
     return mergeWidgetConfig(
       [
@@ -592,12 +587,7 @@ class InputWidget extends BaseInputWidget<InputWidgetProps, WidgetState> {
     }
 
     const conditionalProps: Partial<InputComponentProps> = {};
-
-    conditionalProps.errorMessage = translate(
-      this.props.lang,
-      this.props.errorMessage,
-      this.props.errorMessageJp,
-    );
+    conditionalProps.errorMessage = this.props.errorMessage;
     if (this.props.isRequired && value.length === 0) {
       conditionalProps.errorMessage = createMessage(FIELD_REQUIRED_ERROR);
     }
@@ -684,7 +674,7 @@ class InputWidget extends BaseInputWidget<InputWidgetProps, WidgetState> {
         iconAlign={this.props.iconAlign}
         iconName={this.props.iconName}
         inputType={this.props.inputType}
-        isDynamicHeightEnabled
+        isDynamicHeightEnabled={isAutoHeightEnabledForWidget(this.props)}
         isInvalid={isInvalid}
         isLoading={this.props.isLoading}
         label={this.props.label}
@@ -705,6 +695,9 @@ class InputWidget extends BaseInputWidget<InputWidgetProps, WidgetState> {
         tooltip={this.props.tooltip}
         value={value}
         widgetId={this.props.widgetId}
+        errorTextColor={this.props.errorTextColor}
+        helpText={this.props.helpText}
+        helpTextColor={this.props.helpTextColor}
         {...conditionalProps}
       />
     );
@@ -722,13 +715,6 @@ export interface InputWidgetProps extends BaseInputWidgetProps {
   maxNum?: number;
   minNum?: number;
   inputText: string;
-  lang?: LanguageEnums; // @Author: Bao Tran
 }
 
-const mapStateToProps = (state: AppState) => {
-  return {
-    lang: state.ui.appView.lang,
-  };
-};
-
-export default connect(mapStateToProps, null)(InputWidget);
+export default InputWidget;

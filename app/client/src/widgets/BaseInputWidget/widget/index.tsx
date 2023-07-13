@@ -169,6 +169,26 @@ class BaseInputWidget<
             validation: { type: ValidationTypes.TEXT },
           },
           {
+            helpText: "Sets a placeholder text for the input",
+            propertyName: "placeholderText",
+            label: "Placeholder",
+            controlType: "INPUT_TEXT",
+            placeholderText: "Placeholder",
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: { type: ValidationTypes.TEXT },
+          },
+          {
+            helpText: "Sets a help text for the input",
+            propertyName: "helpText",
+            label: "Help Text",
+            controlType: "INPUT_TEXT",
+            placeholderText: "Help text",
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: { type: ValidationTypes.TEXT },
+          },
+          {
             helpText: "Show arrows to increase or decrease values",
             propertyName: "showStepArrows",
             label: "Show Step Arrows",
@@ -387,6 +407,46 @@ class BaseInputWidget<
         ],
       },
       {
+        sectionName: "Error Styles",
+        children: [
+          {
+            propertyName: "errorTextColor",
+            label: "Font Color",
+            helpText: "Control the color of the error message",
+            controlType: "COLOR_PICKER",
+            isJSConvertible: true,
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: {
+              type: ValidationTypes.TEXT,
+              params: {
+                regex: /^(?![<|{{]).+/,
+              },
+            },
+          },
+        ],
+      },
+      {
+        sectionName: "Help Text Styles",
+        children: [
+          {
+            propertyName: "helpTextColor",
+            label: "Font Color",
+            helpText: "Control the color of the help text",
+            controlType: "COLOR_PICKER",
+            isJSConvertible: true,
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: {
+              type: ValidationTypes.TEXT,
+              params: {
+                regex: /^(?![<|{{]).+/,
+              },
+            },
+          },
+        ],
+      },
+      {
         sectionName: "Border and Shadow",
         children: [
           {
@@ -549,10 +609,11 @@ class BaseInputWidget<
         labelTextSize={this.props.labelTextSize}
         labelWidth={this.getLabelWidth()}
         maxChars={this.props.maxChars}
-        multiline={this.props.inputType === InputTypes.MULTI_LINE_TEXT}
+        multiline={this.props.multiline}
         onFocusChange={this.props.onFocusChange}
         onKeyDown={this.handleKeyDown}
         onValueChange={this.props.onValueChange}
+        placeholder={this.props.placeholder}
         showError={this.props.showError}
         stepSize={1}
         tooltip={this.props.tooltip}
@@ -574,15 +635,13 @@ export interface BaseInputValidator {
 export interface BaseInputWidgetProps extends WidgetProps {
   inputType: InputTypes;
   tooltip?: string;
-  tooltipJp?: string;
   isDisabled?: boolean;
   validation: boolean;
   text: string;
   regex?: string;
   errorMessage?: string;
-  errorMessageJp?: string;
+  placeholderText?: string;
   label: string;
-  translationJp?: string;
   labelPosition?: LabelPosition;
   labelAlignment?: Alignment;
   labelWidth?: number;

@@ -52,6 +52,7 @@ class InputComponent extends React.Component<InputComponentProps> {
         disableNewLineOnPressEnterKey={this.props.disableNewLineOnPressEnterKey}
         disabled={this.props.disabled}
         errorMessage={this.props.errorMessage}
+        errorTextColor={this.props.errorTextColor}
         fill={this.props.fill}
         iconAlign={this.props.iconAlign}
         iconName={this.props.iconName}
@@ -59,7 +60,7 @@ class InputComponent extends React.Component<InputComponentProps> {
         inputRef={this.props.inputRef}
         inputType={this.props.inputType}
         intent={this.props.intent}
-        isDynamicHeightEnabled
+        isDynamicHeightEnabled={this.props.isDynamicHeightEnabled}
         isInvalid={this.props.isInvalid}
         isLoading={this.props.isLoading}
         label={this.props.label}
@@ -83,6 +84,8 @@ class InputComponent extends React.Component<InputComponentProps> {
         tooltip={this.props.tooltip}
         value={this.props.value}
         widgetId={this.props.widgetId}
+        helpText={this.props.helpText}
+        helpTextColor={this.props.helpTextColor}
       />
     );
   }
