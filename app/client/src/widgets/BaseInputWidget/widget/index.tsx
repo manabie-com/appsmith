@@ -38,6 +38,16 @@ class BaseInputWidget<
             validation: { type: ValidationTypes.TEXT },
           },
           {
+            helpText: "Sets the label text JP of the widget",
+            propertyName: "labelJP",
+            label: "Text JP",
+            controlType: "INPUT_TEXT",
+            placeholderText: "Name:",
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: { type: ValidationTypes.TEXT },
+          },
+          {
             helpText: "Sets the label position of the widget",
             propertyName: "labelPosition",
             label: "Position",
@@ -139,6 +149,17 @@ class BaseInputWidget<
             validation: { type: ValidationTypes.TEXT },
           },
           {
+            helpText:
+              "The error message to display if the regex or valid property check fails",
+            propertyName: "errorMessageJP",
+            label: "Error Message JP",
+            controlType: "INPUT_TEXT",
+            placeholderText: "Not a valid value!",
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: { type: ValidationTypes.TEXT },
+          },
+          {
             propertyName: "isSpellCheck",
             label: "Spellcheck",
             helpText:
@@ -164,6 +185,56 @@ class BaseInputWidget<
             label: "Tooltip",
             controlType: "INPUT_TEXT",
             placeholderText: "Value must be atleast 6 chars",
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: { type: ValidationTypes.TEXT },
+          },
+          {
+            helpText: "Show help text or details about current input",
+            propertyName: "tooltipJP",
+            label: "Tooltip JP",
+            controlType: "INPUT_TEXT",
+            placeholderText: "Value must be atleast 6 chars",
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: { type: ValidationTypes.TEXT },
+          },
+          {
+            helpText: "Sets a placeholder text for the input",
+            propertyName: "placeholderText",
+            label: "Placeholder",
+            controlType: "INPUT_TEXT",
+            placeholderText: "Placeholder",
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: { type: ValidationTypes.TEXT },
+          },
+          {
+            helpText: "Sets a placeholder text JP for the input",
+            propertyName: "placeholderTextJP",
+            label: "Placeholder JP",
+            controlType: "INPUT_TEXT",
+            placeholderText: "Placeholder JP",
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: { type: ValidationTypes.TEXT },
+          },
+          {
+            helpText: "Sets a help text for the input",
+            propertyName: "helpText",
+            label: "Help Text",
+            controlType: "INPUT_TEXT",
+            placeholderText: "Help text",
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: { type: ValidationTypes.TEXT },
+          },
+          {
+            helpText: "Sets a help text JP for the input",
+            propertyName: "helpTextJP",
+            label: "Help Text JP",
+            controlType: "INPUT_TEXT",
+            placeholderText: "Help text",
             isBindProperty: true,
             isTriggerProperty: false,
             validation: { type: ValidationTypes.TEXT },
@@ -387,6 +458,46 @@ class BaseInputWidget<
         ],
       },
       {
+        sectionName: "Error Styles",
+        children: [
+          {
+            propertyName: "errorTextColor",
+            label: "Font Color",
+            helpText: "Control the color of the error message",
+            controlType: "COLOR_PICKER",
+            isJSConvertible: true,
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: {
+              type: ValidationTypes.TEXT,
+              params: {
+                regex: /^(?![<|{{]).+/,
+              },
+            },
+          },
+        ],
+      },
+      {
+        sectionName: "Help Text Styles",
+        children: [
+          {
+            propertyName: "helpTextColor",
+            label: "Font Color",
+            helpText: "Control the color of the help text",
+            controlType: "COLOR_PICKER",
+            isJSConvertible: true,
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: {
+              type: ValidationTypes.TEXT,
+              params: {
+                regex: /^(?![<|{{]).+/,
+              },
+            },
+          },
+        ],
+      },
+      {
         sectionName: "Border and Shadow",
         children: [
           {
@@ -549,10 +660,11 @@ class BaseInputWidget<
         labelTextSize={this.props.labelTextSize}
         labelWidth={this.getLabelWidth()}
         maxChars={this.props.maxChars}
-        multiline={this.props.inputType === InputTypes.MULTI_LINE_TEXT}
+        multiline={this.props.multiline}
         onFocusChange={this.props.onFocusChange}
         onKeyDown={this.handleKeyDown}
         onValueChange={this.props.onValueChange}
+        placeholder={this.props.placeholder}
         showError={this.props.showError}
         stepSize={1}
         tooltip={this.props.tooltip}
@@ -574,15 +686,13 @@ export interface BaseInputValidator {
 export interface BaseInputWidgetProps extends WidgetProps {
   inputType: InputTypes;
   tooltip?: string;
-  tooltipJp?: string;
   isDisabled?: boolean;
   validation: boolean;
   text: string;
   regex?: string;
   errorMessage?: string;
-  errorMessageJp?: string;
+  placeholderText?: string;
   label: string;
-  translationJp?: string;
   labelPosition?: LabelPosition;
   labelAlignment?: Alignment;
   labelWidth?: number;

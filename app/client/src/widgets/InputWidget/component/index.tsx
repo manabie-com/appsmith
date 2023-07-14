@@ -455,10 +455,10 @@ class InputComponent extends React.Component<
         return this.state.showPassword ? "text" : "password";
       case "EMAIL":
         return "email";
-      case "SEARCH":
-        return "search";
       case "COLOR":
         return "color";
+      case "SEARCH":
+        return "search";
       default:
         return "text";
     }
