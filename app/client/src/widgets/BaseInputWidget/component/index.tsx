@@ -34,6 +34,10 @@ import LabelWithTooltip, {
 import { getLocale } from "utils/helpers";
 import AutoResizeTextArea from "components/editorComponents/AutoResizeTextArea";
 import { checkInputTypeText } from "../utils";
+import { translate } from "utils/translate";
+import type { AppState } from "ce/reducers";
+import { connect } from "react-redux";
+import type { LanguageEnums } from "entities/App";
 
 /**
  * All design system component specific logic goes here.
@@ -455,12 +459,15 @@ export type InputHTMLType =
 export const isNumberInputType = (inputHTMLType: InputHTMLType = "TEXT") => {
   return inputHTMLType === "NUMBER";
 };
+interface BaseInputProps extends BaseInputComponentProps {
+  lang?: LanguageEnums;
+}
 
 class BaseInputComponent extends React.Component<
-  BaseInputComponentProps,
+  BaseInputProps,
   InputComponentState
 > {
-  constructor(props: BaseInputComponentProps) {
+  constructor(props: BaseInputProps) {
     super(props);
     this.state = { showPassword: false };
   }
@@ -565,6 +572,14 @@ class BaseInputComponent extends React.Component<
     this.props.onKeyUp?.(e);
   };
 
+  translatePlaceHolder = () => {
+    return translate(
+      this.props.lang,
+      this.props.placeholder,
+      this.props.placeholderJP,
+    );
+  };
+
   private numericInputComponent = () => {
     // Get current locale only for the currency widget.
     const locale = this.props.shouldUseLocale ? getLocale() : undefined;
@@ -601,7 +616,7 @@ class BaseInputComponent extends React.Component<
         onKeyDown={this.onKeyDown}
         onKeyUp={this.onKeyUp}
         onValueChange={this.onNumberChange}
-        placeholder={this.props.placeholder}
+        placeholder={this.translatePlaceHolder()}
         stepSize={this.props.stepSize}
         value={this.props.value}
         {...conditionalProps}
@@ -621,7 +636,7 @@ class BaseInputComponent extends React.Component<
       onFocus={() => this.setFocusState(true)}
       onKeyDown={this.onKeyDownTextArea}
       onKeyUp={this.onKeyUp}
-      placeholder={this.props.placeholder}
+      placeholder={this.translatePlaceHolder()}
       ref={this.props.inputRef as IRef<HTMLTextAreaElement>}
       style={{ resize: "none" }}
       value={this.props.value}
@@ -649,7 +664,7 @@ class BaseInputComponent extends React.Component<
         onFocus={() => this.setFocusState(true)}
         onKeyDown={this.onKeyDown}
         onKeyUp={this.onKeyUp}
-        placeholder={this.props.placeholder}
+        placeholder={this.translatePlaceHolder()}
         rightElement={
           this.props.inputType === "PASSWORD" ? (
             <Icon
@@ -709,8 +724,17 @@ class BaseInputComponent extends React.Component<
       tooltip,
       errorTextColor,
       helpText,
+      tooltipJP,
+      lang,
+      labelJP,
+      errorMessageJP,
+      helpTextJP,
     } = this.props;
     const showLabelHeader = label || tooltip;
+    const translateLabel = translate(lang, label, labelJP);
+    const translateErrorMsg = translate(lang, errorMessage, errorMessageJP);
+    const translateTooltip = translate(lang, tooltip, tooltipJP);
+    const translateHelpText = translate(lang, helpText, helpTextJP);
     return (
       <InputComponentWrapper
         compactMode={compactMode}
@@ -739,11 +763,11 @@ class BaseInputComponent extends React.Component<
             disabled={disabled}
             fontSize={labelTextSize}
             fontStyle={labelStyle}
-            helpText={tooltip}
+            helpText={translateTooltip}
             isDynamicHeightEnabled={isDynamicHeightEnabled}
             loading={isLoading}
             position={labelPosition}
-            text={label}
+            text={translateLabel}
             width={labelWidth}
           />
         )}
@@ -766,11 +790,11 @@ class BaseInputComponent extends React.Component<
         </TextInputWrapper>
         {isInvalid ? (
           <p className="error-msg">
-            {errorMessage ||
+            {translateErrorMsg ||
               createMessage(INPUT_WIDGET_DEFAULT_VALIDATION_ERROR)}
           </p>
         ) : (
-          <p className="help-text-msg">{helpText}</p>
+          <p className="help-text-msg">{translateHelpText}</p>
         )}
       </InputComponentWrapper>
     );
@@ -790,6 +814,7 @@ export interface BaseInputComponentProps extends ComponentProps {
   isDynamicHeightEnabled?: boolean;
   defaultValue?: string | number;
   label: string;
+  labelJP?: string;
   labelAlignment?: Alignment;
   labelPosition?: LabelPosition;
   labelWidth?: number;
@@ -797,15 +822,19 @@ export interface BaseInputComponentProps extends ComponentProps {
   labelTextSize?: string;
   labelStyle?: string;
   tooltip?: string;
+  tooltipJP?: string;
   leftIcon?: IconName | JSX.Element;
   allowNumericCharactersOnly?: boolean;
   fill?: boolean;
   errorMessage?: string;
+  errorMessageJP?: string;
   errorTextColor?: string;
   onValueChange: (valueAsString: string) => void;
   stepSize?: number;
   placeholder?: string;
+  placeholderJP?: string;
   helpText?: string;
+  helpTextJP?: string;
   helpTextColor?: string;
   isLoading: boolean;
   multiline?: boolean;
@@ -844,4 +873,10 @@ export interface BaseInputComponentProps extends ComponentProps {
   buttonPosition?: NumberInputStepButtonPosition;
 }
 
-export default BaseInputComponent;
+const mapStateToProps = (state: AppState) => {
+  return {
+    lang: state.ui.appView.lang,
+  };
+};
+
+export default connect(mapStateToProps, null)(BaseInputComponent);

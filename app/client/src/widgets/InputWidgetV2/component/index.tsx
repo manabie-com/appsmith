@@ -52,7 +52,6 @@ class InputComponent extends React.Component<InputComponentProps> {
         disableNewLineOnPressEnterKey={this.props.disableNewLineOnPressEnterKey}
         disabled={this.props.disabled}
         errorMessage={this.props.errorMessage}
-        errorTextColor={this.props.errorTextColor}
         fill={this.props.fill}
         iconAlign={this.props.iconAlign}
         iconName={this.props.iconName}
@@ -84,8 +83,14 @@ class InputComponent extends React.Component<InputComponentProps> {
         tooltip={this.props.tooltip}
         value={this.props.value}
         widgetId={this.props.widgetId}
+        errorTextColor={this.props.errorTextColor}
         helpText={this.props.helpText}
+        helpTextJP={this.props.helpTextJP}
         helpTextColor={this.props.helpTextColor}
+        errorMessageJP={this.props.errorMessageJP}
+        labelJP={this.props.labelJP}
+        placeholderJP={this.props.placeholderJP}
+        tooltipJP={this.props.tooltipJP}
       />
     );
   }

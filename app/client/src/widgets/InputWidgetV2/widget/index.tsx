@@ -31,6 +31,10 @@ import type { Stylesheet } from "entities/AppTheming";
 import { isAutoHeightEnabledForWidget } from "widgets/WidgetUtils";
 import { checkInputTypeTextByProps } from "widgets/BaseInputWidget/utils";
 import { DynamicHeight } from "utils/WidgetFeatures";
+import type { AppState } from "ce/reducers";
+import { connect } from "react-redux";
+import type { LanguageEnums } from "entities/App";
+// import { translate } from "utils/translate";
 
 export function defaultValueValidation(
   value: any,
@@ -175,7 +179,11 @@ export function minValueValidation(min: any, props: InputWidgetProps, _?: any) {
   }
 }
 
-export function maxValueValidation(max: any, props: InputWidgetProps, _?: any) {
+interface InputProps extends InputWidgetProps {
+  lang?: LanguageEnums;
+}
+
+export function maxValueValidation(max: any, props: InputProps, _?: any) {
   const min = props.minNum;
   const value = max;
   max = Number(max);
@@ -251,7 +259,8 @@ function InputTypeUpdateHook(
   return updates;
 }
 
-class InputWidget extends BaseInputWidget<InputWidgetProps, WidgetState> {
+class InputWidget extends BaseInputWidget<InputProps, WidgetState> {
+  static defaultProps: Partial<InputProps> | undefined;
   static getPropertyPaneContentConfig() {
     return mergeWidgetConfig(
       [
@@ -698,6 +707,11 @@ class InputWidget extends BaseInputWidget<InputWidgetProps, WidgetState> {
         errorTextColor={this.props.errorTextColor}
         helpText={this.props.helpText}
         helpTextColor={this.props.helpTextColor}
+        labelJP={this.props.labelJP}
+        errorMessageJP={this.props.errorMessageJP}
+        placeholderJP={this.props.placeholderTextJP}
+        tooltipJP={this.props.tooltipJP}
+        helpTextJP={this.props.helpTextJP}
         {...conditionalProps}
       />
     );
@@ -717,4 +731,10 @@ export interface InputWidgetProps extends BaseInputWidgetProps {
   inputText: string;
 }
 
-export default InputWidget;
+const mapStateToProps = (state: AppState) => {
+  return {
+    lang: state.ui.appView.lang,
+  };
+};
+
+export default connect(mapStateToProps, null)(InputWidget);
