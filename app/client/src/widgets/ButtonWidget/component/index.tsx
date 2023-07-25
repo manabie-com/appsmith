@@ -138,12 +138,13 @@ const buttonBaseStyle = css<ThemeProp & ButtonStyleProps>`
   border-radius: ${({ borderRadius }) => borderRadius};
   box-shadow: ${({ boxShadow }) => `${boxShadow ?? "none"}`} !important;
 
-  ${({ placement }) =>
+  ${({ placement, buttonTextFontSize }) =>
     placement
       ? `
     justify-content: ${getCustomJustifyContent(placement)};
     & > span.bp3-button-text {
       flex: unset !important;
+      font-size: ${buttonTextFontSize};
     }
   `
       : ""}
@@ -173,6 +174,7 @@ export type ButtonStyleProps = {
   iconAlign?: Alignment;
   placement?: ButtonPlacement;
   translation?: string;
+  buttonTextFontSize?: string;
 };
 
 interface ICustomButtonProps extends Omit<IButtonProps, "text"> {
@@ -197,6 +199,7 @@ export function BaseButton(props: ICustomButtonProps & ButtonStyleProps) {
     rightIcon,
     text = "",
     translation = "",
+    buttonTextFontSize = "14px",
   } = props;
   const lang = useSelector(getLang);
 
@@ -228,6 +231,7 @@ export function BaseButton(props: ICustomButtonProps & ButtonStyleProps) {
         placement={placement}
         rightIcon={isRightAlign ? iconName || rightIcon : rightIcon}
         text={translate(lang, text, translation)}
+        buttonTextFontSize={buttonTextFontSize}
       />
     </DragContainer>
   );
@@ -273,6 +277,7 @@ interface ButtonComponentProps extends ComponentProps {
   iconAlign?: Alignment;
   placement?: ButtonPlacement;
   className?: string;
+  buttonTextFontSize?: string;
 }
 
 type RecaptchaV2ComponentPropType = {
@@ -465,6 +470,7 @@ function ButtonComponent(props: ButtonComponentProps & RecaptchaProps) {
         text={props.text}
         translation={props.translation}
         type={props.type}
+        buttonTextFontSize={props.buttonTextFontSize}
       />
     </BtnWrapper>
   );
