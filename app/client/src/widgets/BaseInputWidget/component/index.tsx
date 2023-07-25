@@ -294,7 +294,7 @@ const InputComponentWrapper = styled((props) => (
         margin: 0;
         display: flex;
         align-items: center;
-        padding: 0 10px;
+        padding: 10px;
         position: relative;
         color: ${({ disabled }) =>
           disabled
