@@ -339,6 +339,22 @@ class ButtonWidget extends BaseWidget<ButtonWidgetProps, ButtonWidgetState> {
         ],
       },
       {
+        sectionName: "Text Font Size",
+        children: [
+          {
+            propertyName: "buttonTextFontSize",
+            helpText: "Changes the font size of the text",
+            label: "Font Size",
+            controlType: "INPUT_TEXT",
+            placeholderText: "14px",
+            isJSConvertible: true,
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: { type: ValidationTypes.TEXT },
+          },
+        ],
+      },
+      {
         sectionName: "Border and Shadow",
         children: [
           {
@@ -464,6 +480,7 @@ class ButtonWidget extends BaseWidget<ButtonWidgetProps, ButtonWidgetState> {
         type={this.props.buttonType || ButtonType.BUTTON}
         widgetId={this.props.widgetId}
         widgetName={this.props.widgetName}
+        buttonTextFontSize={this.props.buttonTextFontSize}
       />
     );
   }
