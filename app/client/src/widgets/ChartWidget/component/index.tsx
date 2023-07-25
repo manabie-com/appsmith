@@ -25,6 +25,13 @@ const FusionCharts = require("fusioncharts");
 const plugins: Record<string, any> = {
   Charts: require("fusioncharts/fusioncharts.charts"),
   FusionTheme: require("fusioncharts/themes/fusioncharts.theme.fusion"),
+  OceanTheme: require("fusioncharts/themes/fusioncharts.theme.ocean"),
+  ZuneTheme: require("fusioncharts/themes/fusioncharts.theme.zune"),
+  CandyTheme: require("fusioncharts/themes/fusioncharts.theme.candy"),
+  CarbonTheme: require("fusioncharts/themes/fusioncharts.theme.carbon"),
+  FintTheme: require("fusioncharts/themes/fusioncharts.theme.fint"),
+  GammelTheme: require("fusioncharts/themes/fusioncharts.theme.gammel"),
+  UmberTheme: require("fusioncharts/themes/fusioncharts.theme.umber"),
   Widgets: require("fusioncharts/fusioncharts.widgets"),
   ZoomScatter: require("fusioncharts/fusioncharts.zoomscatter"),
   ZoomLine: require("fusioncharts/fusioncharts.zoomline"),
