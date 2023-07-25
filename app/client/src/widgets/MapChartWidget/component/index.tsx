@@ -13,6 +13,13 @@ import USA from "fusioncharts/maps/fusioncharts.usa";
 
 // Include the theme as fusion
 import FusionTheme from "fusioncharts/themes/fusioncharts.theme.fusion";
+import OceanTheme from "fusioncharts/themes/fusioncharts.theme.ocean";
+import ZuneTheme from "fusioncharts/themes/fusioncharts.theme.zune";
+import CandyTheme from "fusioncharts/themes/fusioncharts.theme.candy";
+import CarbonTheme from "fusioncharts/themes/fusioncharts.theme.carbon";
+import FintTheme from "fusioncharts/themes/fusioncharts.theme.fint";
+import GammelTheme from "fusioncharts/themes/fusioncharts.theme.gammel";
+import UmberTheme from "fusioncharts/themes/fusioncharts.theme.umber";
 
 // Import the dataset and the colorRange of the map
 import type { MapColorObject } from "../constants";
@@ -21,7 +28,20 @@ import { CUSTOM_MAP_PLUGINS } from "../CustomMapConstants";
 import { Colors } from "constants/Colors";
 
 // Adding the chart and theme as dependency to the core fusioncharts
-ReactFC.fcRoot(FusionCharts, FusionMaps, World, FusionTheme, USA);
+ReactFC.fcRoot(
+  FusionCharts,
+  FusionMaps,
+  World,
+  FusionTheme,
+  OceanTheme,
+  ZuneTheme,
+  CandyTheme,
+  CarbonTheme,
+  FintTheme,
+  GammelTheme,
+  UmberTheme,
+  USA,
+);
 
 const MapChartContainer = styled.div<{
   borderRadius?: string;
@@ -239,7 +259,19 @@ function MapChartComponent(props: MapChartComponentProps) {
     if (mapType) {
       const alias = mapType.substring(5);
       const mapDefinition = CUSTOM_MAP_PLUGINS[alias];
-      ReactFC.fcRoot(FusionCharts, FusionMaps, mapDefinition, FusionTheme);
+      ReactFC.fcRoot(
+        FusionCharts,
+        FusionMaps,
+        mapDefinition,
+        FusionTheme,
+        OceanTheme,
+        ZuneTheme,
+        CandyTheme,
+        CarbonTheme,
+        FintTheme,
+        GammelTheme,
+        UmberTheme,
+      );
       setChartConfigs(configs);
     }
   };
