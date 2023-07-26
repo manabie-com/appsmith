@@ -373,6 +373,43 @@ class SelectWidget extends BaseWidget<SelectWidgetProps, WidgetState> {
             isTriggerProperty: false,
             validation: { type: ValidationTypes.BOOLEAN },
           },
+          {
+            helpText: "Sets the input validity based on a JS expression",
+            propertyName: "showError",
+            label: "showError",
+            controlType: "INPUT_TEXT",
+            placeholderText: "{{ 1 > 2 }}",
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: {
+              type: ValidationTypes.BOOLEAN,
+              params: {
+                default: false,
+              },
+            },
+          },
+          {
+            helpText:
+              "The error message to display if the regex or valid property check fails",
+            propertyName: "errorMessage",
+            label: "Error Message",
+            controlType: "INPUT_TEXT",
+            placeholderText: "Not a valid value!",
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: { type: ValidationTypes.TEXT },
+          },
+          {
+            helpText:
+              "The error message to display if the regex or valid property check fails",
+            propertyName: "errorMessageJP",
+            label: "Error Message JP",
+            controlType: "INPUT_TEXT",
+            placeholderText: "Not a valid value!",
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: { type: ValidationTypes.TEXT },
+          },
         ],
       },
       {
@@ -583,6 +620,7 @@ class SelectWidget extends BaseWidget<SelectWidgetProps, WidgetState> {
       value: this.props.selectedOptionValue,
     });
     const { componentHeight, componentWidth } = this.getComponentDimensions();
+
     return (
       <SelectComponent
         accentColor={this.props.accentColor}
@@ -625,6 +663,9 @@ class SelectWidget extends BaseWidget<SelectWidgetProps, WidgetState> {
         value={this.props.selectedOptionValue}
         widgetId={this.props.widgetId}
         width={componentWidth}
+        showError={this.props.showError}
+        errorMessage={this.props.errorMessage}
+        errorMessageJP={this.props.errorMessageJP}
       />
     );
   }
@@ -726,6 +767,9 @@ export interface SelectWidgetProps extends WidgetProps {
   onFilterUpdate: string;
   isDirty?: boolean;
   filterText: string;
+  showError?: boolean;
+  errorMessage?: string;
+  errorMessageJP?: string;
 }
 
 export default SelectWidget;

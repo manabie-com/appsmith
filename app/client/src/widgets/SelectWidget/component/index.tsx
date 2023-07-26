@@ -24,6 +24,10 @@ import type { LabelPosition } from "components/constants";
 import SelectButton from "./SelectButton";
 import { labelMargin } from "../../WidgetUtils";
 import LabelWithTooltip from "widgets/components/LabelWithTooltip";
+import { translate } from "utils/translate";
+import { connect } from "react-redux";
+import type { AppState } from "ce/reducers";
+import type { LanguageEnums } from "entities/App";
 
 const DEBOUNCE_TIMEOUT = 800;
 const ITEM_SIZE = 40;
@@ -287,7 +291,11 @@ class SelectComponent extends React.Component<
       labelTooltip,
       labelWidth,
       widgetId,
+      errorMessage,
+      errorMessageJP,
+      lang,
     } = this.props;
+
     // active focused item
     const activeItem = () => {
       if (
@@ -320,6 +328,7 @@ class SelectComponent extends React.Component<
           this.spanRef.current.parentElement.scrollWidth)
         ? value.toString()
         : "";
+    const translateErrorMsg = translate(lang, errorMessage, errorMessageJP);
 
     return (
       <DropdownContainer
@@ -420,6 +429,9 @@ class SelectComponent extends React.Component<
               tooltipText={tooltipText}
               value={this.props.value?.toString()}
             />
+            {this.props.showError ? (
+              <p className="error-msg">{translateErrorMsg}</p>
+            ) : null}
           </StyledSingleDropDown>
         </StyledControlGroup>
       </DropdownContainer>
@@ -465,6 +477,16 @@ export interface SelectComponentProps extends ComponentProps {
   onClose?: () => void;
   hideCancelIcon?: boolean;
   resetFilterTextOnClose?: boolean;
+  showError?: boolean;
+  errorMessage?: string;
+  errorMessageJP?: string;
+  lang?: LanguageEnums;
 }
 
-export default React.memo(SelectComponent);
+const mapStateToProps = (state: AppState) => {
+  return {
+    lang: state.ui.appView.lang,
+  };
+};
+
+export default connect(mapStateToProps)(React.memo(SelectComponent));
