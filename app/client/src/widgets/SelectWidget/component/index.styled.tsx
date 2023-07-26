@@ -86,6 +86,18 @@ export const StyledSingleDropDown = styled(
   div {
     flex: 1 1 auto;
   }
+  &&&& .error-msg {
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.4px;
+    text-transform: none;
+    font-family: Roboto, sans-serif;
+    text-align: left;
+    color: var(--wds-color-border-danger-focus);
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+  }
   span {
     width: 100%;
     position: relative;
@@ -229,7 +241,7 @@ export const DropdownContainer = styled.div<{
 
   /**
     When the label is on the left it is not center aligned
-    here set height to auto and not 100% because the input 
+    here set height to auto and not 100% because the input
     has fixed height and stretch the container.
   */
     ${({ labelPosition }) => {
