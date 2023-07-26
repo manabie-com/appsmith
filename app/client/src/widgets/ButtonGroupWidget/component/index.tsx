@@ -159,6 +159,7 @@ interface ButtonStyleProps {
   iconAlign?: string;
   placement?: ButtonPlacement;
   isLabel: boolean;
+  textColor?: string;
 }
 
 /*
@@ -198,7 +199,7 @@ const StyledButton = styled.button<ThemeProp & ButtonStyleProps>`
     ${buttonHoverActiveStyles}
   }
 
-  ${({ buttonColor, buttonVariant, iconAlign, isLabel, theme }) => `
+  ${({ buttonColor, buttonVariant, iconAlign, isLabel, theme, textColor }) => `
     & {
       background: ${
         getCustomBackgroundColor(buttonVariant, buttonColor) !== "none"
@@ -229,7 +230,9 @@ const StyledButton = styled.button<ThemeProp & ButtonStyleProps>`
 
     & span {
       color: ${
-        buttonVariant === ButtonVariantTypes.PRIMARY
+        textColor
+          ? textColor
+          : buttonVariant === ButtonVariantTypes.PRIMARY
           ? getComplementaryGrayscaleColor(buttonColor)
           : getCustomBackgroundColor(ButtonVariantTypes.PRIMARY, buttonColor)
       } !important;
@@ -606,6 +609,7 @@ class ButtonGroupComponent extends React.Component<
                     <StyledButton
                       borderRadius={this.props.borderRadius}
                       buttonColor={button.buttonColor}
+                      textColor={button.textColor}
                       buttonVariant={buttonVariant}
                       disabled={isButtonDisabled}
                       iconAlign={button.iconAlign}
@@ -657,6 +661,7 @@ class ButtonGroupComponent extends React.Component<
               <StyledButton
                 borderRadius={this.props.borderRadius}
                 buttonColor={button.buttonColor}
+                textColor={button.textColor}
                 buttonVariant={buttonVariant}
                 disabled={isButtonDisabled}
                 iconAlign={button.iconAlign}
@@ -700,6 +705,7 @@ interface GroupButtonProps {
   translationJp?: string;
   buttonType?: string;
   buttonColor?: string;
+  textColor?: string;
   iconName?: IconName;
   iconAlign?: Alignment;
   placement?: ButtonPlacement;

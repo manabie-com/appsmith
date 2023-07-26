@@ -418,6 +418,17 @@ class ButtonGroupWidget extends BaseWidget<
                       isTriggerProperty: false,
                       validation: { type: ValidationTypes.TEXT },
                     },
+                    {
+                      getStylesheetValue,
+                      propertyName: "textColor",
+                      helpText: "Changes the text color of the button",
+                      label: "Text Color",
+                      controlType: "COLOR_PICKER",
+                      isJSConvertible: true,
+                      isBindProperty: true,
+                      isTriggerProperty: false,
+                      validation: { type: ValidationTypes.TEXT },
+                    },
                   ],
                 },
               ],
@@ -624,6 +635,7 @@ export interface ButtonGroupWidgetProps extends WidgetProps {
       label?: string;
       buttonType?: string;
       buttonColor?: string;
+      textColor?: string;
       iconName?: IconName;
       iconAlign?: Alignment;
       placement?: ButtonPlacement;
