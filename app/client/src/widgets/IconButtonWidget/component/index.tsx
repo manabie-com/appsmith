@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import { Button, Position } from "@blueprintjs/core";
 import type { IconName } from "@blueprintjs/icons";
+import { MuiIcons } from "constants/MuiIcons";
 
 import type { ComponentProps } from "widgets/BaseComponent";
 import type { RenderMode } from "constants/WidgetConstants";
@@ -234,7 +235,9 @@ export const StyledButton = styled((props) => (
 
 export interface IconButtonComponentProps extends ComponentProps {
   iconName?: IconName;
+  muiIcon?: string;
   buttonColor?: string;
+  iconColor?: string;
   buttonVariant: ButtonVariant;
   borderRadius: string;
   boxShadow: string;
@@ -248,11 +251,35 @@ export interface IconButtonComponentProps extends ComponentProps {
   width: number;
 }
 
+const customIconWrapper = (
+  path: any,
+  viewboxDefault = 24,
+  fillColor?: string,
+) => {
+  return (
+    <span className="bp3-icon">
+      <svg
+        style={fillColor ? { fill: fillColor } : {}}
+        version="1.1"
+        id="Capa_1"
+        xmlns="http://www.w3.org/2000/svg"
+        x="0px"
+        y="0px"
+        className="emotion-3"
+        viewBox={`0 0 ${viewboxDefault} ${viewboxDefault}`}
+      >
+        {path}
+      </svg>
+    </span>
+  );
+};
+
 function IconButtonComponent(props: IconButtonComponentProps) {
   const {
     borderRadius,
     boxShadow,
     buttonColor,
+    iconColor,
     buttonVariant,
     hasOnClickAction,
     height,
@@ -261,6 +288,7 @@ function IconButtonComponent(props: IconButtonComponentProps) {
     renderMode,
     tooltip,
     width,
+    muiIcon,
   } = props;
 
   /**
@@ -275,6 +303,9 @@ function IconButtonComponent(props: IconButtonComponentProps) {
 
     return width - WIDGET_PADDING * 2;
   }, [width, height]);
+  const icon = muiIcon
+    ? customIconWrapper(MuiIcons[muiIcon], 24, iconColor)
+    : props.iconName;
 
   const iconBtnWrapper = (
     <IconButtonContainer
@@ -296,7 +327,7 @@ function IconButtonComponent(props: IconButtonComponentProps) {
         dimension={dimension}
         disabled={isDisabled}
         hasOnClickAction={hasOnClickAction}
-        icon={props.iconName}
+        icon={icon}
         large
       />
     </IconButtonContainer>

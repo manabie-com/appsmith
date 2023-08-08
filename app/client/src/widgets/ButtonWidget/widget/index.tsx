@@ -261,6 +261,33 @@ class ButtonWidget extends BaseWidget<ButtonWidgetProps, ButtonWidgetState> {
             },
           },
           {
+            propertyName: "muiIcon",
+            label: "Select MUI Icon",
+            helpText: "Sets the icon to be used for the button",
+            controlType: "MUI_ICON_SELECT",
+            isJSConvertible: true,
+            isBindProperty: true,
+            isTriggerProperty: false,
+            updateHook: (
+              props: ButtonWidgetProps,
+              propertyPath: string,
+              propertyValue: string,
+            ) => {
+              const propertiesToUpdate = [{ propertyPath, propertyValue }];
+              if (!props.iconAlign) {
+                propertiesToUpdate.push({
+                  propertyPath: "iconAlign",
+                  propertyValue: Alignment.LEFT,
+                });
+              }
+              return propertiesToUpdate;
+            },
+            dependencies: ["iconAlign"],
+            validation: {
+              type: ValidationTypes.TEXT,
+            },
+          },
+          {
             propertyName: "iconAlign",
             label: "Position",
             helpText: "Sets the icon alignment of the button",
@@ -335,6 +362,25 @@ class ButtonWidget extends BaseWidget<ButtonWidgetProps, ButtonWidgetState> {
             isBindProperty: true,
             isTriggerProperty: false,
             validation: { type: ValidationTypes.TEXT },
+          },
+          {
+            propertyName: "iconColor",
+            helpText: "Sets the style of the MUI icon color",
+            label: "MUI Icon Color",
+            controlType: "COLOR_PICKER",
+            isJSConvertible: true,
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: {
+              type: ValidationTypes.TEXT,
+              params: {
+                regex: /^(?![<|{{]).+/,
+              },
+            },
+            hidden: (props: ButtonWidgetProps) => {
+              return !props.muiIcon;
+            },
+            dependencies: ["muiIcon"],
           },
         ],
       },
@@ -468,6 +514,8 @@ class ButtonWidget extends BaseWidget<ButtonWidgetProps, ButtonWidgetState> {
         handleRecaptchaV2Loading={this.handleRecaptchaV2Loading}
         iconAlign={this.props.iconAlign}
         iconName={this.props.iconName}
+        muiIcon={this.props.muiIcon}
+        iconColor={this.props.iconColor}
         isDisabled={isDisabled}
         isLoading={this.props.isLoading || this.state.isLoading}
         key={this.props.widgetId}

@@ -440,6 +440,39 @@ class InputWidget extends BaseInputWidget<InputProps, WidgetState> {
                 props.inputType === InputTypes.MULTI_LINE_TEXT,
             },
             {
+              propertyName: "muiIcon",
+              label: "Select MUI Icon",
+              helpText: "Sets the MUI icon to be used in input field",
+              controlType: "MUI_ICON_SELECT",
+              isBindProperty: true,
+              isTriggerProperty: false,
+              isJSConvertible: true,
+              validation: {
+                type: ValidationTypes.TEXT,
+              },
+              hidden: (props: InputWidgetProps) =>
+                props.inputType === InputTypes.MULTI_LINE_TEXT,
+            },
+            {
+              propertyName: "iconColor",
+              helpText: "Sets the style of the MUI icon color",
+              label: "MUI Icon Color",
+              controlType: "COLOR_PICKER",
+              isJSConvertible: true,
+              isBindProperty: true,
+              isTriggerProperty: false,
+              validation: {
+                type: ValidationTypes.TEXT,
+                params: {
+                  regex: /^(?![<|{{]).+/,
+                },
+              },
+              hidden: (props: InputWidgetProps) => {
+                return !props.muiIcon;
+              },
+              dependencies: ["muiIcon"],
+            },
+            {
               propertyName: "iconAlign",
               label: "Position",
               helpText: "Sets the icon alignment of input field",
@@ -461,7 +494,7 @@ class InputWidget extends BaseInputWidget<InputProps, WidgetState> {
               hidden: (props: InputWidgetProps) =>
                 props.inputType === InputTypes.MULTI_LINE_TEXT ||
                 !props.iconName,
-              dependencies: ["iconName"],
+              dependencies: ["iconName", "muiIcon"],
             },
           ],
         },
@@ -682,6 +715,8 @@ class InputWidget extends BaseInputWidget<InputProps, WidgetState> {
         disabled={this.props.isDisabled}
         iconAlign={this.props.iconAlign}
         iconName={this.props.iconName}
+        muiIcon={this.props.muiIcon}
+        iconColor={this.props.iconColor}
         inputType={this.props.inputType}
         isDynamicHeightEnabled={isAutoHeightEnabledForWidget(this.props)}
         isInvalid={isInvalid}

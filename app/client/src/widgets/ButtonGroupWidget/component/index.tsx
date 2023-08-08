@@ -36,6 +36,7 @@ import type { LanguageEnums } from "entities/App";
 import type { AppState } from "ce/reducers";
 import { connect } from "react-redux";
 import { translate } from "utils/translate";
+import { MuiIcons } from "constants/MuiIcons";
 
 // Utility functions
 interface ButtonData {
@@ -323,6 +324,31 @@ const StyledMenu = styled(Menu)`
   min-width: 0px;
 `;
 
+const customIconWrapper = (
+  path: any,
+  viewboxDefault = 24,
+  fillColor?: string,
+) => {
+  return (
+    <span className="bp3-icon">
+      <svg
+        style={fillColor ? { fill: fillColor } : {}}
+        version="1.1"
+        id="Capa_1"
+        xmlns="http://www.w3.org/2000/svg"
+        x="0px"
+        y="0px"
+        width="16"
+        height="16"
+        className="emotion-3"
+        viewBox={`0 0 ${viewboxDefault} ${viewboxDefault}`}
+      >
+        {path}
+      </svg>
+    </span>
+  );
+};
+
 interface PopoverContentProps {
   buttonId: string;
   menuItems: Record<
@@ -338,6 +364,8 @@ interface PopoverContentProps {
       backgroundColor?: string;
       textColor?: string;
       iconName?: IconName;
+      muiIcon?: string;
+      muiIconColor?: string;
       iconColor?: string;
       iconAlign?: Alignment;
       onClick?: string;
@@ -368,6 +396,8 @@ function PopoverContent(props: PopoverContentProps) {
       onClick,
       textColor,
       translationJp,
+      muiIcon,
+      muiIconColor,
     } = menuItem;
     return (
       <BaseMenuItem
@@ -375,13 +405,27 @@ function PopoverContent(props: PopoverContentProps) {
         disabled={isDisabled}
         icon={
           iconAlign !== Alignment.RIGHT && iconName ? (
-            <Icon color={iconColor} icon={iconName} />
+            <Icon
+              color={iconColor}
+              icon={
+                muiIcon
+                  ? customIconWrapper(MuiIcons[muiIcon], 24, muiIconColor)
+                  : iconName
+              }
+            />
           ) : null
         }
         key={id}
         labelElement={
           iconAlign === Alignment.RIGHT && iconName ? (
-            <Icon color={iconColor} icon={iconName} />
+            <Icon
+              color={iconColor}
+              icon={
+                muiIcon
+                  ? customIconWrapper(MuiIcons[muiIcon], 24, muiIconColor)
+                  : iconName
+              }
+            />
           ) : null
         }
         onClick={() => onItemClicked(onClick, buttonId)}
@@ -626,7 +670,19 @@ class ButtonGroupComponent extends React.Component<
                           <Spinner size={18} />
                         ) : (
                           <>
-                            {button.iconName && <Icon icon={button.iconName} />}
+                            {button.iconName && (
+                              <Icon
+                                icon={
+                                  button.muiIcon
+                                    ? customIconWrapper(
+                                        MuiIcons[button.muiIcon],
+                                        24,
+                                        button.muiIconColor,
+                                      )
+                                    : button.iconName
+                                }
+                              />
+                            )}
                             {!!button.label && (
                               <span className={CoreClass.BUTTON_TEXT}>
                                 {translate(
@@ -677,7 +733,19 @@ class ButtonGroupComponent extends React.Component<
                     <Spinner size={18} />
                   ) : (
                     <>
-                      {button.iconName && <Icon icon={button.iconName} />}
+                      {button.iconName && (
+                        <Icon
+                          icon={
+                            button.muiIcon
+                              ? customIconWrapper(
+                                  MuiIcons[button.muiIcon],
+                                  24,
+                                  button.muiIconColor,
+                                )
+                              : button.iconName
+                          }
+                        />
+                      )}
                       {!!button.label && (
                         <span className={CoreClass.BUTTON_TEXT}>
                           {translate(lang, button.label, button.translationJp)}
@@ -707,6 +775,8 @@ interface GroupButtonProps {
   buttonColor?: string;
   textColor?: string;
   iconName?: IconName;
+  muiIcon?: string;
+  muiIconColor?: string;
   iconAlign?: Alignment;
   placement?: ButtonPlacement;
   onClick?: string;
@@ -723,6 +793,8 @@ interface GroupButtonProps {
       backgroundColor?: string;
       textColor?: string;
       iconName?: IconName;
+      muiIcon?: string;
+      muiIconColor?: string;
       iconColor?: string;
       iconAlign?: Alignment;
       onClick?: string;
