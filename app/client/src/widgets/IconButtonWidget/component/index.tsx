@@ -250,7 +250,7 @@ export interface IconButtonComponentProps extends ComponentProps {
   tooltip?: string;
   width: number;
 }
-
+//TODO: icon size
 const customIconWrapper = (
   path: any,
   viewboxDefault = 24,

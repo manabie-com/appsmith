@@ -323,7 +323,7 @@ const StyledMenu = styled(Menu)`
   padding: 0;
   min-width: 0px;
 `;
-
+//TODO: icon size
 const customIconWrapper = (
   path: any,
   viewboxDefault = 24,

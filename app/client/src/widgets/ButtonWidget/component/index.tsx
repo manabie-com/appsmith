@@ -177,7 +177,7 @@ export type ButtonStyleProps = {
   translation?: string;
   buttonTextFontSize?: string;
 };
-
+//TODO: icon size
 const customIconWrapper = (
   path: any,
   viewboxDefault = 24,

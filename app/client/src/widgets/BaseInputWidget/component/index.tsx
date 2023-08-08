@@ -367,7 +367,7 @@ const StyledNumericInput = styled(NumericInput)`
     }
   }
 `;
-
+//TODO: icon size
 const customIconWrapper = (
   path: any,
   viewboxDefault = 24,
