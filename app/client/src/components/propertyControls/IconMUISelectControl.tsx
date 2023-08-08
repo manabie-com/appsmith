@@ -1,8 +1,6 @@
 import * as React from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import { Alignment, Button, Classes, MenuItem } from "@blueprintjs/core";
-// import type { IconName } from "@blueprintjs/icons";
-// import { IconNames } from "@blueprintjs/icons";
 import type { ItemListRenderer, ItemRenderer } from "@blueprintjs/select";
 import { Select } from "@blueprintjs/select";
 import type { GridListProps, VirtuosoGridHandle } from "react-virtuoso";
@@ -12,7 +10,9 @@ import type { ControlProps } from "./BaseControl";
 import BaseControl from "./BaseControl";
 import { TooltipComponent } from "design-system-old";
 import { Colors } from "constants/Colors";
-import { MuiIcons } from "constants/MuiIcons";
+import * as MuiIcons from "constants/Icons";
+type IconType = keyof typeof MuiIcons | typeof NONE;
+
 import { replayHighlightClass } from "globalStyles/portals";
 import _ from "lodash";
 import { generateReactKey } from "utils/generators";
@@ -93,7 +93,7 @@ const StyledMenuItem = styled(MenuItem)`
 `;
 
 export interface IconSelectControlProps extends ControlProps {
-  propertyValue?: string;
+  propertyValue?: IconType;
   defaultIconName?: string;
 }
 
@@ -102,34 +102,24 @@ export interface IconSelectControlState {
   isOpen: boolean;
 }
 
-const customIconWrapper = (
-  path: any,
-  viewboxDefault = 24,
-  fillColor = "rgb(158, 158, 158)",
-) => {
+const customIconWrapper = (path: any) => {
   if (!path) return null;
-  return (
-    <span className="bp3-icon bp3-icon-resolve" style={{ fill: fillColor }}>
-      <svg
-        width="24"
-        height="24"
-        version="1.1"
-        id="Capa_1"
-        xmlns="http://www.w3.org/2000/svg"
-        x="0px"
-        y="0px"
-        className="emotion-3"
-        viewBox={`0 0 ${viewboxDefault} ${viewboxDefault}`}
-      >
-        {path}
-      </svg>
-    </span>
-  );
+  return <span className="bp3-icon bp3-icon-resolve">{path}</span>;
+};
+
+const DynamicIconComponent = ({ iconName }: { iconName: IconType }) => {
+  if (iconName == NONE || !(iconName in MuiIcons)) {
+    return null;
+  }
+
+  const IconComponent = MuiIcons[iconName];
+  return <IconComponent />;
 };
 
 const NONE = "(none)";
-type IconType = string | typeof NONE;
-const ICON_NAMES = Object.keys(MuiIcons).map<IconType>((name: string) => name);
+const ICON_NAMES = Object.keys(MuiIcons).map<IconType>(
+  (name: string) => name as IconType,
+);
 ICON_NAMES.unshift(NONE);
 const icons = new Set(ICON_NAMES);
 
@@ -196,10 +186,10 @@ class IconSelectControl extends BaseControl<
     const { activeIcon } = this.state;
     const containerWidth =
       this.iconSelectTargetRef.current?.getBoundingClientRect?.()?.width || 0;
-    // if (iconName == undefined) {
-    //   return null;
-    // }
-    const flaskIcon = iconName ? customIconWrapper(MuiIcons[iconName]) : null;
+    const customIcon = iconName
+      ? customIconWrapper(<DynamicIconComponent iconName={iconName} />)
+      : null;
+
     return (
       <>
         <IconSelectContainerStyles id={this.id} targetWidth={containerWidth} />
@@ -234,7 +224,7 @@ class IconSelectControl extends BaseControl<
             elementRef={this.iconSelectTargetRef}
             fill
             // icon={iconName || defaultIconName}
-            icon={flaskIcon}
+            icon={customIcon}
             onClick={this.handleButtonClick}
             rightIcon="caret-down"
             tabIndex={0}
@@ -413,20 +403,22 @@ class IconSelectControl extends BaseControl<
     );
   };
 
-  private renderIconItem: ItemRenderer<string | typeof NONE> = (
+  private renderIconItem: ItemRenderer<IconType> = (
     icon,
     { handleClick, modifiers },
   ) => {
     if (!modifiers.matchesPredicate) {
       return null;
     }
-    const flaskIcon = icon ? customIconWrapper(MuiIcons[icon]) : null;
+    const customIcon =
+      icon && icon != NONE
+        ? customIconWrapper(<DynamicIconComponent iconName={icon} />)
+        : null;
     return (
       <TooltipComponent content={icon}>
         <StyledMenuItem
           active={modifiers.active}
-          // icon={icon === NONE ? undefined : icon}
-          icon={flaskIcon}
+          icon={customIcon}
           key={icon}
           onClick={handleClick}
           text={icon === NONE || !icon ? NONE : undefined}

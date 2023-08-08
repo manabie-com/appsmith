@@ -1,0 +1,8 @@
+import * as React from "react";
+const SvgFiberManualRecord = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} {...props}>
+    <path fill="none" d="M24 24H0V0h24v24z" />
+    <circle cx={12} cy={12} r={8} />
+  </svg>
+);
+export default SvgFiberManualRecord;

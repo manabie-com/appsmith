@@ -36,7 +36,8 @@ import type { LanguageEnums } from "entities/App";
 import type { AppState } from "ce/reducers";
 import { connect } from "react-redux";
 import { translate } from "utils/translate";
-import { MuiIcons } from "constants/MuiIcons";
+import * as MuiIcons from "constants/Icons";
+type IconType = keyof typeof MuiIcons;
 
 // Utility functions
 interface ButtonData {
@@ -323,28 +324,32 @@ const StyledMenu = styled(Menu)`
   padding: 0;
   min-width: 0px;
 `;
-//TODO: icon size
-const customIconWrapper = (
-  path: any,
-  viewboxDefault = 24,
-  fillColor?: string,
-) => {
+const customIconWrapper = (path: any) => {
+  if (!path) return null;
+  return <span className="bp3-icon">{path}</span>;
+};
+
+const DynamicIconComponent = ({
+  iconName,
+  fillColor,
+}: {
+  iconName: IconType;
+  fillColor?: string;
+}) => {
+  if (!(iconName in MuiIcons)) {
+    return null;
+  }
+
+  const IconComponent = MuiIcons[iconName];
   return (
-    <span className="bp3-icon">
-      <svg
-        style={fillColor ? { fill: fillColor } : {}}
-        version="1.1"
-        xmlns="http://www.w3.org/2000/svg"
-        x="0px"
-        y="0px"
-        width="16"
-        height="16"
-        className="emotion-3"
-        viewBox={`0 0 ${viewboxDefault} ${viewboxDefault}`}
-      >
-        {path}
-      </svg>
-    </span>
+    <IconComponent
+      x="0px"
+      width={16}
+      height={16}
+      y="0px"
+      style={fillColor ? { fill: fillColor } : {}}
+      viewBox={`0 0 24 24`}
+    />
   );
 };
 
@@ -363,7 +368,7 @@ interface PopoverContentProps {
       backgroundColor?: string;
       textColor?: string;
       iconName?: IconName;
-      muiIcon?: string;
+      muiIcon?: IconType;
       muiIconColor?: string;
       iconColor?: string;
       iconAlign?: Alignment;
@@ -408,7 +413,12 @@ function PopoverContent(props: PopoverContentProps) {
               color={iconColor}
               icon={
                 muiIcon
-                  ? customIconWrapper(MuiIcons[muiIcon], 24, muiIconColor)
+                  ? customIconWrapper(
+                      <DynamicIconComponent
+                        iconName={muiIcon}
+                        fillColor={muiIconColor}
+                      />,
+                    )
                   : iconName
               }
             />
@@ -421,7 +431,12 @@ function PopoverContent(props: PopoverContentProps) {
               color={iconColor}
               icon={
                 muiIcon
-                  ? customIconWrapper(MuiIcons[muiIcon], 24, muiIconColor)
+                  ? customIconWrapper(
+                      <DynamicIconComponent
+                        iconName={muiIcon}
+                        fillColor={muiIconColor}
+                      />,
+                    )
                   : iconName
               }
             />
@@ -674,9 +689,10 @@ class ButtonGroupComponent extends React.Component<
                                 icon={
                                   button.muiIcon
                                     ? customIconWrapper(
-                                        MuiIcons[button.muiIcon],
-                                        24,
-                                        button.muiIconColor,
+                                        <DynamicIconComponent
+                                          iconName={button.muiIcon}
+                                          fillColor={button.muiIconColor}
+                                        />,
                                       )
                                     : button.iconName
                                 }
@@ -737,9 +753,10 @@ class ButtonGroupComponent extends React.Component<
                           icon={
                             button.muiIcon
                               ? customIconWrapper(
-                                  MuiIcons[button.muiIcon],
-                                  24,
-                                  button.muiIconColor,
+                                  <DynamicIconComponent
+                                    iconName={button.muiIcon}
+                                    fillColor={button.muiIconColor}
+                                  />,
                                 )
                               : button.iconName
                           }
@@ -774,7 +791,7 @@ interface GroupButtonProps {
   buttonColor?: string;
   textColor?: string;
   iconName?: IconName;
-  muiIcon?: string;
+  muiIcon?: IconType;
   muiIconColor?: string;
   iconAlign?: Alignment;
   placement?: ButtonPlacement;
@@ -792,7 +809,7 @@ interface GroupButtonProps {
       backgroundColor?: string;
       textColor?: string;
       iconName?: IconName;
-      muiIcon?: string;
+      muiIcon?: IconType;
       muiIconColor?: string;
       iconColor?: string;
       iconAlign?: Alignment;

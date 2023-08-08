@@ -2,7 +2,8 @@ import React, { useMemo } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import { Button, Position } from "@blueprintjs/core";
 import type { IconName } from "@blueprintjs/icons";
-import { MuiIcons } from "constants/MuiIcons";
+import * as MuiIcons from "constants/Icons";
+type IconType = keyof typeof MuiIcons;
 
 import type { ComponentProps } from "widgets/BaseComponent";
 import type { RenderMode } from "constants/WidgetConstants";
@@ -235,7 +236,7 @@ export const StyledButton = styled((props) => (
 
 export interface IconButtonComponentProps extends ComponentProps {
   iconName?: IconName;
-  muiIcon?: string;
+  muiIcon?: IconType;
   buttonColor?: string;
   iconColor?: string;
   buttonVariant: ButtonVariant;
@@ -250,26 +251,31 @@ export interface IconButtonComponentProps extends ComponentProps {
   tooltip?: string;
   width: number;
 }
-//TODO: icon size
-const customIconWrapper = (
-  path: any,
-  viewboxDefault = 24,
-  fillColor?: string,
-) => {
+
+const customIconWrapper = (path: any) => {
+  if (!path) return null;
+  return <span className="bp3-icon">{path}</span>;
+};
+
+const DynamicIconComponent = ({
+  iconName,
+  fillColor,
+}: {
+  iconName: IconType;
+  fillColor?: string;
+}) => {
+  if (!(iconName in MuiIcons)) {
+    return null;
+  }
+
+  const IconComponent = MuiIcons[iconName];
   return (
-    <span className="bp3-icon">
-      <svg
-        style={fillColor ? { fill: fillColor } : {}}
-        version="1.1"
-        xmlns="http://www.w3.org/2000/svg"
-        x="0px"
-        y="0px"
-        className="emotion-3"
-        viewBox={`0 0 ${viewboxDefault} ${viewboxDefault}`}
-      >
-        {path}
-      </svg>
-    </span>
+    <IconComponent
+      x="0px"
+      y="0px"
+      style={fillColor ? { fill: fillColor } : {}}
+      viewBox={`0 0 24 24`}
+    />
   );
 };
 
@@ -288,6 +294,7 @@ function IconButtonComponent(props: IconButtonComponentProps) {
     tooltip,
     width,
     muiIcon,
+    iconName,
   } = props;
 
   /**
@@ -302,9 +309,11 @@ function IconButtonComponent(props: IconButtonComponentProps) {
 
     return width - WIDGET_PADDING * 2;
   }, [width, height]);
-  const icon = muiIcon
-    ? customIconWrapper(MuiIcons[muiIcon], 24, iconColor)
-    : props.iconName;
+  const customIcon = muiIcon
+    ? customIconWrapper(
+        <DynamicIconComponent iconName={muiIcon} fillColor={iconColor} />,
+      )
+    : iconName;
 
   const iconBtnWrapper = (
     <IconButtonContainer
@@ -326,7 +335,7 @@ function IconButtonComponent(props: IconButtonComponentProps) {
         dimension={dimension}
         disabled={isDisabled}
         hasOnClickAction={hasOnClickAction}
-        icon={icon}
+        icon={customIcon}
         large
       />
     </IconButtonContainer>

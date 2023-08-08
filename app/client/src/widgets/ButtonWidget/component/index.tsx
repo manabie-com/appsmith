@@ -38,7 +38,8 @@ import type { ThemeProp } from "widgets/constants";
 import { getLang } from "selectors/appViewSelectors";
 import { translate } from "utils/translate";
 import { useSelector } from "react-redux";
-import { MuiIcons } from "constants/MuiIcons";
+import * as MuiIcons from "constants/Icons";
+type IconType = keyof typeof MuiIcons;
 
 const RecaptchaWrapper = styled.div`
   position: relative;
@@ -177,34 +178,38 @@ export type ButtonStyleProps = {
   translation?: string;
   buttonTextFontSize?: string;
 };
-//TODO: icon size
-const customIconWrapper = (
-  path: any,
-  viewboxDefault = 24,
-  fillColor?: string,
-) => {
+const customIconWrapper = (path: any) => {
+  if (!path) return null;
+  return <span className="bp3-icon">{path}</span>;
+};
+
+const DynamicIconComponent = ({
+  iconName,
+  fillColor,
+}: {
+  iconName: IconType;
+  fillColor?: string;
+}) => {
+  if (!(iconName in MuiIcons)) {
+    return null;
+  }
+
+  const IconComponent = MuiIcons[iconName];
   return (
-    <span className="bp3-icon">
-      <svg
-        style={fillColor ? { fill: fillColor } : {}}
-        version="1.1"
-        xmlns="http://www.w3.org/2000/svg"
-        x="0px"
-        width="16"
-        height="16"
-        y="0px"
-        className="emotion-3"
-        viewBox={`0 0 ${viewboxDefault} ${viewboxDefault}`}
-      >
-        {path}
-      </svg>
-    </span>
+    <IconComponent
+      x="0px"
+      width="16"
+      height="16"
+      y="0px"
+      style={fillColor ? { fill: fillColor } : {}}
+      viewBox={`0 0 24 24`}
+    />
   );
 };
 
 interface ICustomButtonProps extends Omit<IButtonProps, "text"> {
   text?: string;
-  muiIcon?: string;
+  muiIcon?: IconType;
   iconColor?: string;
 }
 // To be used in any other part of the app
@@ -233,7 +238,9 @@ export function BaseButton(props: ICustomButtonProps & ButtonStyleProps) {
 
   const isRightAlign = iconAlign === Alignment.RIGHT;
   const iconFinal = muiIcon
-    ? customIconWrapper(MuiIcons[muiIcon], 24, props.iconColor)
+    ? customIconWrapper(
+        <DynamicIconComponent iconName={muiIcon} fillColor={props.iconColor} />,
+      )
     : iconName;
   return (
     <DragContainer
@@ -292,7 +299,7 @@ interface ButtonComponentProps extends ComponentProps {
   text?: string;
   translation?: string;
   icon?: IconName | MaybeElement;
-  muiIcon?: string;
+  muiIcon?: IconType;
   iconColor?: string;
   tooltip?: string;
   onClick?: (event: React.MouseEvent<HTMLElement>) => void;

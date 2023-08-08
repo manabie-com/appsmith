@@ -1,0 +1,8 @@
+import * as React from "react";
+const SvgDehaze = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} {...props}>
+    <path fill="none" d="M0 0h24v24H0z" />
+    <path d="M2 15.5v2h20v-2H2zm0-5v2h20v-2H2zm0-5v2h20v-2H2z" />
+  </svg>
+);
+export default SvgDehaze;

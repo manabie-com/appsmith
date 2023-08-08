@@ -1,0 +1,8 @@
+import * as React from "react";
+const SvgCreditCardSharp24Px = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} {...props}>
+    <path fill="none" d="M0 0h24v24H0V0z" />
+    <path d="M22 4H2.01L2 20h20V4zm-2 14H4v-6h16v6zm0-10H4V6h16v2z" />
+  </svg>
+);
+export default SvgCreditCardSharp24Px;
