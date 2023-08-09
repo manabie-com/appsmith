@@ -1,5 +1,5 @@
 import type { RefObject } from "react";
-import React, { createRef } from "react";
+import React, { createRef, Suspense } from "react";
 import { sortBy } from "lodash";
 import {
   Alignment,
@@ -36,8 +36,6 @@ import type { LanguageEnums } from "entities/App";
 import type { AppState } from "ce/reducers";
 import { connect } from "react-redux";
 import { translate } from "utils/translate";
-import * as MuiIcons from "constants/Icons";
-type IconType = keyof typeof MuiIcons;
 
 // Utility functions
 interface ButtonData {
@@ -333,26 +331,24 @@ const DynamicIconComponent = ({
   iconName,
   fillColor,
 }: {
-  iconName: IconType;
+  iconName: string;
   fillColor?: string;
 }) => {
-  if (!(iconName in MuiIcons)) {
-    return null;
-  }
+  const IconComponent = React.lazy(
+    () => import(`constants/Icons/${iconName}24Px`),
+  );
 
-  const IconComponent = MuiIcons[iconName];
   return (
-    <IconComponent
-      x="0px"
-      width={16}
-      height={16}
-      y="0px"
-      style={fillColor ? { fill: fillColor } : {}}
-      viewBox={`0 0 24 24`}
-    />
+    <Suspense fallback={<div>Loading...</div>}>
+      <IconComponent
+        x="0px"
+        y="0px"
+        style={fillColor ? { fill: fillColor } : {}}
+        viewBox={`0 0 24 24`}
+      />
+    </Suspense>
   );
 };
-
 interface PopoverContentProps {
   buttonId: string;
   menuItems: Record<
@@ -368,7 +364,7 @@ interface PopoverContentProps {
       backgroundColor?: string;
       textColor?: string;
       iconName?: IconName;
-      muiIcon?: IconType;
+      muiIcon?: string;
       muiIconColor?: string;
       iconColor?: string;
       iconAlign?: Alignment;
@@ -791,7 +787,7 @@ interface GroupButtonProps {
   buttonColor?: string;
   textColor?: string;
   iconName?: IconName;
-  muiIcon?: IconType;
+  muiIcon?: string;
   muiIconColor?: string;
   iconAlign?: Alignment;
   placement?: ButtonPlacement;
@@ -809,7 +805,7 @@ interface GroupButtonProps {
       backgroundColor?: string;
       textColor?: string;
       iconName?: IconName;
-      muiIcon?: IconType;
+      muiIcon?: string;
       muiIconColor?: string;
       iconColor?: string;
       iconAlign?: Alignment;

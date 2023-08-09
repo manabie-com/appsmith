@@ -1,9 +1,7 @@
-import React, { useMemo } from "react";
+import React, { useMemo, Suspense } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import { Button, Position } from "@blueprintjs/core";
 import type { IconName } from "@blueprintjs/icons";
-import * as MuiIcons from "constants/Icons";
-type IconType = keyof typeof MuiIcons;
 
 import type { ComponentProps } from "widgets/BaseComponent";
 import type { RenderMode } from "constants/WidgetConstants";
@@ -236,7 +234,7 @@ export const StyledButton = styled((props) => (
 
 export interface IconButtonComponentProps extends ComponentProps {
   iconName?: IconName;
-  muiIcon?: IconType;
+  muiIcon?: string;
   buttonColor?: string;
   iconColor?: string;
   buttonVariant: ButtonVariant;
@@ -261,21 +259,22 @@ const DynamicIconComponent = ({
   iconName,
   fillColor,
 }: {
-  iconName: IconType;
+  iconName: string;
   fillColor?: string;
 }) => {
-  if (!(iconName in MuiIcons)) {
-    return null;
-  }
+  const IconComponent = React.lazy(
+    () => import(`constants/Icons/${iconName}24Px`),
+  );
 
-  const IconComponent = MuiIcons[iconName];
   return (
-    <IconComponent
-      x="0px"
-      y="0px"
-      style={fillColor ? { fill: fillColor } : {}}
-      viewBox={`0 0 24 24`}
-    />
+    <Suspense fallback={<div>Loading...</div>}>
+      <IconComponent
+        x="0px"
+        y="0px"
+        style={fillColor ? { fill: fillColor } : {}}
+        viewBox={`0 0 24 24`}
+      />
+    </Suspense>
   );
 };
 

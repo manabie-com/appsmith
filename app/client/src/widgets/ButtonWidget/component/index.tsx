@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, Suspense } from "react";
 import styled, { createGlobalStyle, css } from "styled-components";
 import Interweave from "interweave";
 import type { IButtonProps, MaybeElement } from "@blueprintjs/core";
@@ -38,8 +38,6 @@ import type { ThemeProp } from "widgets/constants";
 import { getLang } from "selectors/appViewSelectors";
 import { translate } from "utils/translate";
 import { useSelector } from "react-redux";
-import * as MuiIcons from "constants/Icons";
-type IconType = keyof typeof MuiIcons;
 
 const RecaptchaWrapper = styled.div`
   position: relative;
@@ -187,29 +185,28 @@ const DynamicIconComponent = ({
   iconName,
   fillColor,
 }: {
-  iconName: IconType;
+  iconName: string;
   fillColor?: string;
 }) => {
-  if (!(iconName in MuiIcons)) {
-    return null;
-  }
+  const IconComponent = React.lazy(
+    () => import(`constants/Icons/${iconName}24Px`),
+  );
 
-  const IconComponent = MuiIcons[iconName];
   return (
-    <IconComponent
-      x="0px"
-      width="16"
-      height="16"
-      y="0px"
-      style={fillColor ? { fill: fillColor } : {}}
-      viewBox={`0 0 24 24`}
-    />
+    <Suspense fallback={<div>Loading...</div>}>
+      <IconComponent
+        x="0px"
+        y="0px"
+        style={fillColor ? { fill: fillColor } : {}}
+        viewBox={`0 0 24 24`}
+      />
+    </Suspense>
   );
 };
 
 interface ICustomButtonProps extends Omit<IButtonProps, "text"> {
   text?: string;
-  muiIcon?: IconType;
+  muiIcon?: string;
   iconColor?: string;
 }
 // To be used in any other part of the app
@@ -299,7 +296,7 @@ interface ButtonComponentProps extends ComponentProps {
   text?: string;
   translation?: string;
   icon?: IconName | MaybeElement;
-  muiIcon?: IconType;
+  muiIcon?: string;
   iconColor?: string;
   tooltip?: string;
   onClick?: (event: React.MouseEvent<HTMLElement>) => void;

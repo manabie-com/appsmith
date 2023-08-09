@@ -1,5 +1,5 @@
 import type { MutableRefObject } from "react";
-import React from "react";
+import React, { Suspense } from "react";
 import styled from "styled-components";
 import type { Alignment, Intent, IconName, IRef } from "@blueprintjs/core";
 import {
@@ -36,8 +36,6 @@ import AutoResizeTextArea from "components/editorComponents/AutoResizeTextArea";
 import { checkInputTypeText } from "../utils";
 import { translate } from "utils/translate";
 import type { AppState } from "ce/reducers";
-import * as MuiIcons from "constants/Icons";
-type IconType = keyof typeof MuiIcons;
 import { connect } from "react-redux";
 import type { LanguageEnums } from "entities/App";
 
@@ -378,21 +376,22 @@ const DynamicIconComponent = ({
   iconName,
   fillColor,
 }: {
-  iconName: IconType;
+  iconName: string;
   fillColor?: string;
 }) => {
-  if (!(iconName in MuiIcons)) {
-    return null;
-  }
+  const IconComponent = React.lazy(
+    () => import(`constants/Icons/${iconName}24Px`),
+  );
 
-  const IconComponent = MuiIcons[iconName];
   return (
-    <IconComponent
-      x="0px"
-      y="0px"
-      style={fillColor ? { fill: fillColor } : {}}
-      viewBox={`0 0 24 24`}
-    />
+    <Suspense fallback={<div>Loading...</div>}>
+      <IconComponent
+        x="0px"
+        y="0px"
+        style={fillColor ? { fill: fillColor } : {}}
+        viewBox={`0 0 24 24`}
+      />
+    </Suspense>
   );
 };
 
@@ -897,7 +896,7 @@ export interface BaseInputComponentProps extends ComponentProps {
   isInvalid: boolean;
   autoFocus?: boolean;
   iconName?: IconName;
-  muiIcon?: IconType;
+  muiIcon?: string;
   iconColor?: string;
   iconAlign?: Omit<Alignment, "center">;
   showError: boolean;
