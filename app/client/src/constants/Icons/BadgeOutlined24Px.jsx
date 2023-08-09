@@ -1,5 +1,5 @@
 import * as React from "react";
-const SvgBadgeOutlined24Px = (props) => (
+const SvgBadgeOutlined = (props) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} {...props}>
     <path fill="none" d="M0 0h24v24H0z" />
     <path d="M14 12h4v1.5h-4zM14 15h4v1.5h-4z" />
@@ -8,4 +8,4 @@ const SvgBadgeOutlined24Px = (props) => (
     <path d="M11.08 16.18c-.64-.28-1.34-.43-2.08-.43s-1.44.15-2.08.43c-.56.24-.92.78-.92 1.39V18h6v-.43c0-.61-.36-1.15-.92-1.39z" />
   </svg>
 );
-export default SvgBadgeOutlined24Px;
+export default SvgBadgeOutlined;

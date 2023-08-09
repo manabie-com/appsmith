@@ -1,5 +1,5 @@
 import * as React from "react";
-const SvgTheaterComedyOutlined24Px = (props) => (
+const SvgTheaterComedyOutlined = (props) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} {...props}>
     <path fill="none" d="M0 0h24v24H0z" />
     <circle cx={19} cy={6.5} r={1} />
@@ -11,4 +11,4 @@ const SvgTheaterComedyOutlined24Px = (props) => (
     <path d="M7 17.88c1.38 0 2.5-.84 2.5-1.88h-5c0 1.04 1.12 1.88 2.5 1.88z" />
   </svg>
 );
-export default SvgTheaterComedyOutlined24Px;
+export default SvgTheaterComedyOutlined;
