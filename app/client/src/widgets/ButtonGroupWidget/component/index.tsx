@@ -1,5 +1,5 @@
 import type { RefObject } from "react";
-import React, { createRef, Suspense } from "react";
+import React, { createRef, Suspense, lazy } from "react";
 import { sortBy } from "lodash";
 import {
   Alignment,
@@ -334,10 +334,11 @@ const DynamicIconComponent = ({
   iconName: string;
   fillColor?: string;
 }) => {
-  const IconComponent = React.lazy(
-    () => import(`constants/Icons/${iconName}24Px`),
+  const IconComponent = lazy(() =>
+    import(`constants/Icons/${iconName}24Px`).catch(() => ({
+      default: () => null,
+    })),
   );
-
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <IconComponent

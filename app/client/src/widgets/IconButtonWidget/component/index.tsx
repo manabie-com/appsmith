@@ -1,4 +1,4 @@
-import React, { useMemo, Suspense } from "react";
+import React, { useMemo, Suspense, lazy } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import { Button, Position } from "@blueprintjs/core";
 import type { IconName } from "@blueprintjs/icons";
@@ -262,10 +262,11 @@ const DynamicIconComponent = ({
   iconName: string;
   fillColor?: string;
 }) => {
-  const IconComponent = React.lazy(
-    () => import(`constants/Icons/${iconName}24Px`),
+  const IconComponent = lazy(() =>
+    import(`constants/Icons/${iconName}24Px`).catch(() => ({
+      default: () => null,
+    })),
   );
-
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <IconComponent

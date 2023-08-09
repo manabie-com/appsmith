@@ -1,4 +1,4 @@
-import React, { useRef, useState, Suspense } from "react";
+import React, { useRef, useState, Suspense, lazy } from "react";
 import styled, { createGlobalStyle, css } from "styled-components";
 import Interweave from "interweave";
 import type { IButtonProps, MaybeElement } from "@blueprintjs/core";
@@ -176,6 +176,7 @@ export type ButtonStyleProps = {
   translation?: string;
   buttonTextFontSize?: string;
 };
+
 const customIconWrapper = (path: any) => {
   if (!path) return null;
   return <span className="bp3-icon">{path}</span>;
@@ -188,10 +189,11 @@ const DynamicIconComponent = ({
   iconName: string;
   fillColor?: string;
 }) => {
-  const IconComponent = React.lazy(
-    () => import(`constants/Icons/${iconName}24Px`),
+  const IconComponent = lazy(() =>
+    import(`constants/Icons/${iconName}24Px`).catch(() => ({
+      default: () => null,
+    })),
   );
-
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <IconComponent
