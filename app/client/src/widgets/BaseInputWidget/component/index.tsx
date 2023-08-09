@@ -36,6 +36,8 @@ import AutoResizeTextArea from "components/editorComponents/AutoResizeTextArea";
 import { checkInputTypeText } from "../utils";
 import { translate } from "utils/translate";
 import type { AppState } from "ce/reducers";
+import * as MuiIcons from "constants/Icons";
+type IconType = keyof typeof MuiIcons;
 import { connect } from "react-redux";
 import type { LanguageEnums } from "entities/App";
 
@@ -367,6 +369,33 @@ const StyledNumericInput = styled(NumericInput)`
   }
 `;
 
+const customIconWrapper = (path: any) => {
+  if (!path) return null;
+  return <span className="bp3-icon">{path}</span>;
+};
+
+const DynamicIconComponent = ({
+  iconName,
+  fillColor,
+}: {
+  iconName: IconType;
+  fillColor?: string;
+}) => {
+  if (!(iconName in MuiIcons)) {
+    return null;
+  }
+
+  const IconComponent = MuiIcons[iconName];
+  return (
+    <IconComponent
+      x="0px"
+      y="0px"
+      style={fillColor ? { fill: fillColor } : {}}
+      viewBox={`0 0 24 24`}
+    />
+  );
+};
+
 const TextInputWrapper = styled.div<{
   inputHtmlType?: InputHTMLType;
   compact: boolean;
@@ -528,6 +557,14 @@ class BaseInputComponent extends React.Component<
 
   getLeftIcon = () => {
     if (this.props.iconName && this.props.iconAlign === "left") {
+      if (this.props.muiIcon) {
+        return customIconWrapper(
+          <DynamicIconComponent
+            iconName={this.props.muiIcon}
+            fillColor={this.props.iconColor}
+          />,
+        );
+      }
       return this.props.iconName;
     }
     return this.props.leftIcon;
@@ -655,7 +692,14 @@ class BaseInputComponent extends React.Component<
         intent={this.props.intent}
         leftIcon={
           this.props.iconName && this.props.iconAlign === "left"
-            ? this.props.iconName
+            ? this.props.muiIcon
+              ? customIconWrapper(
+                  <DynamicIconComponent
+                    iconName={this.props.muiIcon}
+                    fillColor={this.props.iconColor}
+                  />,
+                )
+              : this.props.iconName
             : this.props.leftIcon
         }
         maxLength={this.props.maxChars}
@@ -675,7 +719,18 @@ class BaseInputComponent extends React.Component<
               }}
             />
           ) : this.props.iconName && this.props.iconAlign === "right" ? (
-            <Tag icon={this.props.iconName} />
+            <Tag
+              icon={
+                this.props.muiIcon
+                  ? customIconWrapper(
+                      <DynamicIconComponent
+                        iconName={this.props.muiIcon}
+                        fillColor={this.props.iconColor}
+                      />,
+                    )
+                  : this.props.iconName
+              }
+            />
           ) : undefined
         }
         spellCheck={this.props.spellCheck}
@@ -842,6 +897,8 @@ export interface BaseInputComponentProps extends ComponentProps {
   isInvalid: boolean;
   autoFocus?: boolean;
   iconName?: IconName;
+  muiIcon?: IconType;
+  iconColor?: string;
   iconAlign?: Omit<Alignment, "center">;
   showError: boolean;
   onFocusChange: (state: boolean) => void;

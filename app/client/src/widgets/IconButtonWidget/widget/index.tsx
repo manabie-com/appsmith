@@ -16,6 +16,7 @@ import { connect } from "react-redux";
 import type { LanguageEnums } from "entities/App";
 import { translate } from "utils/translate";
 import IconButtonComponent from "../component";
+import type { IconButtonComponentProps } from "../component";
 
 const ICON_NAMES = Object.keys(IconNames).map(
   (name: string) => IconNames[name as keyof typeof IconNames],
@@ -58,6 +59,15 @@ class IconButtonWidget extends BaseWidget<IconButtonWidgetProps, WidgetState> {
                 default: IconNames.PLUS,
               },
             },
+          },
+          {
+            propertyName: "muiIcon",
+            label: "MUI icon",
+            helpText: "Sets the icon to be used for the mui icon button",
+            controlType: "MUI_ICON_SELECT",
+            isJSConvertible: true,
+            isBindProperty: true,
+            isTriggerProperty: false,
           },
           {
             helpText: "when the button is clicked",
@@ -189,6 +199,25 @@ class IconButtonWidget extends BaseWidget<IconButtonWidgetProps, WidgetState> {
               },
             },
           },
+          {
+            propertyName: "iconColor",
+            helpText: "Sets the style of the MUI icon color",
+            label: "MUI Icon Color",
+            controlType: "COLOR_PICKER",
+            isJSConvertible: true,
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: {
+              type: ValidationTypes.TEXT,
+              params: {
+                regex: /^(?![<|{{]).+/,
+              },
+            },
+            hidden: (props: IconButtonComponentProps) => {
+              return !props.muiIcon;
+            },
+            dependencies: ["muiIcon"],
+          },
         ],
       },
       {
@@ -236,6 +265,7 @@ class IconButtonWidget extends BaseWidget<IconButtonWidgetProps, WidgetState> {
       buttonColor,
       buttonVariant,
       iconName,
+      muiIcon,
       isDisabled,
       isVisible,
       tooltip,
@@ -249,12 +279,14 @@ class IconButtonWidget extends BaseWidget<IconButtonWidgetProps, WidgetState> {
         borderRadius={borderRadius}
         boxShadow={boxShadow}
         buttonColor={buttonColor}
+        iconColor={this.props.iconColor}
         buttonVariant={buttonVariant}
         hasOnClickAction={!!this.props.onClick}
         height={
           (this.props.bottomRow - this.props.topRow) * this.props.parentRowSpace
         }
         iconName={iconName}
+        muiIcon={muiIcon}
         isDisabled={isDisabled}
         isVisible={isVisible}
         onClick={this.handleClick}

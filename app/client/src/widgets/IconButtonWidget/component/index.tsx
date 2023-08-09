@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, Suspense, lazy } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import { Button, Position } from "@blueprintjs/core";
 import type { IconName } from "@blueprintjs/icons";
@@ -234,7 +234,9 @@ export const StyledButton = styled((props) => (
 
 export interface IconButtonComponentProps extends ComponentProps {
   iconName?: IconName;
+  muiIcon?: string;
   buttonColor?: string;
+  iconColor?: string;
   buttonVariant: ButtonVariant;
   borderRadius: string;
   boxShadow: string;
@@ -248,11 +250,41 @@ export interface IconButtonComponentProps extends ComponentProps {
   width: number;
 }
 
+const customIconWrapper = (path: any) => {
+  if (!path) return null;
+  return <span className="bp3-icon">{path}</span>;
+};
+
+const DynamicIconComponent = ({
+  iconName,
+  fillColor,
+}: {
+  iconName: string;
+  fillColor?: string;
+}) => {
+  const IconComponent = lazy(() =>
+    import(`constants/Icons/${iconName}24Px`).catch(() => ({
+      default: () => null,
+    })),
+  );
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <IconComponent
+        x="0px"
+        y="0px"
+        style={fillColor ? { fill: fillColor } : {}}
+        viewBox={`0 0 24 24`}
+      />
+    </Suspense>
+  );
+};
+
 function IconButtonComponent(props: IconButtonComponentProps) {
   const {
     borderRadius,
     boxShadow,
     buttonColor,
+    iconColor,
     buttonVariant,
     hasOnClickAction,
     height,
@@ -261,6 +293,8 @@ function IconButtonComponent(props: IconButtonComponentProps) {
     renderMode,
     tooltip,
     width,
+    muiIcon,
+    iconName,
   } = props;
 
   /**
@@ -275,6 +309,11 @@ function IconButtonComponent(props: IconButtonComponentProps) {
 
     return width - WIDGET_PADDING * 2;
   }, [width, height]);
+  const customIcon = muiIcon
+    ? customIconWrapper(
+        <DynamicIconComponent iconName={muiIcon} fillColor={iconColor} />,
+      )
+    : iconName;
 
   const iconBtnWrapper = (
     <IconButtonContainer
@@ -296,7 +335,7 @@ function IconButtonComponent(props: IconButtonComponentProps) {
         dimension={dimension}
         disabled={isDisabled}
         hasOnClickAction={hasOnClickAction}
-        icon={props.iconName}
+        icon={customIcon}
         large
       />
     </IconButtonContainer>

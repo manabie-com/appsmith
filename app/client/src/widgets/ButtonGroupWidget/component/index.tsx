@@ -1,5 +1,5 @@
 import type { RefObject } from "react";
-import React, { createRef } from "react";
+import React, { createRef, Suspense, lazy } from "react";
 import { sortBy } from "lodash";
 import {
   Alignment,
@@ -322,7 +322,34 @@ const StyledMenu = styled(Menu)`
   padding: 0;
   min-width: 0px;
 `;
+const customIconWrapper = (path: any) => {
+  if (!path) return null;
+  return <span className="bp3-icon">{path}</span>;
+};
 
+const DynamicIconComponent = ({
+  iconName,
+  fillColor,
+}: {
+  iconName: string;
+  fillColor?: string;
+}) => {
+  const IconComponent = lazy(() =>
+    import(`constants/Icons/${iconName}24Px`).catch(() => ({
+      default: () => null,
+    })),
+  );
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <IconComponent
+        x="0px"
+        y="0px"
+        style={fillColor ? { fill: fillColor } : {}}
+        viewBox={`0 0 24 24`}
+      />
+    </Suspense>
+  );
+};
 interface PopoverContentProps {
   buttonId: string;
   menuItems: Record<
@@ -338,6 +365,8 @@ interface PopoverContentProps {
       backgroundColor?: string;
       textColor?: string;
       iconName?: IconName;
+      muiIcon?: string;
+      muiIconColor?: string;
       iconColor?: string;
       iconAlign?: Alignment;
       onClick?: string;
@@ -368,6 +397,8 @@ function PopoverContent(props: PopoverContentProps) {
       onClick,
       textColor,
       translationJp,
+      muiIcon,
+      muiIconColor,
     } = menuItem;
     return (
       <BaseMenuItem
@@ -375,13 +406,37 @@ function PopoverContent(props: PopoverContentProps) {
         disabled={isDisabled}
         icon={
           iconAlign !== Alignment.RIGHT && iconName ? (
-            <Icon color={iconColor} icon={iconName} />
+            <Icon
+              color={iconColor}
+              icon={
+                muiIcon
+                  ? customIconWrapper(
+                      <DynamicIconComponent
+                        iconName={muiIcon}
+                        fillColor={muiIconColor}
+                      />,
+                    )
+                  : iconName
+              }
+            />
           ) : null
         }
         key={id}
         labelElement={
           iconAlign === Alignment.RIGHT && iconName ? (
-            <Icon color={iconColor} icon={iconName} />
+            <Icon
+              color={iconColor}
+              icon={
+                muiIcon
+                  ? customIconWrapper(
+                      <DynamicIconComponent
+                        iconName={muiIcon}
+                        fillColor={muiIconColor}
+                      />,
+                    )
+                  : iconName
+              }
+            />
           ) : null
         }
         onClick={() => onItemClicked(onClick, buttonId)}
@@ -626,7 +681,20 @@ class ButtonGroupComponent extends React.Component<
                           <Spinner size={18} />
                         ) : (
                           <>
-                            {button.iconName && <Icon icon={button.iconName} />}
+                            {button.iconName && (
+                              <Icon
+                                icon={
+                                  button.muiIcon
+                                    ? customIconWrapper(
+                                        <DynamicIconComponent
+                                          iconName={button.muiIcon}
+                                          fillColor={button.muiIconColor}
+                                        />,
+                                      )
+                                    : button.iconName
+                                }
+                              />
+                            )}
                             {!!button.label && (
                               <span className={CoreClass.BUTTON_TEXT}>
                                 {translate(
@@ -677,7 +745,20 @@ class ButtonGroupComponent extends React.Component<
                     <Spinner size={18} />
                   ) : (
                     <>
-                      {button.iconName && <Icon icon={button.iconName} />}
+                      {button.iconName && (
+                        <Icon
+                          icon={
+                            button.muiIcon
+                              ? customIconWrapper(
+                                  <DynamicIconComponent
+                                    iconName={button.muiIcon}
+                                    fillColor={button.muiIconColor}
+                                  />,
+                                )
+                              : button.iconName
+                          }
+                        />
+                      )}
                       {!!button.label && (
                         <span className={CoreClass.BUTTON_TEXT}>
                           {translate(lang, button.label, button.translationJp)}
@@ -707,6 +788,8 @@ interface GroupButtonProps {
   buttonColor?: string;
   textColor?: string;
   iconName?: IconName;
+  muiIcon?: string;
+  muiIconColor?: string;
   iconAlign?: Alignment;
   placement?: ButtonPlacement;
   onClick?: string;
@@ -723,6 +806,8 @@ interface GroupButtonProps {
       backgroundColor?: string;
       textColor?: string;
       iconName?: IconName;
+      muiIcon?: string;
+      muiIconColor?: string;
       iconColor?: string;
       iconAlign?: Alignment;
       onClick?: string;

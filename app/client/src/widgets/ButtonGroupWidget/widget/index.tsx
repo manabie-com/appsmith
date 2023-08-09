@@ -198,6 +198,33 @@ class ButtonGroupWidget extends BaseWidget<
                                 validation: { type: ValidationTypes.TEXT },
                               },
                               {
+                                propertyName: "muiIcon",
+                                label: "Select MUI Icon",
+                                helpText:
+                                  "Sets the MUI icon to be used in input field",
+                                controlType: "MUI_ICON_SELECT",
+                                isJSConvertible: true,
+                                isBindProperty: true,
+                                isTriggerProperty: false,
+                                validation: { type: ValidationTypes.TEXT },
+                              },
+                              {
+                                propertyName: "muiIconColor",
+                                helpText:
+                                  "Sets the style of the MUI icon color",
+                                label: "MUI Icon Color",
+                                controlType: "COLOR_PICKER",
+                                isJSConvertible: true,
+                                isBindProperty: true,
+                                isTriggerProperty: false,
+                                validation: {
+                                  type: ValidationTypes.TEXT,
+                                  params: {
+                                    regex: /^(?![<|{{]).+/,
+                                  },
+                                },
+                              },
+                              {
                                 propertyName: "iconAlign",
                                 label: "Position",
                                 helpText:
@@ -346,6 +373,31 @@ class ButtonGroupWidget extends BaseWidget<
                       isBindProperty: true,
                       isTriggerProperty: false,
                       validation: { type: ValidationTypes.TEXT },
+                    },
+                    {
+                      propertyName: "muiIcon",
+                      label: "Select MUI Icon",
+                      helpText: "Sets the MUI icon to be used in input field",
+                      controlType: "MUI_ICON_SELECT",
+                      isJSConvertible: true,
+                      isBindProperty: true,
+                      isTriggerProperty: false,
+                      validation: { type: ValidationTypes.TEXT },
+                    },
+                    {
+                      propertyName: "muiIconColor",
+                      helpText: "Sets the style of the MUI icon color",
+                      label: "MUI Icon Color",
+                      controlType: "COLOR_PICKER",
+                      isJSConvertible: true,
+                      isBindProperty: true,
+                      isTriggerProperty: false,
+                      validation: {
+                        type: ValidationTypes.TEXT,
+                        params: {
+                          regex: /^(?![<|{{]).+/,
+                        },
+                      },
                     },
                     {
                       propertyName: "iconAlign",
@@ -637,6 +689,8 @@ export interface ButtonGroupWidgetProps extends WidgetProps {
       buttonColor?: string;
       textColor?: string;
       iconName?: IconName;
+      muiIcon?: string;
+      muiIconColor?: string;
       iconAlign?: Alignment;
       placement?: ButtonPlacement;
       onClick?: string;
@@ -652,6 +706,8 @@ export interface ButtonGroupWidgetProps extends WidgetProps {
           backgroundColor?: string;
           textColor?: string;
           iconName?: IconName;
+          muiIcon?: string;
+          muiIconColor?: string;
           iconColor?: string;
           iconAlign?: Alignment;
           onClick?: string;

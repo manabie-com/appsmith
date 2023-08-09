@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, Suspense, lazy } from "react";
 import styled, { createGlobalStyle, css } from "styled-components";
 import Interweave from "interweave";
 import type { IButtonProps, MaybeElement } from "@blueprintjs/core";
@@ -177,8 +177,39 @@ export type ButtonStyleProps = {
   buttonTextFontSize?: string;
 };
 
+const customIconWrapper = (path: any) => {
+  if (!path) return null;
+  return <span className="bp3-icon">{path}</span>;
+};
+
+const DynamicIconComponent = ({
+  iconName,
+  fillColor,
+}: {
+  iconName: string;
+  fillColor?: string;
+}) => {
+  const IconComponent = lazy(() =>
+    import(`constants/Icons/${iconName}24Px`).catch(() => ({
+      default: () => null,
+    })),
+  );
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <IconComponent
+        x="0px"
+        y="0px"
+        style={fillColor ? { fill: fillColor } : {}}
+        viewBox={`0 0 24 24`}
+      />
+    </Suspense>
+  );
+};
+
 interface ICustomButtonProps extends Omit<IButtonProps, "text"> {
   text?: string;
+  muiIcon?: string;
+  iconColor?: string;
 }
 // To be used in any other part of the app
 export function BaseButton(props: ICustomButtonProps & ButtonStyleProps) {
@@ -191,6 +222,7 @@ export function BaseButton(props: ICustomButtonProps & ButtonStyleProps) {
     className,
     disabled,
     icon,
+    muiIcon,
     iconAlign,
     iconName,
     loading,
@@ -204,7 +236,11 @@ export function BaseButton(props: ICustomButtonProps & ButtonStyleProps) {
   const lang = useSelector(getLang);
 
   const isRightAlign = iconAlign === Alignment.RIGHT;
-
+  const iconFinal = muiIcon
+    ? customIconWrapper(
+        <DynamicIconComponent iconName={muiIcon} fillColor={props.iconColor} />,
+      )
+    : iconName;
   return (
     <DragContainer
       buttonColor={buttonColor}
@@ -225,11 +261,11 @@ export function BaseButton(props: ICustomButtonProps & ButtonStyleProps) {
         data-test-variant={buttonVariant}
         disabled={disabled}
         fill
-        icon={isRightAlign ? icon : iconName || icon}
+        icon={isRightAlign ? icon : iconFinal || icon}
         loading={loading}
         onClick={onClick}
         placement={placement}
-        rightIcon={isRightAlign ? iconName || rightIcon : rightIcon}
+        rightIcon={isRightAlign ? iconFinal || rightIcon : rightIcon}
         text={translate(lang, text, translation)}
         buttonTextFontSize={buttonTextFontSize}
       />
@@ -262,6 +298,8 @@ interface ButtonComponentProps extends ComponentProps {
   text?: string;
   translation?: string;
   icon?: IconName | MaybeElement;
+  muiIcon?: string;
+  iconColor?: string;
   tooltip?: string;
   onClick?: (event: React.MouseEvent<HTMLElement>) => void;
   isDisabled?: boolean;
@@ -465,6 +503,8 @@ function ButtonComponent(props: ButtonComponentProps & RecaptchaProps) {
         iconAlign={props.iconAlign}
         iconName={props.iconName}
         loading={props.isLoading}
+        muiIcon={props.muiIcon}
+        iconColor={props.iconColor}
         placement={props.placement}
         rightIcon={props.rightIcon}
         text={props.text}
