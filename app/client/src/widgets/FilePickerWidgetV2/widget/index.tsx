@@ -46,6 +46,39 @@ const FilePickerGlobalStyles = createGlobalStyle<{
     font-family: var(--wds-font-family);
   }
 
+  .uppy-Dashboard-AddFiles-title{
+    font-size: 16px !important;
+    -webkit-box-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    align-items: center;
+    border: 1px dashed rgba(33, 150, 243, 0.5);
+    border-radius: 4px;
+    background: rgba(33, 150, 243, 0.08);
+    cursor: pointer;
+    padding: 24px;
+    color: rgb(75 73 73);
+    max-width: 600px !important;
+  }
+  .uppy-Dashboard-AddFiles-info{
+    margin-top: 0;
+    width: 600px;
+    text-align: left;
+    position: unset !important;
+    padding-top: 0px !important;
+  }
+  .uppy-Dashboard-browse{
+    color: rgb(66, 165, 245) !important;
+  }
+  .uppy-size--md .uppy-Dashboard-note {
+    font-size: 15px;
+    line-height: 1.35;
+    max-width: 600px;
+    text-align: left;
+    margin: unset;
+    padding: 0px !important;
+  }
+
   /*********************************************************/
   /* Set the new dropHint upload icon */
   .uppy-Dashboard-dropFilesHereHint {
@@ -354,6 +387,17 @@ class FilePickerWidget extends BaseWidget<
             isTriggerProperty: false,
             validation: { type: ValidationTypes.TEXT },
           },
+          {
+            propertyName: "helpText",
+            label: "Help Text",
+            controlType: "INPUT_TEXT",
+            helpText: "Sets the helpText of the button",
+            placeholderText: "Max file size is: 5MB",
+            inputType: "TEXT",
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: { type: ValidationTypes.TEXT },
+          },
         ],
       },
       {
@@ -577,7 +621,7 @@ class FilePickerWidget extends BaseWidget<
    * add all uppy events listeners needed
    */
 
-  initializeUppyEventListeners = (lang: LanguageEnums) => {
+  initializeUppyEventListeners = (lang: LanguageEnums, label?: string) => {
     this.state.uppy
       .use(Dashboard, {
         target: "body",
@@ -590,7 +634,7 @@ class FilePickerWidget extends BaseWidget<
         showProgressDetails: false,
         hideUploadButton: false,
         hideProgressAfterFinish: false,
-        note: null,
+        note: label,
         closeAfterFinish: true,
         closeModalOnClickOutside: true,
         disableStatusBar: false,
@@ -613,7 +657,9 @@ class FilePickerWidget extends BaseWidget<
                 ? "ファイルをドラッグ＆ドロップ または %{browseFiles}"
                 : "Drag & drop your files or %{browseFiles}",
             browseFiles:
-              lang == LanguageEnums.JA ? "ファイルを選択" : "browser",
+              lang == LanguageEnums.JA
+                ? "ファイルを選択"
+                : "choose files to upload",
             xFilesSelected: {
               "0":
                 lang == LanguageEnums.JA
@@ -860,7 +906,7 @@ class FilePickerWidget extends BaseWidget<
       if (!Object.values(LanguageEnums).includes(lang as LanguageEnums)) {
         lang = DEFAULT_LANGUAGE;
       }
-      this.initializeUppyEventListeners(lang);
+      this.initializeUppyEventListeners(lang, this.props.helpText);
       this.initializeSelectedFiles();
     } catch (e) {
       log.debug("Error in initializing uppy");
@@ -884,6 +930,7 @@ class FilePickerWidget extends BaseWidget<
           isLoading={this.props.isLoading || this.state.isLoading}
           key={this.props.widgetId}
           label={this.props.label}
+          helpText={this.props.helpText}
           uppy={this.state.uppy}
           widgetId={this.props.widgetId}
         />
@@ -957,6 +1004,7 @@ interface FilePickerWidgetState extends WidgetState {
 
 interface FilePickerWidgetProps extends WidgetProps {
   label: string;
+  helpText?: string;
   maxNumFiles?: number;
   maxFileSize?: number;
   selectedFiles?: any[];
