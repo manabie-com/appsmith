@@ -47,7 +47,7 @@ const FilePickerGlobalStyles = createGlobalStyle<{
   }
 
   .uppy-Dashboard-AddFiles-title{
-    font-size: 16px !important;
+    font-size: 15px !important;
     -webkit-box-pack: center;
     justify-content: center;
     -webkit-box-align: center;
@@ -60,6 +60,7 @@ const FilePickerGlobalStyles = createGlobalStyle<{
     color: rgb(75 73 73);
     max-width: 600px !important;
   }
+
   .uppy-Dashboard-AddFiles-info{
     margin-top: 0;
     width: 600px;
@@ -67,6 +68,22 @@ const FilePickerGlobalStyles = createGlobalStyle<{
     position: unset !important;
     padding-top: 0px !important;
   }
+  .uppy-Dashboard-note{
+    margin: unset !important;
+    text-align: left;
+    padding: 0px;
+  }
+  .uppy-Dashboard-AddFiles-title::before {
+    content: "";
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" style="fill: rgb(144, 202, 249);" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3zM8 13h2.55v3h2.9v-3H16l-4-4z"/></svg>');
+    background-size: cover;
+    margin-right: 10px;
+    margin-bottom: -13px;
+  }
+
   .uppy-Dashboard-browse{
     color: rgb(66, 165, 245) !important;
   }
