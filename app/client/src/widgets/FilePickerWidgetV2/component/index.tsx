@@ -47,6 +47,7 @@ function FilePickerComponent(props: FilePickerComponentProps) {
 }
 export interface FilePickerComponentProps extends ComponentProps {
   label: string;
+  helpText?: string;
   uppy: any;
   isLoading: boolean;
   files?: any[];
