@@ -85,6 +85,15 @@ type PropType = BaseCellComponentProps & {
   disabledEditIconMessage: string;
 };
 
+function sanitizeHTML(html: string) {
+  html = html.replace(
+    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+    "",
+  );
+
+  return html;
+}
+
 export const BasicCell = React.forwardRef(
   (
     {
@@ -151,7 +160,10 @@ export const BasicCell = React.forwardRef(
           url={url}
           verticalAlignment={verticalAlignment}
         >
-          <Content ref={contentRef}>{value}</Content>
+          <Content
+            ref={contentRef}
+            dangerouslySetInnerHTML={{ __html: sanitizeHTML(value) }}
+          />
         </StyledAutoToolTipComponent>
         {isCellEditable && (
           <StyledEditIcon
