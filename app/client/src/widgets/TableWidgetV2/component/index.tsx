@@ -76,6 +76,7 @@ interface ReactTableComponentProps {
   applyFilter: (filters: ReactTableFilter[]) => void;
   columns: ReactTableColumnProps[];
   compactMode?: CompactMode;
+  rowHeight?: number;
   isVisibleSearch?: boolean;
   isVisibleFilters?: boolean;
   isVisibleDownload?: boolean;
@@ -226,6 +227,7 @@ function ReactTableComponent(props: ReactTableComponentProps) {
       columnWidthMap={columnWidthMap}
       columns={columns}
       compactMode={compactMode}
+      rowHeight={props.rowHeight}
       data={tableData}
       delimiter={delimiter}
       disableDrag={memoziedDisableDrag}
@@ -329,6 +331,7 @@ export default React.memo(ReactTableComponent, (prev, next) => {
     prev.allowRowSelection === next.allowRowSelection &&
     prev.allowSorting === next.allowSorting &&
     prev.disabledAddNewRowSave === next.disabledAddNewRowSave &&
-    prev.canFreezeColumn === next.canFreezeColumn
+    prev.canFreezeColumn === next.canFreezeColumn &&
+    prev.rowHeight === next.rowHeight
   );
 });

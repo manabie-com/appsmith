@@ -803,6 +803,7 @@ class TableWidgetV2 extends BaseWidget<TableWidgetProps, WidgetState> {
           columnWidthMap={this.props.columnWidthMap}
           columns={tableColumns}
           compactMode={this.props.compactMode || CompactModeTypes.DEFAULT}
+          rowHeight={this.props.rowHeight}
           delimiter={delimiter}
           disableDrag={this.toggleDrag}
           disabledAddNewRowSave={this.hasInvalidColumnCell()}

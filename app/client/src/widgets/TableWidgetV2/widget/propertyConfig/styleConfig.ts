@@ -29,6 +29,19 @@ export default [
           },
         ],
       },
+      {
+        helpText: "Enter value custom row height",
+        propertyName: "rowHeight",
+        label: "Custom Row Height",
+        placeholderText: "Enter value number",
+        controlType: "INPUT_TEXT",
+        isBindProperty: true,
+        isTriggerProperty: false,
+        validation: {
+          type: ValidationTypes.NUMBER,
+          params: { min: 30, max: 200 },
+        },
+      },
     ],
   },
   {

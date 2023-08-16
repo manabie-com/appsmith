@@ -101,6 +101,7 @@ export interface TableProps {
   filters?: ReactTableFilter[];
   applyFilter: (filters: ReactTableFilter[]) => void;
   compactMode?: CompactMode;
+  rowHeight?: number;
   isVisibleDownload?: boolean;
   isVisibleFilters?: boolean;
   isVisiblePagination?: boolean;
@@ -255,6 +256,9 @@ export function Table(props: TableProps) {
   );
   const selectedRowIndices = props.selectedRowIndices || emptyArr;
   const tableSizes = TABLE_SIZES[props.compactMode || CompactModeTypes.DEFAULT];
+  if (props.rowHeight) {
+    tableSizes.ROW_HEIGHT = props.rowHeight;
+  }
   const tableWrapperRef = useRef<HTMLDivElement | null>(null);
   const scrollBarRef = useRef<SimpleBar | null>(null);
   const tableHeaderWrapperRef = React.createRef<HTMLDivElement>();
