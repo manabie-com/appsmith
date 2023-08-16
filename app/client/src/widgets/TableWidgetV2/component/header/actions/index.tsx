@@ -92,6 +92,7 @@ const SearchComponentWrapper = styled.div<{
     box-shadow: none !important;
   }
 `;
+
 export interface ActionsPropsType {
   updatePageNo: (pageNo: number, event?: EventType) => void;
   nextPageClick: () => void;
