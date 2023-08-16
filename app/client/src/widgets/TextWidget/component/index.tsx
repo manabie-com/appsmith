@@ -82,6 +82,43 @@ export const TextContainer = styled.div`
       text-decoration: underline;
     }
   }
+  .manabie-page-title {
+    margin: 0px;
+    font-size: 1.25rem;
+    font-weight: 500;
+    letter-spacing: 0.15px;
+    text-transform: none;
+    font-family: Roboto, sans-serif;
+    line-height: 1.6;
+  }
+  .manabie-span-label {
+    margin: 0px;
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.4px;
+    text-transform: none;
+    font-family: Roboto, sans-serif;
+    line-height: 1.66;
+    color: rgb(117, 117, 117);
+  }
+  .manabie-span-value {
+    margin: 0px;
+    font-size: 0.875rem;
+    font-weight: 400;
+    letter-spacing: 0.15px;
+    text-transform: none;
+    font-family: Roboto, sans-serif;
+    line-height: 1.43;
+  }
+  .manabie-section-title {
+    margin: 0px;
+    font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: 0.15px;
+    text-transform: none;
+    font-family: Roboto, sans-serif;
+    line-height: 1.75;
+  }
 `;
 
 const StyledIcon = styled(Icon)`
@@ -198,6 +235,7 @@ export interface TextComponentProps extends ComponentProps {
   ellipsize?: boolean;
   fontSize?: TextSize;
   fontFamily: string;
+  manabieStyle?: string;
   isLoading: boolean;
   backgroundColor?: string;
   textColor?: string;
@@ -283,16 +321,22 @@ class TextComponent extends React.Component<TextComponentProps, State> {
       text,
       textAlign,
       textColor,
+      manabieStyle,
       truncateButtonColor,
     } = this.props;
-
+    const customClass =
+      manabieStyle && manabieStyle != "none" ? manabieStyle : "";
     return (
       <>
         <FontLoader fontFamily={this.props.fontFamily}>
           <TextContainer>
             <StyledText
               backgroundColor={backgroundColor}
-              className={this.props.isLoading ? "bp3-skeleton" : "bp3-ui-text"}
+              className={
+                this.props.isLoading
+                  ? "bp3-skeleton"
+                  : `bp3-ui-text ${customClass}`
+              }
               ellipsize={ellipsize}
               fontSize={fontSize}
               fontStyle={fontStyle}

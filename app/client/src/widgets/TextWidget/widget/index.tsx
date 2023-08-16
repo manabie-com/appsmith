@@ -197,6 +197,41 @@ class TextWidget extends BaseWidget<TextProps, WidgetState> {
             },
           },
           {
+            propertyName: "manabieStyle",
+            label: "Manabie Style",
+            helpText: "Controls the common style in Manabie",
+            controlType: "DROP_DOWN",
+            options: [
+              {
+                label: "None",
+                value: "none",
+              },
+              {
+                label: "Page Title",
+                value: "manabie-page-title",
+              },
+              {
+                label: "Section Title",
+                value: "manabie-section-title",
+              },
+              {
+                label: "Span Label",
+                value: "manabie-span-label",
+              },
+              {
+                label: "Span Value",
+                value: "manabie-span-value",
+              },
+            ],
+            defaultValue: "none",
+            isJSConvertible: true,
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: {
+              type: ValidationTypes.TEXT,
+            },
+          },
+          {
             propertyName: "fontSize",
             label: "Font Size",
             helpText: "Controls the size of the font used",
@@ -440,6 +475,7 @@ class TextWidget extends BaseWidget<TextProps, WidgetState> {
           bottomRow={this.props.bottomRow}
           disableLink={disableLink}
           fontFamily={this.props.fontFamily}
+          manabieStyle={this.props.manabieStyle}
           fontSize={this.props.fontSize}
           fontStyle={this.props.fontStyle}
           isLoading={this.props.isLoading}
