@@ -82,42 +82,97 @@ export const TextContainer = styled.div`
       text-decoration: underline;
     }
   }
-  .manabie-page-title {
-    margin: 0px;
-    font-size: 1.25rem;
-    font-weight: 500;
-    letter-spacing: 0.15px;
-    text-transform: none;
+
+  .manabie-h1 {
     font-family: Roboto, sans-serif;
-    line-height: 1.6;
+    font-size: 6rem;
+    font-weight: 300;
+    letter-spacing: -1.5px;
+    text-transform: none;
   }
-  .manabie-span-label {
-    margin: 0px;
-    font-size: 0.75rem;
-    font-weight: 400;
-    letter-spacing: 0.4px;
-    text-transform: none;
-    font-family: Roboto, sans-serif;
-    line-height: 1.66;
-    color: rgb(117, 117, 117);
+  .manabie-h2 {
+      font-family: Roboto, sans-serif;
+      font-size: 3.75rem;
+      font-weight: 300;
+      letter-spacing: -0.5px,
+      text-transform: none,
   }
-  .manabie-span-value {
-    margin: 0px;
-    font-size: 0.875rem;
-    font-weight: 400;
-    letter-spacing: 0.15px;
-    text-transform: none;
-    font-family: Roboto, sans-serif;
-    line-height: 1.43;
+  .manabie-h3 {
+      font-family: Roboto, sans-serif;
+      font-size: 3rem;
+      font-weight: 400;
+      letter-spacing: 0px;
+      text-transform: none;
   }
-  .manabie-section-title {
-    margin: 0px;
-    font-size: 1rem;
-    font-weight: 400;
-    letter-spacing: 0.15px;
-    text-transform: none;
-    font-family: Roboto, sans-serif;
-    line-height: 1.75;
+  .manabie-h4 {
+      font-family: Roboto, sans-serif;
+      font-size: 2.125rem;
+      font-weight: 400;
+      letter-spacing: 0.25px;
+      text-transform: none;
+  }
+  .manabie-h5 {
+      font-family: Roboto, sans-serif;
+      font-size: 1.5rem;
+      font-weight: 300;
+      letter-spacing: 0px;
+      text-transform: none;
+  }
+  .manabie-h6 {
+      font-family: Roboto, sans-serif;
+      font-size: 1.25rem;
+      font-weight: 500;
+      letter-spacing: 0.15px;
+      text-transform: none;
+  }
+  .manabie-subtitle1 {
+      font-family: Roboto, sans-serif;
+      font-size: 1rem;
+      font-weight: 400;
+      letter-spacing: 0.15px;
+      text-transform: none;
+  }
+  .manabie-subtitle2 {
+      font-family: Roboto, sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      letter-spacing: 0.1px;
+      text-transform: none;
+  }
+  .manabie-body1 {
+      font-family: Roboto, sans-serif;
+      font-size: 1rem;
+      font-weight: 400;
+      letter-spacing: 0.15px;
+      text-transform: none;
+  }
+  .manabie-body2 {
+      font-family: Roboto, sans-serif;
+      font-size: 0.875rem;
+      font-weight: 400;
+      letter-spacing: 0.15px;
+      text-transform: none;
+  }
+  .manabie-button {
+      font-family: Roboto, sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      letter-spacing: 0.4px;
+      text-transform: capitalize;
+  }
+  .manabie-caption {
+      font-family: Roboto, sans-serif;
+      font-size: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 0.4px;
+      text-transform: none;
+  }
+  .manabie-overline {
+      font-family: Roboto, sans-serif;
+      font-size: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 1px;
+      text-transform: capitalize;
   }
 `;
 

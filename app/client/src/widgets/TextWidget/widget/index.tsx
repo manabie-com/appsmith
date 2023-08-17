@@ -207,20 +207,56 @@ class TextWidget extends BaseWidget<TextProps, WidgetState> {
                 value: "none",
               },
               {
-                label: "Page Title",
-                value: "manabie-page-title",
+                label: "H1",
+                value: "manabie-h1",
               },
               {
-                label: "Section Title",
-                value: "manabie-section-title",
+                label: "H2",
+                value: "manabie-h2",
               },
               {
-                label: "Span Label",
-                value: "manabie-span-label",
+                label: "H3",
+                value: "manabie-h3",
               },
               {
-                label: "Span Value",
-                value: "manabie-span-value",
+                label: "H4",
+                value: "manabie-h4",
+              },
+              {
+                label: "H5",
+                value: "manabie-h5",
+              },
+              {
+                label: "H6",
+                value: "manabie-h6",
+              },
+              {
+                label: "Subtitle1",
+                value: "manabie-subtitle1",
+              },
+              {
+                label: "Subtitle2",
+                value: "manabie-subtitle2",
+              },
+              {
+                label: "Body1",
+                value: "manabie-body1",
+              },
+              {
+                label: "Body2",
+                value: "manabie-body2",
+              },
+              {
+                label: "Button",
+                value: "manabie-button",
+              },
+              {
+                label: "Caption",
+                value: "manabie-caption",
+              },
+              {
+                label: "Overline",
+                value: "manabie-overline",
               },
             ],
             defaultValue: "none",
