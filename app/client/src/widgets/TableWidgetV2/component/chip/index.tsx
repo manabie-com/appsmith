@@ -4,6 +4,7 @@ import type { BannerPropType } from "../header/banner";
 
 import styled from "styled-components";
 import { DEFAULT_FILTER } from "../Constants";
+import { LanguageEnums } from "entities/App";
 
 export const ChipContainer = styled.div`
   .filter-container {
@@ -123,10 +124,24 @@ function TableHeaderChip(props: ActionsPropsType & BannerPropType) {
   const handleClearAll = () => {
     props.applyFilter(defaultFilters);
   };
+  const DEFAULT_LANGUAGE = LanguageEnums.EN;
+
+  let lang: LanguageEnums =
+    (new URLSearchParams(window.location.search).get(
+      "lang",
+    ) as LanguageEnums) || DEFAULT_LANGUAGE;
+
+  if (!Object.values(LanguageEnums).includes(lang as LanguageEnums)) {
+    lang = DEFAULT_LANGUAGE;
+  }
   return props.isAddRowInProgress ? null : (
     <ChipContainer>
       <div className="filter-container">
-        <p className="filter-text">You filter by :</p>
+        <p className="filter-text">
+          {lang == LanguageEnums.JA
+            ? "適応中のフィルター :"
+            : "You filter by :"}
+        </p>
         <div className="chip-container">
           {props.filters?.map((item, index) => {
             return (
@@ -148,7 +163,7 @@ function TableHeaderChip(props: ActionsPropsType & BannerPropType) {
           })}
         </div>
         <button className="clear-button" onClick={handleClearAll} type="button">
-          Clear All
+          {lang == LanguageEnums.JA ? "リセット" : " Clear All :"}
         </button>
       </div>
     </ChipContainer>
