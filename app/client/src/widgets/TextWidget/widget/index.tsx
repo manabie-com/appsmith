@@ -197,6 +197,77 @@ class TextWidget extends BaseWidget<TextProps, WidgetState> {
             },
           },
           {
+            propertyName: "manabieStyle",
+            label: "Manabie Style",
+            helpText: "Controls the common style in Manabie",
+            controlType: "DROP_DOWN",
+            options: [
+              {
+                label: "None",
+                value: "none",
+              },
+              {
+                label: "H1",
+                value: "manabie-h1",
+              },
+              {
+                label: "H2",
+                value: "manabie-h2",
+              },
+              {
+                label: "H3",
+                value: "manabie-h3",
+              },
+              {
+                label: "H4",
+                value: "manabie-h4",
+              },
+              {
+                label: "H5",
+                value: "manabie-h5",
+              },
+              {
+                label: "H6",
+                value: "manabie-h6",
+              },
+              {
+                label: "Subtitle1",
+                value: "manabie-subtitle1",
+              },
+              {
+                label: "Subtitle2",
+                value: "manabie-subtitle2",
+              },
+              {
+                label: "Body1",
+                value: "manabie-body1",
+              },
+              {
+                label: "Body2",
+                value: "manabie-body2",
+              },
+              {
+                label: "Button",
+                value: "manabie-button",
+              },
+              {
+                label: "Caption",
+                value: "manabie-caption",
+              },
+              {
+                label: "Overline",
+                value: "manabie-overline",
+              },
+            ],
+            defaultValue: "none",
+            isJSConvertible: true,
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: {
+              type: ValidationTypes.TEXT,
+            },
+          },
+          {
             propertyName: "fontSize",
             label: "Font Size",
             helpText: "Controls the size of the font used",
@@ -440,6 +511,7 @@ class TextWidget extends BaseWidget<TextProps, WidgetState> {
           bottomRow={this.props.bottomRow}
           disableLink={disableLink}
           fontFamily={this.props.fontFamily}
+          manabieStyle={this.props.manabieStyle}
           fontSize={this.props.fontSize}
           fontStyle={this.props.fontStyle}
           isLoading={this.props.isLoading}

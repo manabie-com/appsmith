@@ -15,6 +15,7 @@ import {
   TableHeaderInnerWrapper,
 } from "./TableStyledWrappers";
 import TableHeader from "./header";
+import TableHeaderChip from "./chip";
 import { Classes } from "@blueprintjs/core";
 import type {
   ReactTableColumnProps,
@@ -58,6 +59,7 @@ const PopoverStyles = createGlobalStyle<{
       }
     }
 `;
+
 export interface TableProps {
   width: number;
   height: number;
@@ -99,6 +101,7 @@ export interface TableProps {
   filters?: ReactTableFilter[];
   applyFilter: (filters: ReactTableFilter[]) => void;
   compactMode?: CompactMode;
+  rowHeight?: number;
   isVisibleDownload?: boolean;
   isVisibleFilters?: boolean;
   isVisiblePagination?: boolean;
@@ -253,6 +256,9 @@ export function Table(props: TableProps) {
   );
   const selectedRowIndices = props.selectedRowIndices || emptyArr;
   const tableSizes = TABLE_SIZES[props.compactMode || CompactModeTypes.DEFAULT];
+  if (props.rowHeight) {
+    tableSizes.ROW_HEIGHT = props.rowHeight;
+  }
   const tableWrapperRef = useRef<HTMLDivElement | null>(null);
   const scrollBarRef = useRef<SimpleBar | null>(null);
   const tableHeaderWrapperRef = React.createRef<HTMLDivElement>();
@@ -340,7 +346,7 @@ export function Table(props: TableProps) {
       {isHeaderVisible && (
         <SimpleBar
           style={{
-            maxHeight: tableSizes.TABLE_HEADER_HEIGHT,
+            maxHeight: "90px",
           }}
         >
           <TableHeaderWrapper
@@ -394,6 +400,46 @@ export function Table(props: TableProps) {
               />
             </TableHeaderInnerWrapper>
           </TableHeaderWrapper>
+          {props.isVisibleFilters &&
+            props.filters &&
+            props.filters.length > 0 &&
+            props.filters[0].column && (
+              <TableHeaderChip
+                accentColor={props.accentColor}
+                allowAddNewRow={props.allowAddNewRow}
+                applyFilter={props.applyFilter}
+                borderRadius={props.borderRadius}
+                boxShadow={props.boxShadow}
+                columns={tableHeadercolumns}
+                currentPageIndex={currentPageIndex}
+                delimiter={props.delimiter}
+                disableAddNewRow={!!props.editableCell.column}
+                disabledAddNewRowSave={props.disabledAddNewRowSave}
+                filters={props.filters}
+                isAddRowInProgress={props.isAddRowInProgress}
+                isVisibleDownload={props.isVisibleDownload}
+                isVisibleFilters={props.isVisibleFilters}
+                isVisiblePagination={props.isVisiblePagination}
+                isVisibleSearch={props.isVisibleSearch}
+                nextPageClick={props.nextPageClick}
+                onAddNewRow={props.onAddNewRow}
+                onAddNewRowAction={props.onAddNewRowAction}
+                pageCount={pageCount}
+                pageNo={props.pageNo}
+                pageOptions={pageOptions}
+                prevPageClick={props.prevPageClick}
+                searchKey={props.searchKey}
+                searchTableData={props.searchTableData}
+                serverSidePaginationEnabled={props.serverSidePaginationEnabled}
+                tableColumns={columns}
+                tableData={data}
+                tableSizes={tableSizes}
+                totalRecordsCount={props.totalRecordsCount}
+                updatePageNo={props.updatePageNo}
+                widgetId={props.widgetId}
+                widgetName={props.widgetName}
+              />
+            )}
         </SimpleBar>
       )}
       <div
