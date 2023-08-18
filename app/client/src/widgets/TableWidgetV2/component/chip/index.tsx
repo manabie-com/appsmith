@@ -163,7 +163,7 @@ function TableHeaderChip(props: ActionsPropsType & BannerPropType) {
           })}
         </div>
         <button className="clear-button" onClick={handleClearAll} type="button">
-          {lang == LanguageEnums.JA ? "リセット" : " Clear All :"}
+          {lang == LanguageEnums.JA ? "リセット" : " Clear All"}
         </button>
       </div>
     </ChipContainer>
