@@ -784,6 +784,7 @@ class BaseInputComponent extends React.Component<
       labelJP,
       errorMessageJP,
       helpTextJP,
+      helpTextColor,
     } = this.props;
     const showLabelHeader = label || tooltip;
     const translateLabel = translate(lang, label, labelJP);
@@ -804,6 +805,7 @@ class BaseInputComponent extends React.Component<
         labelStyle={labelStyle}
         labelTextColor={labelTextColor}
         errorTextColor={errorTextColor}
+        helpTextColor={helpTextColor}
         labelTextSize={labelTextSize ?? "inherit"}
         multiline={(!!multiline).toString()}
         numeric={isNumberInputType(inputHTMLType)}

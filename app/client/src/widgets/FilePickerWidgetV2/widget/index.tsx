@@ -56,7 +56,7 @@ const FilePickerGlobalStyles = createGlobalStyle<{
     border-radius: 4px;
     background: rgba(33, 150, 243, 0.08);
     cursor: pointer;
-    padding: 24px;
+    padding: 24px 24px 37px 24px;
     color: rgb(75 73 73);
     max-width: 600px !important;
   }
