@@ -36,6 +36,7 @@ import type { LanguageEnums } from "entities/App";
 import type { AppState } from "ce/reducers";
 import { connect } from "react-redux";
 import { translate } from "utils/translate";
+import { BUTTON_GROUP_POPOVER_WITH_MODE } from "../constants";
 
 // Utility functions
 interface ButtonData {
@@ -126,11 +127,18 @@ const MenuButtonWrapper = styled.div<{ renderMode: RenderMode }>`
 
 const PopoverStyles = createGlobalStyle<{
   minPopoverWidth: number;
+  popoverWidthMode: BUTTON_GROUP_POPOVER_WITH_MODE;
   popoverTargetWidth?: number;
   id: string;
   borderRadius?: string;
 }>`
-  ${({ borderRadius, id, minPopoverWidth, popoverTargetWidth }) => `
+  ${({
+    borderRadius,
+    id,
+    minPopoverWidth,
+    popoverWidthMode,
+    popoverTargetWidth,
+  }) => `
     .${id}.${Classes.POPOVER2} {
       background: none;
       box-shadow: 0 6px 20px 0px rgba(0, 0, 0, 0.15) !important;
@@ -142,7 +150,10 @@ const PopoverStyles = createGlobalStyle<{
       box-shadow: none;
       overflow: hidden;
       ${popoverTargetWidth && `width: ${popoverTargetWidth}px`};
-      min-width: ${minPopoverWidth}px;
+      ${
+        popoverWidthMode === BUTTON_GROUP_POPOVER_WITH_MODE.AUTO &&
+        `min-width: ${minPopoverWidth}px`
+      }
     }
 
     .button-group-menu-popover > .${Classes.POPOVER2_CONTENT} {
@@ -490,7 +501,8 @@ class ButtonGroupComponent extends React.Component<
     if (
       this.state.itemRefs !== prevState.itemRefs ||
       this.props.width !== prevProps.width ||
-      this.props.orientation !== prevProps.orientation
+      this.props.orientation !== prevProps.orientation ||
+      this.props.popoverWidthMode !== prevProps.popoverWidthMode
     ) {
       if (this.timer) {
         clearTimeout(this.timer);
@@ -554,7 +566,10 @@ class ButtonGroupComponent extends React.Component<
       if (this.props.groupButtons[id].buttonType === "MENU") {
         return {
           ...acc,
-          [id]: this.state.itemRefs[id].current?.getBoundingClientRect().width,
+          [id]:
+            this.props.popoverWidthMode === BUTTON_GROUP_POPOVER_WITH_MODE.AUTO
+              ? this.state.itemRefs[id].current?.getBoundingClientRect().width
+              : this.props.valuePopoverWidth,
         };
       }
       return acc;
@@ -599,6 +614,7 @@ class ButtonGroupComponent extends React.Component<
       groupButtons,
       isDisabled,
       minPopoverWidth,
+      popoverWidthMode,
       orientation,
       widgetId,
       lang,
@@ -637,6 +653,7 @@ class ButtonGroupComponent extends React.Component<
                   borderRadius={this.props.borderRadius}
                   id={popoverId}
                   minPopoverWidth={minPopoverWidth}
+                  popoverWidthMode={popoverWidthMode}
                   popoverTargetWidth={this.state.itemWidths[button.id]}
                 />
                 <Popover2
@@ -826,6 +843,8 @@ export interface ButtonGroupComponentProps {
   groupButtons: Record<string, GroupButtonProps>;
   isDisabled: boolean;
   orientation: string;
+  popoverWidthMode: BUTTON_GROUP_POPOVER_WITH_MODE;
+  valuePopoverWidth?: number;
   renderMode: RenderMode;
   width: number;
   minPopoverWidth: number;

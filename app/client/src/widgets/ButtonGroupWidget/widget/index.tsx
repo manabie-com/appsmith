@@ -12,6 +12,7 @@ import BaseWidget from "widgets/BaseWidget";
 import { MinimumPopupRows } from "widgets/constants";
 import ButtonGroupComponent from "../component";
 import { getStylesheetValue } from "./helpers";
+import { BUTTON_GROUP_POPOVER_WITH_MODE } from "../constants";
 
 class ButtonGroupWidget extends BaseWidget<
   ButtonGroupWidgetProps,
@@ -587,6 +588,38 @@ class ButtonGroupWidget extends BaseWidget<
             isTriggerProperty: false,
             validation: { type: ValidationTypes.TEXT },
           },
+          {
+            helpText: "Control popover width",
+            propertyName: "popoverWidthMode",
+            label: "Popover width mode",
+            controlType: "ICON_TABS",
+            fullWidth: true,
+            options: [
+              {
+                label: "Auto",
+                value: BUTTON_GROUP_POPOVER_WITH_MODE.AUTO,
+              },
+              {
+                label: "Static",
+                value: BUTTON_GROUP_POPOVER_WITH_MODE.STATIC,
+              },
+            ],
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: { type: ValidationTypes.TEXT },
+          },
+          {
+            helpText: "Value static popover width",
+            propertyName: "valuePopoverWidth",
+            label: "Popover width",
+            controlType: "INPUT_TEXT",
+            fullWidth: true,
+            isBindProperty: true,
+            isTriggerProperty: false,
+            validation: { type: ValidationTypes.NUMBER },
+            hidden: (props: any) =>
+              props?.popoverWidthMode === BUTTON_GROUP_POPOVER_WITH_MODE.AUTO,
+          },
         ],
       },
       {
@@ -658,6 +691,8 @@ class ButtonGroupWidget extends BaseWidget<
         isDisabled={this.props.isDisabled}
         minPopoverWidth={minPopoverWidth}
         orientation={this.props.orientation}
+        popoverWidthMode={this.props.popoverWidthMode}
+        valuePopoverWidth={this.props.valuePopoverWidth}
         renderMode={this.props.renderMode}
         widgetId={this.props.widgetId}
         width={componentWidth}
@@ -672,6 +707,8 @@ class ButtonGroupWidget extends BaseWidget<
 
 export interface ButtonGroupWidgetProps extends WidgetProps {
   orientation: string;
+  popoverWidthMode: BUTTON_GROUP_POPOVER_WITH_MODE;
+  valuePopoverWidth?: number;
   isDisabled: boolean;
   borderRadius?: string;
   boxShadow?: string;

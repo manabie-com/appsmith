@@ -8,6 +8,7 @@ import { BlueprintOperationTypes } from "widgets/constants";
 import IconSVG from "./icon.svg";
 import Widget from "./widget";
 import type { ButtonGroupWidgetProps } from "./widget";
+import { BUTTON_GROUP_POPOVER_WITH_MODE } from "./constants";
 
 export const CONFIG = {
   type: Widget.getWidgetType(),
@@ -21,6 +22,8 @@ export const CONFIG = {
     columns: 24,
     widgetName: "ButtonGroup",
     orientation: "horizontal",
+    popoverWidthMode: BUTTON_GROUP_POPOVER_WITH_MODE.AUTO,
+    valuePopoverWidth: 300,
     buttonVariant: ButtonVariantTypes.PRIMARY,
     isVisible: true,
     version: 1,
