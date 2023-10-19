@@ -201,6 +201,26 @@ export class GracefulWorkerService {
     }
   }
 
+  syncRequest(data = {}): any {
+    if (!this._isReady || !this._Worker) return;
+
+    try {
+      sendMessage.call(this._Worker, {
+        messageType: MessageType.REQUEST,
+        body: {
+          method: "MESSAGE_TRIGGER",
+          data,
+        },
+        messageId: "MESSAGE_TRIGGER",
+      });
+    } catch (error) {
+      let message = "Unknown Error";
+      if (error instanceof Error) message = error.message;
+
+      log.debug(`Worker trigger MESSAGE_TRIGGER catch error: ${message}`);
+    }
+  }
+
   private _broker(event: MessageEvent<TMessage<any>>) {
     if (!event || !event.data) return;
     const { body, messageType } = event.data;

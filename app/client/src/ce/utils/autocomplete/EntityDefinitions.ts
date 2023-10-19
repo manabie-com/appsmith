@@ -790,6 +790,10 @@ export const GLOBAL_FUNCTIONS = {
     "!doc": "Execute triggers at a given interval",
     "!type": "fn(callback: fn, interval: number, id?: string) -> void",
   },
+  windowMessageListener: {
+    "!doc": "Add a listener for event receive message from origin",
+    "!type": "fn(callback: fn) -> void",
+  },
   clearInterval: {
     "!doc": "Stop executing a setInterval with id",
     "!type": "fn(id: string) -> void",
