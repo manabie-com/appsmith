@@ -1064,10 +1064,7 @@ function* executePluginActionSaga(
         }
         if (typeof data == "object") {
           for (const key in data) {
-            if (
-              (key == "message" && data[key] == "Unauthenticated") ||
-              (key == "errors" && data[key].length > 0)
-            ) {
+            if (key == "message" && data[key] == "Unauthenticated") {
               hasError = true;
               yield delay(1000);
             }
