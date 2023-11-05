@@ -307,6 +307,7 @@ export const DEDICATED_WORKER_GLOBAL_SCOPE_IDENTIFIERS = {
   ServiceWorkerRegistration: "ServiceWorkerRegistration",
   Set: "Set",
   setInterval: "setInterval",
+  windowMessageListener: "windowMessageListener",
   setTimeout: "setTimeout",
   StorageManager: "StorageManager",
   String: "String",

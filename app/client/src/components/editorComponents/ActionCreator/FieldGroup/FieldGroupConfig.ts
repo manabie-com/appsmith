@@ -16,6 +16,7 @@ import {
   REMOVE_VALUE,
   RESET_WIDGET,
   SET_INTERVAL,
+  WINDOW_MESSAGE_LISTENER,
   SHOW_ALERT,
   STOP_WATCH_GEO_LOCATION,
   STORE_VALUE,
@@ -129,6 +130,14 @@ export const FIELD_GROUP_CONFIG: FieldGroupConfig = {
     defaultParams: `() => {
       // add code here
     }, 5000, ''`,
+    icon: "set-interval",
+  },
+  [AppsmithFunction.windowMessageListener]: {
+    label: createMessage(WINDOW_MESSAGE_LISTENER),
+    fields: [FieldType.CALLBACK_FUNCTION_FIELD_WINDOW_MESSAGE_LISTENER],
+    defaultParams: `() => {
+      // add code here
+    }`,
     icon: "set-interval",
   },
   [AppsmithFunction.clearInterval]: {

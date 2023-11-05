@@ -15,6 +15,7 @@ export type ActionTriggerKeys =
   | "COPY_TO_CLIPBOARD"
   | "RESET_WIDGET_META_RECURSIVE_BY_NAME"
   | "SET_INTERVAL"
+  | "WINDOW_MESSAGE_LISTENER"
   | "CLEAR_INTERVAL"
   | "GET_CURRENT_LOCATION"
   | "WATCH_CURRENT_LOCATION"
@@ -34,6 +35,7 @@ export const ActionTriggerFunctionNames: Record<ActionTriggerKeys, string> = {
   RESET_WIDGET_META_RECURSIVE_BY_NAME: "resetWidget",
   RUN_PLUGIN_ACTION: "action.run",
   SET_INTERVAL: "setInterval",
+  WINDOW_MESSAGE_LISTENER: "windowMessageListener",
   SHOW_ALERT: "showAlert",
   SHOW_MODAL_BY_NAME: "showModal",
   STORE_VALUE: "storeValue",
@@ -163,6 +165,13 @@ export type ClearIntervalDescription = ActionDescriptionInterface<
   "CLEAR_INTERVAL"
 >;
 
+export type WindowMessageListenerDescription = ActionDescriptionInterface<
+  {
+    callback: string;
+  },
+  "WINDOW_MESSAGE_LISTENER"
+>;
+
 type GeolocationOptions = {
   maximumAge?: number;
   timeout?: number;
@@ -218,6 +227,7 @@ export type ActionDescription =
   | CopyToClipboardDescription
   | ResetWidgetDescription
   | SetIntervalDescription
+  | WindowMessageListenerDescription
   | ClearIntervalDescription
   | GetCurrentLocationDescription
   | WatchCurrentLocationDescription

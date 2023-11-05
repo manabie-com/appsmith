@@ -55,6 +55,9 @@ function GetIconForAction(
     case AppsmithFunction.setInterval:
       return () => <Icon name="set-interval" />;
 
+    case AppsmithFunction.windowMessageListener:
+      return () => <Icon name="set-interval" />;
+
     case AppsmithFunction.clearInterval:
       return () => <Icon name="clear-interval" />;
 
@@ -175,6 +178,14 @@ function getActionHeading(
           "ms" || "Add interval"
       );
 
+    case AppsmithFunction.windowMessageListener:
+      return (
+        getCodeFromMoustache(
+          FIELD_CONFIG[
+            FieldType.CALLBACK_FUNCTION_FIELD_WINDOW_MESSAGE_LISTENER
+          ].getter(code),
+        ) + "ms" || "Add windowMessageListener"
+      );
     case AppsmithFunction.clearInterval:
       return (
         FIELD_CONFIG[FieldType.CLEAR_INTERVAL_ID_FIELD].getter(code) || "Add ID"

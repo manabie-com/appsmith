@@ -127,6 +127,15 @@ export const PLATFORM_FUNCTIONS: Record<
       executionType: ExecutionType.TRIGGER,
     };
   },
+  windowMessageListener: function (callback: Function) {
+    return {
+      type: "WINDOW_MESSAGE_LISTENER",
+      payload: {
+        callback: callback?.toString(),
+      },
+      executionType: ExecutionType.TRIGGER,
+    };
+  },
   postWindowMessage: function (
     message: unknown,
     source: string,

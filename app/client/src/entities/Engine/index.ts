@@ -25,6 +25,7 @@ import type { Channel } from "redux-saga";
 import { channel } from "redux-saga";
 import type { StoreValueActionDescription } from "@appsmith/entities/DataTree/actionTriggers";
 import { handleStoreOperations } from "sagas/ActionExecution/StoreActionSaga";
+import { evalWorker } from "sagas/EvaluationsSaga";
 
 export type AppEnginePayload = {
   applicationId?: string;
@@ -120,9 +121,25 @@ export default abstract class AppEngine {
           triggerPropertyName: "triggerPropertyName",
         } as TriggerMeta,
       });
+
+      // Post message to service worker
+      const messageObj = JSON.parse(event.data);
+      if (messageObj) {
+        evalWorker.syncRequest(messageObj);
+      }
     };
 
+    // function storageListener(event: Event) {
+    //   // Post local storage changed to service worker
+    //   if (event instanceof StorageEvent && event.newValue) {
+    //     const messageObj = JSON.parse(event.newValue);
+    //     evalWorker.syncRequest(messageObj);
+    //   }
+    // }
+    // window.addEventListener("MANA_STORAGE", storageListener);
+
     window.addEventListener("message", messageHandler);
+
     window.parent.postMessage(
       JSON.stringify({
         type: POST_MESSAGE_TYPE.LOADED,

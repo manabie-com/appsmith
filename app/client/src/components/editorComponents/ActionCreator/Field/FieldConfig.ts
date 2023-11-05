@@ -303,6 +303,22 @@ export const FIELD_CONFIG: AppsmithFunctionConfigType = {
     },
     view: ViewTypes.TEXT_VIEW,
   },
+  // windowMessageListener
+  [FieldType.CALLBACK_FUNCTION_FIELD_WINDOW_MESSAGE_LISTENER]: {
+    label: () => "Callback function",
+    defaultText: "",
+    exampleText: `windowMessageListener(() => {
+      const a = 0;
+     })`,
+    options: () => null,
+    getter: (value: string) => {
+      return callBackFieldGetter(value);
+    },
+    setter: (value, currentValue) => {
+      return callBackFieldSetter(value, currentValue, 0);
+    },
+    view: ViewTypes.TEXT_VIEW,
+  },
   [FieldType.DELAY_FIELD]: {
     label: () => "Delay (ms)",
     defaultText: "",

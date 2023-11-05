@@ -51,6 +51,12 @@ export function* handleStoreOperations(triggers: StoreOperation[]) {
   yield put(updateAppStore(currentStore));
   const storeString = JSON.stringify(parsedLocalStore);
   localStorage.setItem(appStoreName, storeString);
+
+  // window.dispatchEvent(
+  //   new StorageEvent("MANA_STORAGE", {
+  //     newValue: storeString,
+  //   }),
+  // );
   AppsmithConsole.addLogs(
     logs.map((text) => ({
       text,
